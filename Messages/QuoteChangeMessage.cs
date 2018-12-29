@@ -17,6 +17,7 @@ namespace StockSharp.Messages
 {
 	using System;
 	using System.Collections.Generic;
+	using System.ComponentModel;
 	using System.Linq;
 	using System.Runtime.Serialization;
 
@@ -51,14 +52,8 @@ namespace StockSharp.Messages
 		[MainCategory]
 		public IEnumerable<QuoteChange> Bids
 		{
-			get { return _bids; }
-			set
-			{
-				if (value == null)
-					throw new ArgumentNullException(nameof(value));
-
-				_bids = value;
-			}
+			get => _bids;
+			set => _bids = value ?? throw new ArgumentNullException(nameof(value));
 		}
 
 		private IEnumerable<QuoteChange> _asks = Enumerable.Empty<QuoteChange>();
@@ -72,14 +67,8 @@ namespace StockSharp.Messages
 		[MainCategory]
 		public IEnumerable<QuoteChange> Asks
 		{
-			get { return _asks; }
-			set
-			{
-				if (value == null)
-					throw new ArgumentNullException(nameof(value));
-
-				_asks = value;
-			}
+			get => _asks;
+			set => _asks = value ?? throw new ArgumentNullException(nameof(value));
 		}
 
 		/// <summary>
@@ -99,6 +88,18 @@ namespace StockSharp.Messages
 		[DescriptionLoc(LocalizedStrings.Str285Key, true)]
 		[MainCategory]
 		public bool IsSorted { get; set; }
+
+		/// <summary>
+		/// The quote change was built by level1.
+		/// </summary>
+		[Browsable(false)]
+		public bool IsByLevel1 { get; set; }
+
+		/// <summary>
+		/// The quote change contains filtered quotes.
+		/// </summary>
+		[Browsable(false)]
+		public bool IsFiltered { get; set; }
 
 		/// <summary>
 		/// Trading security currency.
@@ -133,6 +134,8 @@ namespace StockSharp.Messages
 				ServerTime = ServerTime,
 				IsSorted = IsSorted,
 				Currency = Currency,
+				IsByLevel1 = IsByLevel1,
+				IsFiltered = IsFiltered,
 			};
 
 			this.CopyExtensionInfo(clone);

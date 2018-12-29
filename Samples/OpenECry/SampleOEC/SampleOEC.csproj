@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SampleOEC</RootNamespace>
     <AssemblyName>SampleOEC</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
@@ -68,6 +68,9 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CommLib">
+      <HintPath>..\..\..\References\CommLib.dll</HintPath>
+    </Reference>
     <Reference Include="Ecng.Localization">
       <HintPath>..\..\..\References\Ecng.Localization.dll</HintPath>
     </Reference>
@@ -97,17 +100,20 @@
     <Reference Include="Ecng.Xaml">
       <HintPath>..\..\..\References\Ecng.Xaml.dll</HintPath>
     </Reference>
-    <Reference Include="DevExpress.Data.v15.2">
-      <HintPath>..\..\..\References\DevExpress.Data.v15.2.dll</HintPath>
+    <Reference Include="DevExpress.Data.v18.1">
+      <HintPath>..\..\..\References\DevExpress.Data.v18.1.dll</HintPath>
     </Reference>
-    <Reference Include="DevExpress.Xpf.Core.v15.2">
-      <HintPath>..\..\..\References\DevExpress.Xpf.Core.v15.2.dll</HintPath>
+    <Reference Include="DevExpress.Xpf.Core.v18.1">
+      <HintPath>..\..\..\References\DevExpress.Xpf.Core.v18.1.dll</HintPath>
     </Reference>
-    <Reference Include="DevExpress.Xpf.Grid.v15.2">
-      <HintPath>..\..\..\References\DevExpress.Xpf.Grid.v15.2.dll</HintPath>
+    <Reference Include="DevExpress.Xpf.Grid.v18.1">
+      <HintPath>..\..\..\References\DevExpress.Xpf.Grid.v18.1.dll</HintPath>
     </Reference>
-    <Reference Include="DevExpress.Xpf.Grid.v15.2.Core">
-      <HintPath>..\..\..\References\DevExpress.Xpf.Grid.v15.2.Core.dll</HintPath>
+    <Reference Include="DevExpress.Xpf.Grid.v18.1.Core">
+      <HintPath>..\..\..\References\DevExpress.Xpf.Grid.v18.1.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Xpf.Themes.Office2016White.v18.1">
+      <HintPath>..\..\..\References\DevExpress.Xpf.Themes.Office2016White.v18.1.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -165,9 +171,6 @@
     </Compile>
     <Compile Include="StopOrdersWindow.xaml.cs">
       <DependentUpon>StopOrdersWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="TradesWindow.xaml.cs">
-      <DependentUpon>TradesWindow.xaml</DependentUpon>
     </Compile>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -229,12 +232,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="TradesWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
@@ -267,7 +264,7 @@
       <Project>{dce69db8-53ca-4b7f-9368-02f175a31074}</Project>
       <Name>BusinessEntities</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\StockSharpApps\Connectors\OpenECry\OpenECry.csproj">
+    <ProjectReference Include="..\..\..\..\StockSharp %28GitLab%29\Connectors\OpenECry\OpenECry.csproj">
       <Project>{17EAE926-C9A9-40C7-8D54-3545077B4AB7}</Project>
       <Name>OpenECry</Name>
     </ProjectReference>

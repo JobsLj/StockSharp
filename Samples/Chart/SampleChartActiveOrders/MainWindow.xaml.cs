@@ -17,6 +17,7 @@
 	using StockSharp.Algo.Storages;
 	using StockSharp.BusinessEntities;
 	using StockSharp.Messages;
+	using StockSharp.Xaml;
 	using StockSharp.Xaml.Charting;
 
 	public partial class MainWindow
@@ -49,13 +50,7 @@
 			Board = ExchangeBoard.Forts
 		};
 
-		private readonly ThreadSafeObservableCollection<Portfolio> _portfolios = new ThreadSafeObservableCollection<Portfolio>(new ObservableCollectionEx<Portfolio>
-		{
-			new Portfolio
-			{
-				Name = "Test portfolio"
-			}
-		});
+		private readonly PortfolioDataSource _portfolios = new PortfolioDataSource();
 
 		public MainWindow()
 		{
@@ -65,8 +60,11 @@
 			InitializeComponent();
 			Loaded += OnLoaded;
 
+			var pf = new Portfolio { Name = "Test portfolio" };
+			_portfolios.Add(pf);
+
 			Chart.OrderSettings.Security = _security;
-			Chart.OrderSettings.Portfolio = _portfolios.First();
+			Chart.OrderSettings.Portfolio = pf;
 			Chart.OrderSettings.Volume = 5;
 
 			_chartUpdateTimer.Interval = TimeSpan.FromMilliseconds(100);
@@ -247,8 +245,7 @@
 
 		private void Fill_Click(object sender, RoutedEventArgs e)
 		{
-			var order = _ordersListBox.SelectedItem as Order;
-			if (order == null)
+			if (!(_ordersListBox.SelectedItem is Order order))
 				return;
 
 			if (IsInFinalState(order))
@@ -271,8 +268,7 @@
 
 		private void Remove_Click(object sender, RoutedEventArgs e)
 		{
-			var order = _ordersListBox.SelectedItem as Order;
-			if (order == null)
+			if (!(_ordersListBox.SelectedItem is Order order))
 				return;
 
 			Log($"Remove order: {order}");
@@ -281,7 +277,7 @@
 
 		private long _transId;
 
-		private void Chart_OnRegisterOrder(Order orderDraft)
+		private void Chart_OnRegisterOrder(ChartArea area, Order orderDraft)
 		{
 			if (NeedToConfirm && !Confirm("Register order?"))
 				return;
@@ -304,7 +300,7 @@
 
 			oi.IsFrozen = true;
 
-			Action regAction = () =>
+			void RegAction()
 			{
 				if (NeedToFail)
 				{
@@ -318,12 +314,12 @@
 					oi.UpdateOrderState(order);
 					Log($"Order registered: {order}");
 				}
-			};
+			}
 
 			if (NeedToDelay)
-				DelayedAction(regAction, _delay, "register");
+				DelayedAction(RegAction, _delay, "register");
 			else
-				regAction();
+				RegAction();
 		}
 
 		private void Chart_OnMoveOrder(Order oldOrder, decimal newPrice)
@@ -362,7 +358,7 @@
 
 			oiOld.IsFrozen = oiNew.IsFrozen = true;
 
-			Action moveAction = () =>
+			void MoveAction()
 			{
 				if (NeedToFail)
 				{
@@ -381,12 +377,12 @@
 					oiNew.UpdateOrderState(newOrder);
 					Log($"Order moved to new: {newOrder}");
 				}
-			};
+			}
 
 			if(NeedToDelay)
-				DelayedAction(moveAction, _delay, "move");
+				DelayedAction(MoveAction, _delay, "move");
 			else
-				moveAction();
+				MoveAction();
 		}
 
 		private void Chart_OnCancelOrder(Order order)
@@ -400,7 +396,7 @@
 
 			oi.IsFrozen = true;
 
-			Action cancelAction = () =>
+			void CancelAction()
 			{
 				if (NeedToFail)
 				{
@@ -412,19 +408,28 @@
 					order.State = OrderStates.Done;
 					oi.UpdateOrderState(order);
 				}
-			};
+			}
 
-			if(NeedToDelay)
-				DelayedAction(cancelAction, _delay, "cancel");
+			if (NeedToDelay)
+				DelayedAction(CancelAction, _delay, "cancel");
 			else
-				cancelAction();
+				CancelAction();
 		}
 
 		private ChartActiveOrderInfo GetOrderInfo(Order order, ChartActiveOrderInfo initFrom = null)
 		{
-			bool isNew;
+			var oi = _chartOrderInfos.SafeAdd(order, o =>
+			{
+				var info = new ChartActiveOrderInfo();
 
-			var oi = _chartOrderInfos.SafeAdd(order, o => new ChartActiveOrderInfo(initFrom), out isNew);
+				if (initFrom != null)
+				{
+					info.AutoRemoveFromChart = initFrom.AutoRemoveFromChart;
+					info.ChartX = initFrom.ChartX;
+				}
+
+				return info;
+			}, out var isNew);
 
 			if (isNew)
 			{
@@ -438,9 +443,7 @@
 
 		private bool RemoveOrder(Order o)
 		{
-			ChartActiveOrderInfo oi;
-
-			if (!_chartOrderInfos.TryGetValue(o, out oi))
+			if (!_chartOrderInfos.TryGetValue(o, out var oi))
 				return false;
 
 			_activeOrdersElement.Orders.Remove(oi);

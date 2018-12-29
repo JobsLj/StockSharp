@@ -24,6 +24,13 @@ namespace StockSharp.BusinessEntities
 	public interface IPortfolioProvider
 	{
 		/// <summary>
+		/// To get the portfolio by the name.
+		/// </summary>
+		/// <param name="name">Portfolio name.</param>
+		/// <returns>Portfolio.</returns>
+		Portfolio GetPortfolio(string name);
+
+		/// <summary>
 		/// Get all portfolios.
 		/// </summary>
 		IEnumerable<Portfolio> Portfolios { get; }
@@ -32,5 +39,10 @@ namespace StockSharp.BusinessEntities
 		/// New portfolio received.
 		/// </summary>
 		event Action<Portfolio> NewPortfolio;
+
+		/// <summary>
+		/// Portfolio changed.
+		/// </summary>
+		event Action<Portfolio> PortfolioChanged;
 	}
 }

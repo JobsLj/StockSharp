@@ -14,11 +14,15 @@
 
 		<StackPanel Grid.Row="1" HorizontalAlignment="Right" Orientation="Horizontal">
 			<Button x:Name="Quotes" Content="{x:Static loc:LocalizedStrings.XamlStr40}" Width="100" IsEnabled="False" Click="QuotesClick" />
+			<Button x:Name="OrderLog" Content="{x:Static loc:LocalizedStrings.OrderLog}" Width="100" IsEnabled="False" Click="OrderLogClick" />
 			<Button x:Name="Depth" Width="100" IsEnabled="False" Click="DepthClick">
 				<TextBlock><Run Text="{x:Static loc:LocalizedStrings.MarketDepth}" />...</TextBlock>
 			</Button>
 			<Button x:Name="NewOrder" Width="100" IsEnabled="False" Click="NewOrderClick">
 				<TextBlock><Run Text="{x:Static loc:LocalizedStrings.NewOrder}" />...</TextBlock>
+			</Button>
+			<Button x:Name="NewStopOrder" Width="120" IsEnabled="False" Click="NewStopOrderClick">
+				<TextBlock><Run Text="{x:Static loc:LocalizedStrings.NewStopOrder}" />...</TextBlock>
 			</Button>
 		</StackPanel>
 	</Grid>

@@ -40,14 +40,8 @@ namespace StockSharp.Algo.Positions
 		/// </summary>
 		public IPositionManager PositionManager
 		{
-			get { return _positionManager; }
-			set
-			{
-				if (value == null)
-					throw new ArgumentNullException(nameof(value));
-
-				_positionManager = value;
-			}
+			get => _positionManager;
+			set => _positionManager = value ?? throw new ArgumentNullException(nameof(value));
 		}
 
 		/// <summary>
@@ -56,8 +50,13 @@ namespace StockSharp.Algo.Positions
 		/// <param name="message">Message.</param>
 		public override void SendInMessage(Message message)
 		{
-			PositionManager.ProcessMessage(message);
+			if (message.IsBack)
+			{
+				base.SendInMessage(message);
+				return;
+			}
 
+			PositionManager.ProcessMessage(message);
 			base.SendInMessage(message);
 		}
 
@@ -67,10 +66,13 @@ namespace StockSharp.Algo.Positions
 		/// <param name="message">The message.</param>
 		protected override void OnInnerAdapterNewOutMessage(Message message)
 		{
-			var position = PositionManager.ProcessMessage(message);
+			if (!message.IsBack)
+			{
+				var position = PositionManager.ProcessMessage(message);
 
-			if (position != null)
-				((ExecutionMessage)message).Position = position;
+				if (position != null)
+					((ExecutionMessage)message).Position = position;	
+			}
 
 			base.OnInnerAdapterNewOutMessage(message);
 		}

@@ -17,6 +17,7 @@ namespace StockSharp.Messages
 {
 	using System;
 	using System.ComponentModel;
+	using System.ComponentModel.DataAnnotations;
 	using System.Linq;
 	using System.Runtime.Serialization;
 
@@ -37,106 +38,136 @@ namespace StockSharp.Messages
 		/// Initial value.
 		/// </summary>
 		[EnumMember]
-		[EnumDisplayNameLoc(LocalizedStrings.Str253Key)]
+		[Display(ResourceType = typeof(LocalizedStrings), Name = LocalizedStrings.Str253Key)]
 		BeginValue,
 
 		/// <summary>
 		/// Current value.
 		/// </summary>
 		[EnumMember]
-		[EnumDisplayNameLoc(LocalizedStrings.Str254Key)]
+		[Display(ResourceType = typeof(LocalizedStrings), Name = LocalizedStrings.Str254Key)]
 		CurrentValue,
 
 		/// <summary>
 		/// Blocked.
 		/// </summary>
 		[EnumMember]
-		[EnumDisplayNameLoc(LocalizedStrings.Str255Key)]
+		[Display(ResourceType = typeof(LocalizedStrings), Name = LocalizedStrings.Str255Key)]
 		BlockedValue,
 
 		/// <summary>
 		/// Position price.
 		/// </summary>
 		[EnumMember]
-		[EnumDisplayNameLoc(LocalizedStrings.Str256Key)]
+		[Display(ResourceType = typeof(LocalizedStrings), Name = LocalizedStrings.Str256Key)]
 		CurrentPrice,
 
 		/// <summary>
 		/// Average price.
 		/// </summary>
 		[EnumMember]
-		[EnumDisplayNameLoc(LocalizedStrings.Str257Key)]
+		[Display(ResourceType = typeof(LocalizedStrings), Name = LocalizedStrings.Str257Key)]
 		AveragePrice,
 
 		/// <summary>
 		/// Unrealized profit.
 		/// </summary>
 		[EnumMember]
-		[EnumDisplayNameLoc(LocalizedStrings.Str258Key)]
+		[Display(ResourceType = typeof(LocalizedStrings), Name = LocalizedStrings.Str258Key)]
 		UnrealizedPnL,
 
 		/// <summary>
 		/// Realized profit.
 		/// </summary>
 		[EnumMember]
-		[EnumDisplayNameLoc(LocalizedStrings.Str259Key)]
+		[Display(ResourceType = typeof(LocalizedStrings), Name = LocalizedStrings.Str259Key)]
 		RealizedPnL,
 
 		/// <summary>
 		/// Variation margin.
 		/// </summary>
 		[EnumMember]
-		[EnumDisplayNameLoc(LocalizedStrings.Str260Key)]
+		[Display(ResourceType = typeof(LocalizedStrings), Name = LocalizedStrings.Str260Key)]
 		VariationMargin,
 
 		/// <summary>
 		/// Currency.
 		/// </summary>
 		[EnumMember]
-		[EnumDisplayNameLoc(LocalizedStrings.CurrencyKey)]
+		[Display(ResourceType = typeof(LocalizedStrings), Name = LocalizedStrings.CurrencyKey)]
 		Currency,
 
 		/// <summary>
 		/// Extended information.
 		/// </summary>
 		[EnumMember]
-		[EnumDisplayNameLoc(LocalizedStrings.ExtendedInfoKey)]
+		[Display(ResourceType = typeof(LocalizedStrings), Name = LocalizedStrings.ExtendedInfoKey)]
+		[Obsolete]
 		ExtensionInfo,
 
 		/// <summary>
 		/// Margin leverage.
 		/// </summary>
 		[EnumMember]
-		[EnumDisplayNameLoc(LocalizedStrings.Str261Key)]
+		[Display(ResourceType = typeof(LocalizedStrings), Name = LocalizedStrings.Str261Key)]
 		Leverage,
 
 		/// <summary>
 		/// Total commission.
 		/// </summary>
 		[EnumMember]
-		[EnumDisplayNameLoc(LocalizedStrings.Str262Key)]
+		[Display(ResourceType = typeof(LocalizedStrings), Name = LocalizedStrings.Str262Key)]
 		Commission,
 
 		/// <summary>
 		/// Current value (in lots).
 		/// </summary>
 		[EnumMember]
-		[EnumDisplayNameLoc(LocalizedStrings.Str263Key)]
+		[Display(ResourceType = typeof(LocalizedStrings), Name = LocalizedStrings.Str263Key)]
 		CurrentValueInLots,
 
 		/// <summary>
 		/// The depositary where the physical security.
 		/// </summary>
 		[EnumMember]
-		[EnumDisplayNameLoc(LocalizedStrings.Str264Key)]
+		[Display(ResourceType = typeof(LocalizedStrings), Name = LocalizedStrings.Str264Key)]
+		[Obsolete]
 		DepoName,
 
 		/// <summary>
 		/// Portfolio state.
 		/// </summary>
 		[EnumMember]
-		[EnumDisplayNameLoc(LocalizedStrings.Str265Key)]
+		[Display(ResourceType = typeof(LocalizedStrings), Name = LocalizedStrings.Str265Key)]
 		State,
+
+		/// <summary>
+		/// Expiration date.
+		/// </summary>
+		[EnumMember]
+		[Display(ResourceType = typeof(LocalizedStrings), Name = LocalizedStrings.ExpiryDateKey)]
+		ExpirationDate,
+
+		/// <summary>
+		/// Commission (taker).
+		/// </summary>
+		[EnumMember]
+		[Display(ResourceType = typeof(LocalizedStrings), Name = LocalizedStrings.CommissionTakerKey)]
+		CommissionTaker,
+
+		/// <summary>
+		/// Commission (maker).
+		/// </summary>
+		[EnumMember]
+		[Display(ResourceType = typeof(LocalizedStrings), Name = LocalizedStrings.CommissionMakerKey)]
+		CommissionMaker,
+
+		/// <summary>
+		/// Settlement price.
+		/// </summary>
+		[EnumMember]
+		[Display(ResourceType = typeof(LocalizedStrings), Name = LocalizedStrings.Str312Key)]
+		SettlementPrice,
 	}
 
 	/// <summary>
@@ -144,6 +175,8 @@ namespace StockSharp.Messages
 	/// </summary>
 	[System.Runtime.Serialization.DataContract]
 	[Serializable]
+	[DisplayNameLoc(LocalizedStrings.Str862Key)]
+	[DescriptionLoc(LocalizedStrings.PositionDescKey)]
 	public sealed class PositionChangeMessage : BaseChangeMessage<PositionChangeTypes>
 	{
 		/// <summary>
@@ -201,6 +234,12 @@ namespace StockSharp.Messages
 		public string Description { get; set; }
 
 		/// <summary>
+		/// ID of the original message <see cref="PortfolioMessage.TransactionId"/> for which this message is a response.
+		/// </summary>
+		[DataMember]
+		public long OriginalTransactionId { get; set; }
+
+		/// <summary>
 		/// Initializes a new instance of the <see cref="PositionChangeMessage"/>.
 		/// </summary>
 		public PositionChangeMessage()
@@ -223,6 +262,8 @@ namespace StockSharp.Messages
 				ServerTime = ServerTime,
 				LimitType = LimitType,
 				Description = Description,
+				OriginalTransactionId = OriginalTransactionId,
+				ClientCode = ClientCode,
 			};
 
 			msg.Changes.AddRange(Changes);
@@ -237,7 +278,7 @@ namespace StockSharp.Messages
 		/// <returns>A string that represents the current object.</returns>
 		public override string ToString()
 		{
-			return base.ToString() + $",Sec={SecurityId},P={PortfolioName},Changes={Changes.Select(c => c.ToString()).Join(",")}";
+			return base.ToString() + $",Sec={SecurityId},P={PortfolioName},CL={ClientCode},Changes={Changes.Select(c => c.ToString()).Join(",")}";
 		}
 	}
 }

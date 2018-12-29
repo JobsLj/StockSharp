@@ -40,6 +40,7 @@ namespace StockSharp.Algo.Indicators
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Envelope"/>.
 		/// </summary>
+		/// <param name="ma">Middle line.</param>
 		public Envelope(LengthIndicator<decimal> ma)
 		{
 			InnerIndicators.Add(Middle = ma);
@@ -76,7 +77,7 @@ namespace StockSharp.Algo.Indicators
 		[CategoryLoc(LocalizedStrings.GeneralKey)]
 		public virtual int Length
 		{
-			get { return Middle.Length; }
+			get => Middle.Length;
 			set
 			{
 				Middle.Length = Upper.Length = Lower.Length = value;
@@ -84,17 +85,17 @@ namespace StockSharp.Algo.Indicators
 			}
 		}
 
-		private decimal _shift = 0.25m;
+		private decimal _shift = 0.01m;
 
 		/// <summary>
-		/// The shift width. Specified as percentage from 0 to 1. The default equals to 0.25.
+		/// The shift width. Specified as percentage from 0 to 1. The default equals to 0.01.
 		/// </summary>
 		[DisplayNameLoc(LocalizedStrings.Str783Key)]
 		[DescriptionLoc(LocalizedStrings.Str784Key)]
 		[CategoryLoc(LocalizedStrings.GeneralKey)]
 		public decimal Shift
 		{
-			get { return _shift; }
+			get => _shift;
 			set
 			{
 				if (value < 0)

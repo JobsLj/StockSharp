@@ -102,7 +102,7 @@ namespace StockSharp.BusinessEntities
 		public DateTimeOffset LocalTime { get; set; }
 
 		/// <summary>
-		/// Number of contracts in a trade.
+		/// Number of contracts in the trade.
 		/// </summary>
 		[DataMember]
 		[Display(
@@ -198,7 +198,7 @@ namespace StockSharp.BusinessEntities
 		public CurrencyTypes? Currency { get; set; }
 
 		[field: NonSerialized]
-		private IDictionary<object, object> _extensionInfo;
+		private IDictionary<string, object> _extensionInfo;
 
 		/// <summary>
 		/// Extended trade info.
@@ -214,10 +214,10 @@ namespace StockSharp.BusinessEntities
 			Description = LocalizedStrings.Str427Key,
 			GroupName = LocalizedStrings.GeneralKey,
 			Order = 8)]
-		public IDictionary<object, object> ExtensionInfo
+		public IDictionary<string, object> ExtensionInfo
 		{
-			get { return _extensionInfo; }
-			set { _extensionInfo = value; }
+			get => _extensionInfo;
+			set => _extensionInfo = value;
 		}
 
 		/// <summary>
@@ -259,7 +259,8 @@ namespace StockSharp.BusinessEntities
 		/// <returns>A string that represents the current object.</returns>
 		public override string ToString()
 		{
-			return "{0} {1} {2} {3}".Put(Time, Id, Price, Volume);
+			var idStr = Id == 0 ? StringId : Id.To<string>();
+			return $"{Time} {idStr} {Price} {Volume}";
 		}
 	}
 }

@@ -16,14 +16,11 @@ Copyright 2010 by StockSharp, LLC
 namespace SampleLMAX
 {
 	using System;
-	using System.Collections.Generic;
 	using System.ComponentModel;
 	using System.Windows;
 
 	using Ecng.Common;
 	using Ecng.Xaml;
-
-	using MoreLinq;
 
 	using StockSharp.BusinessEntities;
 	using StockSharp.LMAX;
@@ -104,7 +101,7 @@ namespace SampleLMAX
 
 					Trader.Restored += () => this.GuiAsync(() =>
 					{
-						// update gui labes
+						// update gui labels
 						ChangeConnectStatus(true);
 						MessageBox.Show(this, LocalizedStrings.Str2958);
 					});
@@ -115,7 +112,7 @@ namespace SampleLMAX
 						// set flag (connection is established)
 						_isConnected = true;
 
-						// update gui labes
+						// update gui labels
 						this.GuiAsync(() => ChangeConnectStatus(true));
 					};
 					Trader.Disconnected += () => this.GuiAsync(() => ChangeConnectStatus(false));
@@ -123,7 +120,7 @@ namespace SampleLMAX
 					// subscribe on connection error event
 					Trader.ConnectionError += error => this.GuiAsync(() =>
 					{
-						// update gui labes
+						// update gui labels
 						ChangeConnectStatus(false);
 
 						MessageBox.Show(this, error.ToString(), LocalizedStrings.Str2959);
@@ -137,30 +134,24 @@ namespace SampleLMAX
 					Trader.MarketDataSubscriptionFailed += (security, msg, error) =>
 						this.GuiAsync(() => MessageBox.Show(this, error.ToString(), LocalizedStrings.Str2956Params.Put(msg.DataType, security)));
 
-					Trader.NewSecurities += securities => _securitiesWindow.SecurityPicker.Securities.AddRange(securities);
-					Trader.NewMyTrades += trades => _myTradesWindow.TradeGrid.Trades.AddRange(trades);
-					Trader.NewTrades += trades => _tradesWindow.TradeGrid.Trades.AddRange(trades);
-					Trader.NewOrders += orders => _ordersWindow.OrderGrid.Orders.AddRange(orders);
-					Trader.NewStopOrders += orders => _stopOrdersWindow.OrderGrid.Orders.AddRange(orders);
+					Trader.NewSecurity += _securitiesWindow.SecurityPicker.Securities.Add;
+					Trader.NewMyTrade += _myTradesWindow.TradeGrid.Trades.Add;
+					Trader.NewTrade += _tradesWindow.TradeGrid.Trades.Add;
+					Trader.NewOrder += _ordersWindow.OrderGrid.Orders.Add;
+					Trader.NewStopOrder += _stopOrdersWindow.OrderGrid.Orders.Add;
 					
-					Trader.NewPortfolios += portfolios =>
-					{
-						// subscribe on portfolio updates
-						portfolios.ForEach(Trader.RegisterPortfolio);
-
-						_portfoliosWindow.PortfolioGrid.Portfolios.AddRange(portfolios);
-					};
-					Trader.NewPositions += positions => _portfoliosWindow.PortfolioGrid.Positions.AddRange(positions);
+					Trader.NewPortfolio += _portfoliosWindow.PortfolioGrid.Portfolios.Add;
+					Trader.NewPosition += _portfoliosWindow.PortfolioGrid.Positions.Add;
 
 					// subscribe on error of order registration event
-					Trader.OrdersRegisterFailed += OrdersFailed;
+					Trader.OrderRegisterFailed += _ordersWindow.OrderGrid.AddRegistrationFail;
 					// subscribe on error of order cancelling event
-					Trader.OrdersCancelFailed += OrdersFailed;
+					Trader.OrderCancelFailed += OrderFailed;
 
 					// subscribe on error of stop-order registration event
-					Trader.StopOrdersRegisterFailed += OrdersFailed;
+					Trader.StopOrderRegisterFailed += OrderFailed;
 					// subscribe on error of stop-order cancelling event
-					Trader.StopOrdersCancelFailed += OrdersFailed;
+					Trader.StopOrderCancelFailed += OrderFailed;
 
 					Trader.MassOrderCancelFailed += (transId, error) =>
 						this.GuiAsync(() => MessageBox.Show(this, error.ToString(), LocalizedStrings.Str716));
@@ -178,7 +169,10 @@ namespace SampleLMAX
 				Trader.IsDemo = IsDemo.IsChecked == true;
 
 				// in sandbox security identifies may be different than uploaded on the site
-				Trader.IsDownloadSecurityFromSite = !Trader.IsDemo;
+				if (!Trader.IsDemo)
+				{
+					Trader.SecuritiesLocation = LmaxLocations.London;
+				}
 
 				// clear password box for security reason
 				//Password.Clear();
@@ -191,12 +185,11 @@ namespace SampleLMAX
 			}
 		}
 
-		private void OrdersFailed(IEnumerable<OrderFail> fails)
+		private void OrderFailed(OrderFail fail)
 		{
 			this.GuiAsync(() =>
 			{
-				foreach (var fail in fails)
-					MessageBox.Show(this, fail.Error.ToString(), LocalizedStrings.Str153);
+				MessageBox.Show(this, fail.Error.ToString(), LocalizedStrings.Str153);
 			});
 		}
 

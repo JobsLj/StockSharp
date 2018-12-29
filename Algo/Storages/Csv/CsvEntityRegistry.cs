@@ -3,11 +3,9 @@ namespace StockSharp.Algo.Storages.Csv
 	using System;
 	using System.Collections.Generic;
 	using System.ComponentModel;
-	using System.Globalization;
 	using System.IO;
 	using System.Linq;
 	using System.Text;
-	using System.Threading;
 
 	using Ecng.Collections;
 	using Ecng.Common;
@@ -80,7 +78,7 @@ namespace StockSharp.Algo.Storages.Csv
 			{
 			}
 
-			public BatchContext BeginBatch()
+			public IBatchContext BeginBatch()
 			{
 				return new BatchContext(this);
 			}
@@ -100,229 +98,10 @@ namespace StockSharp.Algo.Storages.Csv
 			public event Action<object> Removed;
 		}
 
-		private abstract class CsvEntityList<T> : SynchronizedList<T>, IStorageEntityList<T>
-			where T : class
-		{
-			private readonly string _fileName;
-			private readonly Encoding _encoding;
-
-			private readonly SynchronizedDictionary<object, object> _serializers = new SynchronizedDictionary<object, object>();
-			private readonly CachedSynchronizedDictionary<object, T> _items = new CachedSynchronizedDictionary<object, T>();
-			private readonly List<T> _addedItems = new List<T>();
-			private readonly SyncObject _syncRoot = new SyncObject();
-
-			private bool _isChanged;
-			private bool _isFullChanged;
-
-			protected CsvEntityRegistry Registry { get; }
-
-			protected CsvEntityList(CsvEntityRegistry registry, string fileName, Encoding encoding)
-			{
-				if (registry == null)
-					throw new ArgumentNullException(nameof(registry));
-				
-				if (fileName == null)
-					throw new ArgumentNullException(nameof(fileName));
-
-				if (encoding == null)
-					throw new ArgumentNullException(nameof(encoding));
-
-				Registry = registry;
-
-				_fileName = System.IO.Path.Combine(Registry.Path, fileName);
-				_encoding = encoding;
-			}
-
-			#region IStorageEntityList
-
-			public DelayAction DelayAction { get; set; }
-
-			public T ReadById(object id)
-			{
-				return _items.TryGetValue(id);
-			}
-
-			public IEnumerable<T> ReadLasts(int count)
-			{
-				return _items.CachedValues.Skip(Count - count).Take(count);
-			}
-
-			public void Save(T entity)
-			{
-				var key = GetKey(entity);
-				var item = _items.TryGetValue(key);
-
-				if (item == null)
-				{
-					Add(entity);
-				}
-				else
-					Write();
-			}
-
-			#endregion
-
-			protected abstract object GetKey(T item);
-
-			protected abstract void Write(CsvFileWriter writer, T data);
-
-			protected abstract T Read(FastCsvReader reader);
-
-			protected override void OnAdded(T item)
-			{
-				base.OnAdded(item);
-
-				if (_items.TryAdd(GetKey(item), item))
-					Write(item);
-			}
-
-			protected override void OnRemoved(T item)
-			{
-				base.OnRemoved(item);
-
-				_items.Remove(GetKey(item));
-				Write();
-			}
-
-			protected override void OnCleared()
-			{
-				base.OnCleared();
-
-				_items.Clear();
-				Write();
-			}
-
-			public void ReadItems()
-			{
-				if (!File.Exists(_fileName))
-					return;
-
-				CultureInfo.InvariantCulture.DoInCulture(() =>
-				{
-					using (var stream = new FileStream(_fileName, FileMode.OpenOrCreate))
-					{
-						var reader = new FastCsvReader(stream, _encoding);
-
-						while (reader.NextLine())
-						{
-							var item = Read(reader);
-							var key = GetKey(item);
-
-							_items.Add(key, item);
-							Add(item);
-						}
-					}
-				});
-			}
-
-			private void Write()
-			{
-				lock (_syncRoot)
-				{
-					_isChanged = true;
-					_isFullChanged = true;
-				}
-
-				Registry.TryCreateTimer();
-			}
-
-			private void Write(T entity)
-			{
-				lock (_syncRoot)
-				{
-					_isChanged = true;
-					_addedItems.Add(entity);
-				}
-
-				Registry.TryCreateTimer();
-			}
-
-			public bool Flush()
-			{
-				bool isChanged;
-				bool isFullChanged;
-
-				var addedItems = ArrayHelper.Empty<T>();
-
-				lock (_syncRoot)
-				{
-					isChanged = _isChanged;
-					isFullChanged = _isFullChanged;
-
-					_isChanged = false;
-
-					if (!isChanged)
-					{
-						_isFullChanged = false;
-						addedItems = _addedItems.CopyAndClear();
-					}
-				}
-
-				if (isChanged)
-					return false;
-
-				if (isFullChanged)
-				{
-					Write(_items.CachedValues, false, true);
-				}
-				else if (addedItems.Length > 0)
-				{
-					Write(addedItems, true, false);
-				}
-
-				return true;
-			}
-
-			private void Write(IEnumerable<T> items, bool append, bool clear)
-			{
-				using (var stream = new FileStream(_fileName, FileMode.OpenOrCreate))
-				{
-					if (clear)
-						stream.SetLength(0);
-
-					if (append)
-						stream.Position = stream.Length;
-
-					using (var writer = new CsvFileWriter(stream, _encoding))
-					{
-						foreach (var item in items)
-							Write(writer, item);
-					}
-				}
-			}
-
-			protected string Serialize<TItem>(TItem item)
-			{
-				if (item == null)
-					return null;
-
-				var serializer = (XmlSerializer<TItem>)_serializers.SafeAdd(typeof(TItem), k => new XmlSerializer<TItem>());
-
-				using (var stream = new MemoryStream())
-				{
-					serializer.Serialize(item, stream);
-					return Encoding.UTF8.GetString(stream.ToArray()).Remove(Environment.NewLine).Replace("\"", "'");
-				}
-			}
-
-			protected TItem Deserialize<TItem>(string value)
-				where TItem : class
-			{
-				if (value.IsEmpty())
-					return null;
-
-				var serializer = (XmlSerializer<TItem>)_serializers.SafeAdd(typeof(TItem), k => new XmlSerializer<TItem>());
-				var bytes = Encoding.UTF8.GetBytes(value.Replace("'", "\""));
-
-				using (var stream = new MemoryStream(bytes))
-					return serializer.Deserialize(stream);
-			}
-		}
-
-		sealed class ExchangeCsvList : CsvEntityList<Exchange>
+		private class ExchangeCsvList : CsvEntityList<Exchange>
 		{
 			public ExchangeCsvList(CsvEntityRegistry registry)
-				: base(registry, "exchange.csv", Encoding.UTF8)
+				: base(registry, "exchange.csv")
 			{
 			}
 
@@ -358,10 +137,10 @@ namespace StockSharp.Algo.Storages.Csv
 			}
 		}
 
-		sealed class ExchangeBoardCsvList : CsvEntityList<ExchangeBoard>
+		private class ExchangeBoardCsvList : CsvEntityList<ExchangeBoard>
 		{
 			public ExchangeBoardCsvList(CsvEntityRegistry registry)
-				: base(registry, "exchangeboard.csv", Encoding.UTF8)
+				: base(registry, "exchangeboard.csv")
 			{
 			}
 
@@ -370,24 +149,43 @@ namespace StockSharp.Algo.Storages.Csv
 				return item.Code;
 			}
 
+			private Exchange GetExchange(string exchangeCode)
+			{
+				var exchange = Registry.Exchanges.ReadById(exchangeCode);
+
+				if (exchange == null)
+					throw new InvalidOperationException(LocalizedStrings.Str1217Params.Put(exchangeCode));
+
+				return exchange;
+			}
+
 			protected override ExchangeBoard Read(FastCsvReader reader)
 			{
 				var board = new ExchangeBoard
 				{
 					Code = reader.ReadString(),
-					Exchange = Registry.Exchanges.ReadById(reader.ReadString()),
+					Exchange = GetExchange(reader.ReadString()),
 					ExpiryTime = reader.ReadString().ToTime(),
 					//IsSupportAtomicReRegister = reader.ReadBool(),
 					//IsSupportMarketOrders = reader.ReadBool(),
 					TimeZone = TimeZoneInfo.FindSystemTimeZoneById(reader.ReadString()),
-					WorkingTime =
-					{
-						Periods = Deserialize<List<WorkingTimePeriod>>(reader.ReadString()),
-						SpecialWorkingDays = Deserialize<List<DateTime>>(reader.ReadString()),
-						SpecialHolidays = Deserialize<List<DateTime>>(reader.ReadString())
-					},
-					//ExtensionInfo = Deserialize<Dictionary<object, object>>(reader.ReadString())
 				};
+
+				var time = board.WorkingTime;
+
+				if (reader.ColumnCount == 7)
+				{
+					time.Periods = Deserialize<List<WorkingTimePeriod>>(reader.ReadString());
+					time.SpecialWorkingDays = Deserialize<IEnumerable<DateTime>>(reader.ReadString()).ToArray();
+					time.SpecialHolidays = Deserialize<IEnumerable<DateTime>>(reader.ReadString()).ToArray();
+				}
+				else
+				{
+					time.Periods.AddRange(reader.ReadString().DecodeToPeriods());
+					time.SpecialDays.AddRange(reader.ReadString().DecodeToSpecialDays());
+				}
+
+				//ExtensionInfo = Deserialize<Dictionary<object, object>>(reader.ReadString())
 
 				return board;
 			}
@@ -402,18 +200,55 @@ namespace StockSharp.Algo.Storages.Csv
 					//data.IsSupportAtomicReRegister.To<string>(),
 					//data.IsSupportMarketOrders.To<string>(),
 					data.TimeZone.Id,
-					Serialize(data.WorkingTime.Periods),
-					Serialize(data.WorkingTime.SpecialWorkingDays),
-					Serialize(data.WorkingTime.SpecialHolidays),
+					//Serialize(data.WorkingTime.Periods),
+					data.WorkingTime.Periods.EncodeToString(),
+					//Serialize(data.WorkingTime.SpecialWorkingDays),
+					//Serialize(data.WorkingTime.SpecialHolidays),
+					data.WorkingTime.SpecialDays.EncodeToString(),
 					//Serialize(data.ExtensionInfo)
 				});
 			}
+
+			private readonly SynchronizedDictionary<Type, IXmlSerializer> _serializers = new SynchronizedDictionary<Type, IXmlSerializer>();
+
+			//private string Serialize<TItem>(TItem item)
+			//	where TItem : class
+			//{
+			//	if (item == null)
+			//		return null;
+
+			//	var serializer = GetSerializer<TItem>();
+
+			//	using (var stream = new MemoryStream())
+			//	{
+			//		serializer.Serialize(item, stream);
+			//		return Registry.Encoding.GetString(stream.ToArray()).Remove(Environment.NewLine).Replace("\"", "'");
+			//	}
+			//}
+
+			private TItem Deserialize<TItem>(string value)
+				where TItem : class
+			{
+				if (value.IsEmpty())
+					return null;
+
+				var serializer = GetSerializer<TItem>();
+				var bytes = Registry.Encoding.GetBytes(value.Replace("'", "\""));
+
+				using (var stream = new MemoryStream(bytes))
+					return serializer.Deserialize(stream);
+			}
+
+			private XmlSerializer<TItem> GetSerializer<TItem>()
+			{
+				return (XmlSerializer<TItem>)_serializers.SafeAdd(typeof(TItem), k => new XmlSerializer<TItem>(false));
+			}
 		}
 
-		sealed class SecurityCsvList : CsvEntityList<Security>, IStorageSecurityList
+		private class SecurityCsvList : CsvEntityList<Security>, IStorageSecurityList
 		{
 			public SecurityCsvList(CsvEntityRegistry registry)
-				: base(registry, "security.csv", Encoding.UTF8)
+				: base(registry, "security.csv")
 			{
 				((ICollectionEx<Security>)this).AddedRange += s => _added?.Invoke(s);
 				((ICollectionEx<Security>)this).RemovedRange += s => _removed?.Invoke(s);
@@ -421,7 +256,7 @@ namespace StockSharp.Algo.Storages.Csv
 
 			#region IStorageSecurityList
 
-			public void Dispose()
+			void IDisposable.Dispose()
 			{
 			}
 
@@ -429,19 +264,19 @@ namespace StockSharp.Algo.Storages.Csv
 
 			event Action<IEnumerable<Security>> ISecurityProvider.Added
 			{
-				add { _added += value; }
-				remove { _added -= value; }
+				add => _added += value;
+				remove => _added -= value;
 			}
 
 			private Action<IEnumerable<Security>> _removed;
 
 			event Action<IEnumerable<Security>> ISecurityProvider.Removed
 			{
-				add { _removed += value; }
-				remove { _removed -= value; }
+				add => _removed += value;
+				remove => _removed -= value;
 			}
 
-			public IEnumerable<Security> Lookup(Security criteria)
+			IEnumerable<Security> ISecurityProvider.Lookup(Security criteria)
 			{
 				if (criteria.IsLookupAll())
 					return ToArray();
@@ -449,23 +284,18 @@ namespace StockSharp.Algo.Storages.Csv
 				if (criteria.Id.IsEmpty())
 					return this.Filter(criteria);
 
-				var security = ReadById(criteria.Id);
+				var security = ((IStorageSecurityList)this).ReadById(criteria.Id);
 				return security == null ? Enumerable.Empty<Security>() : new[] { security };
 			}
 
-			public void Delete(Security security)
+			void ISecurityStorage.Delete(Security security)
 			{
 				Remove(security);
 			}
 
-			public void DeleteBy(Security criteria)
+			void ISecurityStorage.DeleteBy(Security criteria)
 			{
 				this.Filter(criteria).ForEach(s => Remove(s));
-			}
-
-			public IEnumerable<string> GetSecurityIds()
-			{
-				return this.Select(s => s.Id);
 			}
 
 			#endregion
@@ -477,16 +307,241 @@ namespace StockSharp.Algo.Storages.Csv
 				return item.Id;
 			}
 
+			private class LiteSecurity
+			{
+				public string Id { get; set; }
+				public string Name { get; set; }
+				public string Code { get; set; }
+				public string Class { get; set; }
+				public string ShortName { get; set; }
+				public string Board { get; set; }
+				public string UnderlyingSecurityId { get; set; }
+				public decimal? PriceStep { get; set; }
+				public decimal? VolumeStep { get; set; }
+				public decimal? Multiplier { get; set; }
+				public int? Decimals { get; set; }
+				public SecurityTypes? Type { get; set; }
+				public DateTimeOffset? ExpiryDate { get; set; }
+				public DateTimeOffset? SettlementDate { get; set; }
+				public decimal? Strike { get; set; }
+				public OptionTypes? OptionType { get; set; }
+				public CurrencyTypes? Currency { get; set; }
+				public SecurityExternalId ExternalId { get; set; }
+				public SecurityTypes? UnderlyingSecurityType { get; set; }
+				public string BinaryOptionType { get; set; }
+				public string CfiCode { get; set; }
+				public DateTimeOffset? IssueDate { get; set; }
+				public decimal? IssueSize { get; set; }
+				public string BasketCode { get; set; }
+				public string BasketExpression { get; set; }
+
+				public Security ToSecurity(SecurityCsvList list)
+				{
+					return new Security
+					{
+						Id = Id,
+						Name = Name,
+						Code = Code,
+						Class = Class,
+						ShortName = ShortName,
+						Board = list.Registry.GetBoard(Board),
+						UnderlyingSecurityId = UnderlyingSecurityId,
+						PriceStep = PriceStep,
+						VolumeStep = VolumeStep,
+						Multiplier = Multiplier,
+						Decimals = Decimals,
+						Type = Type,
+						ExpiryDate = ExpiryDate,
+						SettlementDate = SettlementDate,
+						Strike = Strike,
+						OptionType = OptionType,
+						Currency = Currency,
+						ExternalId = ExternalId.Clone(),
+						UnderlyingSecurityType = UnderlyingSecurityType,
+						BinaryOptionType = BinaryOptionType,
+						CfiCode = CfiCode,
+						IssueDate = IssueDate,
+						IssueSize = IssueSize,
+						BasketCode = BasketCode,
+						BasketExpression = BasketExpression,
+					};
+				}
+
+				public void Update(Security security)
+				{
+					Name = security.Name;
+					Code = security.Code;
+					Class = security.Class;
+					ShortName = security.ShortName;
+					Board = security.Board.Code;
+					UnderlyingSecurityId = security.UnderlyingSecurityId;
+					PriceStep = security.PriceStep;
+					VolumeStep = security.VolumeStep;
+					Multiplier = security.Multiplier;
+					Decimals = security.Decimals;
+					Type = security.Type;
+					ExpiryDate = security.ExpiryDate;
+					SettlementDate = security.SettlementDate;
+					Strike = security.Strike;
+					OptionType = security.OptionType;
+					Currency = security.Currency;
+					ExternalId = security.ExternalId.Clone();
+					UnderlyingSecurityType = security.UnderlyingSecurityType;
+					BinaryOptionType = security.BinaryOptionType;
+					CfiCode = security.CfiCode;
+					IssueDate = security.IssueDate;
+					IssueSize = security.IssueSize;
+					BasketCode = security.BasketCode;
+					BasketExpression = security.BasketExpression;
+				}
+			}
+
+			private readonly Dictionary<string, LiteSecurity> _cache = new Dictionary<string, LiteSecurity>(StringComparer.InvariantCultureIgnoreCase);
+
+			private static bool IsChanged(string original, string cached, bool forced)
+			{
+				if (original.IsEmpty())
+					return forced && !cached.IsEmpty();
+				else
+					return cached.IsEmpty() || (forced && !cached.CompareIgnoreCase(original));
+			}
+
+			private static bool IsChanged<T>(T? original, T? cached, bool forced)
+				where T : struct
+			{
+				if (original == null)
+					return forced && cached != null;
+				else
+					return cached == null || (forced && !original.Value.Equals(cached.Value));
+			}
+
+			protected override bool IsChanged(Security security, bool forced)
+			{
+				var liteSec = _cache.TryGetValue(security.Id);
+
+				if (liteSec == null)
+					throw new ArgumentOutOfRangeException(nameof(security), security.Id, LocalizedStrings.Str2736);
+
+				if (IsChanged(security.Name, liteSec.Name, forced))
+					return true;
+
+				if (IsChanged(security.Code, liteSec.Code, forced))
+					return true;
+
+				if (IsChanged(security.Class, liteSec.Class, forced))
+					return true;
+
+				if (IsChanged(security.ShortName, liteSec.ShortName, forced))
+					return true;
+
+				if (IsChanged(security.UnderlyingSecurityId, liteSec.UnderlyingSecurityId, forced))
+					return true;
+
+				if (IsChanged(security.UnderlyingSecurityType, liteSec.UnderlyingSecurityType, forced))
+					return true;
+
+				if (IsChanged(security.PriceStep, liteSec.PriceStep, forced))
+					return true;
+
+				if (IsChanged(security.VolumeStep, liteSec.VolumeStep, forced))
+					return true;
+
+				if (IsChanged(security.Multiplier, liteSec.Multiplier, forced))
+					return true;
+
+				if (IsChanged(security.Decimals, liteSec.Decimals, forced))
+					return true;
+
+				if (IsChanged(security.Type, liteSec.Type, forced))
+					return true;
+
+				if (IsChanged(security.ExpiryDate, liteSec.ExpiryDate, forced))
+					return true;
+
+				if (IsChanged(security.SettlementDate, liteSec.SettlementDate, forced))
+					return true;
+
+				if (IsChanged(security.Strike, liteSec.Strike, forced))
+					return true;
+
+				if (IsChanged(security.OptionType, liteSec.OptionType, forced))
+					return true;
+
+				if (IsChanged(security.Currency, liteSec.Currency, forced))
+					return true;
+
+				if (IsChanged(security.BinaryOptionType, liteSec.BinaryOptionType, forced))
+					return true;
+
+				if (IsChanged(security.CfiCode, liteSec.CfiCode, forced))
+					return true;
+
+				if (IsChanged(security.IssueDate, liteSec.IssueDate, forced))
+					return true;
+
+				if (IsChanged(security.IssueSize, liteSec.IssueSize, forced))
+					return true;
+
+				if (security.Board == null)
+				{
+					if (!liteSec.Board.IsEmpty() && forced)
+						return true;
+				}
+				else
+				{
+					if (liteSec.Board.IsEmpty() || (forced && !liteSec.Board.CompareIgnoreCase(security.Board.Code)))
+						return true;
+				}
+
+				if (forced && security.ExternalId != liteSec.ExternalId)
+					return true;
+
+				if (IsChanged(security.BasketCode, liteSec.BasketCode, forced))
+					return true;
+
+				if (IsChanged(security.BasketExpression, liteSec.BasketExpression, forced))
+					return true;
+
+				return false;
+			}
+
+			protected override void ClearCache()
+			{
+				_cache.Clear();
+			}
+
+			protected override void AddCache(Security item)
+			{
+				var sec = new LiteSecurity { Id = item.Id };
+				sec.Update(item);
+				_cache.Add(item.Id, sec);
+			}
+
+			protected override void RemoveCache(Security item)
+			{
+				_cache.Remove(item.Id);
+			}
+
+			protected override void UpdateCache(Security item)
+			{
+				_cache[item.Id].Update(item);
+			}
+
+			//protected override void WriteMany(Security[] values)
+			//{
+			//	base.WriteMany(_cache.Values.Select(l => l.ToSecurity(this)).ToArray());
+			//}
+
 			protected override Security Read(FastCsvReader reader)
 			{
-				var security = new Security
+				var liteSec = new LiteSecurity
 				{
 					Id = reader.ReadString(),
 					Name = reader.ReadString(),
 					Code = reader.ReadString(),
 					Class = reader.ReadString(),
 					ShortName = reader.ReadString(),
-					Board = Registry.ExchangeBoards.ReadById(reader.ReadString()),
+					Board = reader.ReadString(),
 					UnderlyingSecurityId = reader.ReadString(),
 					PriceStep = reader.ReadNullableDecimal(),
 					VolumeStep = reader.ReadNullableDecimal(),
@@ -509,10 +564,24 @@ namespace StockSharp.Algo.Storages.Csv
 						InteractiveBrokers = reader.ReadNullableInt(),
 						Plaza = reader.ReadString()
 					},
-					//ExtensionInfo = Deserialize<Dictionary<object, object>>(reader.ReadString())
 				};
 
-				return security;
+				if ((reader.ColumnCurr + 1) < reader.ColumnCount)
+				{
+					liteSec.UnderlyingSecurityType = reader.ReadNullableEnum<SecurityTypes>();
+					liteSec.BinaryOptionType = reader.ReadString();
+					liteSec.CfiCode = reader.ReadString();
+					liteSec.IssueDate = ReadNullableDateTime(reader);
+					liteSec.IssueSize = reader.ReadNullableDecimal();
+				}
+
+				if ((reader.ColumnCurr + 1) < reader.ColumnCount)
+					liteSec.BasketCode = reader.ReadString();
+
+				if ((reader.ColumnCurr + 1) < reader.ColumnCount)
+					liteSec.BasketExpression = reader.ReadString();
+
+				return liteSec.ToSecurity(this);
 			}
 
 			protected override void Write(CsvFileWriter writer, Security data)
@@ -544,17 +613,34 @@ namespace StockSharp.Algo.Storages.Csv
 					data.ExternalId.IQFeed,
 					data.ExternalId.InteractiveBrokers.To<string>(),
 					data.ExternalId.Plaza,
-					//Serialize(data.ExtensionInfo)
+					data.UnderlyingSecurityType.To<string>(),
+					data.BinaryOptionType,
+					data.CfiCode,
+					data.IssueDate?.UtcDateTime.ToString(_dateTimeFormat),
+					data.IssueSize.To<string>(),
+					data.BasketCode,
+					data.BasketExpression,
 				});
+			}
+
+			public override void Save(Security entity, bool forced)
+			{
+				lock (Registry.Exchanges.SyncRoot)
+					Registry.Exchanges.TryAdd(entity.Board.Exchange);
+
+				lock (Registry.ExchangeBoards.SyncRoot)
+					Registry.ExchangeBoards.TryAdd(entity.Board);
+
+				base.Save(entity, forced);
 			}
 
 			#endregion
 		}
 
-		sealed class PortfolioCsvList : CsvEntityList<Portfolio>
+		private class PortfolioCsvList : CsvEntityList<Portfolio>
 		{
 			public PortfolioCsvList(CsvEntityRegistry registry)
-				: base(registry, "portfolio.csv", Encoding.UTF8)
+				: base(registry, "portfolio.csv")
 			{
 			}
 
@@ -582,15 +668,23 @@ namespace StockSharp.Algo.Storages.Csv
 					LocalTime = _dateTimeParser.Parse(reader.ReadString()).ChangeKind(DateTimeKind.Utc)
 				};
 
+				if ((reader.ColumnCurr + 1) < reader.ColumnCount)
+					portfolio.ClientCode = reader.ReadString();
+
+				if ((reader.ColumnCurr + 1) < reader.ColumnCount)
+				{
+					portfolio.Currency = reader.ReadString().To<CurrencyTypes?>();
+
+					var str = reader.ReadString();
+					portfolio.ExpirationDate = str.IsEmpty() ? (DateTimeOffset?)null : _dateTimeParser.Parse(str).ChangeKind(DateTimeKind.Utc);
+				}
+
 				return portfolio;
 			}
 
-			private ExchangeBoard GetBoard(string code)
+			private ExchangeBoard GetBoard(string boardCode)
 			{
-				if (code.IsEmpty())
-					return null;
-
-				return Registry.ExchangeBoards.ReadById(code);
+				return boardCode.IsEmpty() ? null : Registry.GetBoard(boardCode);
 			}
 
 			protected override void Write(CsvFileWriter writer, Portfolio data)
@@ -609,21 +703,44 @@ namespace StockSharp.Algo.Storages.Csv
 					data.State.To<string>(),
 					data.Description,
 					data.LastChangeTime.UtcDateTime.ToString(_dateTimeFormat),
-					data.LocalTime.UtcDateTime.ToString(_dateTimeFormat)
+					data.LocalTime.UtcDateTime.ToString(_dateTimeFormat),
+					data.ClientCode,
+					data.Currency?.To<string>(),
+					data.ExpirationDate?.UtcDateTime.ToString(_dateTimeFormat),
 				});
 			}
 		}
 
-		sealed class PositionCsvList : CsvEntityList<Position>, IStoragePositionList
+		private class PositionCsvList : CsvEntityList<Position>, IStoragePositionList
 		{
 			public PositionCsvList(CsvEntityRegistry registry)
-				: base(registry, "position.csv", Encoding.UTF8)
+				: base(registry, "position.csv")
 			{
 			}
 
 			protected override object GetKey(Position item)
 			{
 				return Tuple.Create(item.Portfolio, item.Security);
+			}
+
+			private Portfolio GetPortfolio(string id)
+			{
+				var portfolio = Registry.Portfolios.ReadById(id);
+
+				if (portfolio == null)
+					throw new InvalidOperationException(LocalizedStrings.Str3622Params.Put(id));
+
+				return portfolio;
+			}
+
+			private Security GetSecurity(string id)
+			{
+				var security = Registry.Securities.ReadById(id);
+
+				if (security == null)
+					throw new InvalidOperationException(LocalizedStrings.Str704Params.Put(id));
+
+				return security;
 			}
 
 			protected override Position Read(FastCsvReader reader)
@@ -633,8 +750,8 @@ namespace StockSharp.Algo.Storages.Csv
 
 				var position = new Position
 				{
-					Portfolio = Registry.Portfolios.ReadById(pfName),
-					Security = Registry.Securities.ReadById(secId),
+					Portfolio = GetPortfolio(pfName),
+					Security = GetSecurity(secId),
 					DepoName = reader.ReadString(),
 					LimitType = reader.ReadNullableEnum<TPlusLimits>(),
 					BeginValue = reader.ReadNullableDecimal(),
@@ -644,14 +761,19 @@ namespace StockSharp.Algo.Storages.Csv
 					Commission = reader.ReadNullableDecimal(),
 					Currency = reader.ReadNullableEnum<CurrencyTypes>(),
 					LastChangeTime = _dateTimeParser.Parse(reader.ReadString()).ChangeKind(DateTimeKind.Utc),
-					LocalTime = _dateTimeParser.Parse(reader.ReadString()).ChangeKind(DateTimeKind.Utc)
+					LocalTime = _dateTimeParser.Parse(reader.ReadString()).ChangeKind(DateTimeKind.Utc),
 				};
 
-				if (position.Security == null)
-					throw new InvalidOperationException(LocalizedStrings.Str1218Params.Put(secId));
+				if ((reader.ColumnCurr + 1) < reader.ColumnCount)
+					position.ClientCode = reader.ReadString();
 
-				if (position.Portfolio == null)
-					throw new InvalidOperationException(LocalizedStrings.Str891);
+				if ((reader.ColumnCurr + 1) < reader.ColumnCount)
+				{
+					position.Currency = reader.ReadString().To<CurrencyTypes?>();
+
+					var str = reader.ReadString();
+					position.ExpirationDate = str.IsEmpty() ? (DateTimeOffset?)null : _dateTimeParser.Parse(str).ChangeKind(DateTimeKind.Utc);
+				}
 
 				return position;
 			}
@@ -671,13 +793,16 @@ namespace StockSharp.Algo.Storages.Csv
 					data.Commission.To<string>(),
 					data.Description,
 					data.LastChangeTime.UtcDateTime.ToString(_dateTimeFormat),
-					data.LocalTime.UtcDateTime.ToString(_dateTimeFormat)
+					data.LocalTime.UtcDateTime.ToString(_dateTimeFormat),
+					data.ClientCode,
+					data.Currency?.To<string>(),
+					data.ExpirationDate?.UtcDateTime.ToString(_dateTimeFormat),
 				});
 			}
 
-			public Position ReadBySecurityAndPortfolio(Security security, Portfolio portfolio)
+			public Position GetPosition(Portfolio portfolio, Security security, string clientCode = "", string depoName = "")
 			{
-				return ReadById(Tuple.Create(portfolio, security));
+				return ((IStorageEntityList<Position>)this).ReadById(Tuple.Create(portfolio, security));
 			}
 		}
 
@@ -694,208 +819,146 @@ namespace StockSharp.Algo.Storages.Csv
 			return _dateTimeParser.Parse(str).ChangeKind(DateTimeKind.Utc);
 		}
 
-		private readonly TimeSpan _flushInterval = TimeSpan.FromSeconds(1);
-		private readonly SyncObject _syncRoot = new SyncObject();
-
 		private readonly ExchangeCsvList _exchanges;
 		private readonly ExchangeBoardCsvList _exchangeBoards;
 		private readonly SecurityCsvList _securities;
 		private readonly PortfolioCsvList _portfolios;
 		private readonly PositionCsvList _positions;
 
-		private DelayAction _delayAction;
-		private Timer _flushTimer;
-		private bool _isFlushing;
+		private readonly List<ICsvEntityList> _csvLists = new List<ICsvEntityList>();
 
 		/// <summary>
 		/// The path to data directory.
 		/// </summary>
 		public string Path { get; set; }
 
-		/// <summary>
-		/// The special interface for direct access to the storage.
-		/// </summary>
+		/// <inheritdoc />
 		public IStorage Storage { get; }
 
+		private Encoding _encoding = Encoding.UTF8;
+
 		/// <summary>
-		/// The time delayed action.
+		/// Encoding.
 		/// </summary>
-		public DelayAction DelayAction
+		public Encoding Encoding
 		{
-			get { return _delayAction; }
+			get => _encoding;
+			set => _encoding = value ?? throw new ArgumentNullException(nameof(value));
+		}
+
+		private DelayAction _delayAction = new DelayAction(ex => ex.LogError());
+
+		/// <inheritdoc />
+		public virtual DelayAction DelayAction
+		{
+			get => _delayAction;
 			set
 			{
-				_delayAction = value;
-
-				Exchanges.DelayAction = _delayAction;
-				ExchangeBoards.DelayAction = _delayAction;
-				Securities.DelayAction = _delayAction;
-				//Trades.DelayAction = _delayAction;
-				//MyTrades.DelayAction = _delayAction;
-				//Orders.DelayAction = _delayAction;
-				//OrderFails.DelayAction = _delayAction;
-				//Portfolios.DelayAction = _delayAction;
-				//Positions.DelayAction = _delayAction;
-				//News.DelayAction = _delayAction;
+				_delayAction = value ?? throw new ArgumentNullException(nameof(value));
+				UpdateDelayAction();
 			}
 		}
 
-		/// <summary>
-		/// List of exchanges.
-		/// </summary>
+		private void UpdateDelayAction()
+		{
+			_exchanges.DelayAction = _delayAction;
+			_exchangeBoards.DelayAction = _delayAction;
+			_securities.DelayAction = _delayAction;
+			_positions.DelayAction = _delayAction;
+			_portfolios.DelayAction = _delayAction;
+		}
+
+		/// <inheritdoc />
 		public IStorageEntityList<Exchange> Exchanges => _exchanges;
 
-		/// <summary>
-		/// The list of stock boards.
-		/// </summary>
+		/// <inheritdoc />
 		public IStorageEntityList<ExchangeBoard> ExchangeBoards => _exchangeBoards;
 
-		/// <summary>
-		/// The list of instruments.
-		/// </summary>
+		/// <inheritdoc />
 		public IStorageSecurityList Securities => _securities;
 
-		/// <summary>
-		/// The list of portfolios.
-		/// </summary>
+		/// <inheritdoc />
 		public IStorageEntityList<Portfolio> Portfolios => _portfolios;
 
-		/// <summary>
-		/// The list of positions.
-		/// </summary>
+		/// <inheritdoc />
 		public IStoragePositionList Positions => _positions;
 
-		/// <summary>
-		/// The list of own trades.
-		/// </summary>
-		public IStorageEntityList<MyTrade> MyTrades { get { throw new NotSupportedException(); } }
-
-		/// <summary>
-		/// The list of tick trades.
-		/// </summary>
-		public IStorageEntityList<Trade> Trades { get { throw new NotSupportedException(); } }
-
-		/// <summary>
-		/// The list of orders.
-		/// </summary>
-		public IStorageEntityList<Order> Orders { get { throw new NotSupportedException(); } }
-
-		/// <summary>
-		/// The list of orders registration and cancelling errors.
-		/// </summary>
-		public IStorageEntityList<OrderFail> OrderFails { get { throw new NotSupportedException(); } }
-
-		/// <summary>
-		/// The list of news.
-		/// </summary>
-		public IStorageEntityList<News> News { get { throw new NotSupportedException(); } }
+		/// <inheritdoc />
+		public IPositionStorage PositionStorage { get; }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="CsvEntityRegistry"/>.
 		/// </summary>
+		/// <param name="path">The path to data directory.</param>
 		public CsvEntityRegistry(string path)
 		{
-			if (path == null)
-				throw new ArgumentNullException(nameof(path));
-
-			Path = path;
+			Path = path ?? throw new ArgumentNullException(nameof(path));
 			Storage = new FakeStorage(this);
 
-			_exchanges = new ExchangeCsvList(this);
-			_exchangeBoards = new ExchangeBoardCsvList(this);
-			_securities = new SecurityCsvList(this);
-			_portfolios = new PortfolioCsvList(this);
-			_positions = new PositionCsvList(this);
+			Add(_exchanges = new ExchangeCsvList(this));
+			Add(_exchangeBoards = new ExchangeBoardCsvList(this));
+			Add(_securities = new SecurityCsvList(this));
+			Add(_portfolios = new PortfolioCsvList(this));
+			Add(_positions = new PositionCsvList(this));
+
+			UpdateDelayAction();
+
+			PositionStorage = new PositionStorage(this);
 		}
 
 		/// <summary>
-		/// Initialize the storage.
+		/// Add list of trade objects.
 		/// </summary>
-		public void Init()
+		/// <typeparam name="T">Entity type.</typeparam>
+		/// <param name="list">List of trade objects.</param>
+		public void Add<T>(CsvEntityList<T> list)
+			where T : class
+		{
+			if (list == null)
+				throw new ArgumentNullException(nameof(list));
+
+			_csvLists.Add(list);
+		}
+
+		/// <inheritdoc />
+		public IDictionary<object, Exception> Init()
 		{
 			Directory.CreateDirectory(Path);
 
-			var errors = new List<Exception>();
+			var errors = new Dictionary<object, Exception>();
 
-			ReadItems(_exchanges, errors);
-			ReadItems(_exchangeBoards, errors);
-			ReadItems(_securities, errors);
-			ReadItems(_portfolios, errors);
-			ReadItems(_positions, errors);
-
-			if (errors.Count > 0)
-				throw new AggregateException(errors);
-		}
-
-		private static void ReadItems<T>(CsvEntityList<T> list, ICollection<Exception> errors)
-			where T : class
-		{
-			try
+			foreach (var list in _csvLists)
 			{
-				list.ReadItems();
-			}
-			catch (Exception ex)
-			{
-				errors.Add(ex);
-			}
-		}
-
-		private void TryCreateTimer()
-		{
-			lock (_syncRoot)
-			{
-				if (_isFlushing || _flushTimer != null)
-					return;
-
-				_flushTimer = ThreadingHelper
-					.Timer(() => CultureInfo.InvariantCulture.DoInCulture(OnFlush))
-					.Interval(_flushInterval);
-			}
-		}
-
-		private void OnFlush()
-		{
-			try
-			{
-				lock (_syncRoot)
-				{
-					if (_isFlushing)
-						return;
-
-					_isFlushing = true;
-				}
-
-				var canStop = true;
-
 				try
 				{
-					canStop &= _exchanges.Flush();
-					canStop &= _exchangeBoards.Flush();
-					canStop &= _securities.Flush();
-					canStop &= _portfolios.Flush();
-					canStop &= _positions.Flush();
-				}
-				finally
-				{
-					lock (_syncRoot)
-					{
-						_isFlushing = false;
+					var listErrors = new List<Exception>();
+					list.Init(listErrors);
 
-						if (canStop)
-						{
-							if (_flushTimer != null)
-							{
-								_flushTimer.Dispose();
-								_flushTimer = null;
-							}
-						}
-					}
+					if (listErrors.Count > 0)
+						errors.Add(list, new AggregateException(listErrors));
+				}
+				catch (Exception ex)
+				{
+					errors.Add(list, ex);
 				}
 			}
-			catch (Exception ex)
-			{
-				ex.LogError("Flush CSV entity registry error: {0}");
-			}
+
+			return errors;
+		}
+
+		internal ExchangeBoard GetBoard(string boardCode)
+		{
+			var board = ExchangeBoards.ReadById(boardCode);
+
+			if (board != null)
+				return board;
+
+			board = ServicesRegistry.EnsureGetExchangeInfoProvider().GetExchangeBoard(boardCode);
+
+			if (board == null)
+				throw new InvalidOperationException(LocalizedStrings.Str1217Params.Put(boardCode));
+
+			return board;
 		}
 	}
 }

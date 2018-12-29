@@ -18,7 +18,6 @@ namespace StockSharp.Messages
 	using System;
 	using System.Runtime.Serialization;
 
-	using Ecng.Common;
 	using Ecng.Serialization;
 
 	using StockSharp.Localization;
@@ -40,7 +39,7 @@ namespace StockSharp.Messages
 		public decimal Price { get; set; }
 
 		/// <summary>
-		/// Number of contracts in an order.
+		/// Number of contracts in the order.
 		/// </summary>
 		[DataMember]
 		[DisplayNameLoc(LocalizedStrings.VolumeKey)]
@@ -80,7 +79,7 @@ namespace StockSharp.Messages
 		/// Order expiry time. The default is <see langword="null" />, which mean (GTC).
 		/// </summary>
 		/// <remarks>
-		/// If the value is equal <see langword="null" /> or <see cref="DateTimeOffset.MaxValue"/>, order will be GTC (good til cancel). Or uses exact date.
+		/// If the value is equal <see langword="null" />, order will be GTC (good til cancel). Or uses exact date.
 		/// </remarks>
 		[DataMember]
 		[DisplayNameLoc(LocalizedStrings.Str141Key)]
@@ -114,6 +113,32 @@ namespace StockSharp.Messages
 		public RpsOrderInfo RpsInfo { get; set; }
 
 		/// <summary>
+		/// Is the order of market-maker.
+		/// </summary>
+		[DataMember]
+		[DisplayNameLoc(LocalizedStrings.MarketMakerKey)]
+		[DescriptionLoc(LocalizedStrings.MarketMakerOrderKey, true)]
+		[MainCategory]
+		public bool? IsMarketMaker { get; set; }
+
+		/// <summary>
+		/// Is margin enabled.
+		/// </summary>
+		[DataMember]
+		[DisplayNameLoc(LocalizedStrings.MarginKey)]
+		[DescriptionLoc(LocalizedStrings.IsMarginKey)]
+		[MainCategory]
+		public bool? IsMargin { get; set; }
+
+		/// <summary>
+		/// Slippage in trade price.
+		/// </summary>
+		[DataMember]
+		[DisplayNameLoc(LocalizedStrings.Str163Key)]
+		[DescriptionLoc(LocalizedStrings.Str164Key)]
+		public decimal? Slippage { get; set; }
+
+		/// <summary>
 		/// Initializes a new instance of the <see cref="OrderRegisterMessage"/>.
 		/// </summary>
 		public OrderRegisterMessage()
@@ -136,32 +161,46 @@ namespace StockSharp.Messages
 		/// <returns>Copy.</returns>
 		public override Message Clone()
 		{
-			var clone = new OrderRegisterMessage(Type)
-			{
-				Comment = Comment,
-				Condition = Condition,
-				TillDate = TillDate,
-				OrderType = OrderType,
-				PortfolioName = PortfolioName,
-				Price = Price,
-				RepoInfo = RepoInfo.CloneNullable(),
-				RpsInfo = RpsInfo.CloneNullable(),
-				SecurityId = SecurityId,
-				//SecurityType = SecurityType,
-				Side = Side,
-				TimeInForce = TimeInForce,
-				TransactionId = TransactionId,
-				VisibleVolume = VisibleVolume,
-				Volume = Volume,
-				Currency = Currency,
-				UserOrderId = UserOrderId,
-				ClientCode = ClientCode,
-				BrokerCode = BrokerCode,
-			};
+			var clone = new OrderRegisterMessage(Type);
 
 			CopyTo(clone);
 
 			return clone;
+		}
+
+		/// <summary>
+		/// Copy the message into the <paramref name="destination" />.
+		/// </summary>
+		/// <param name="destination">The object, to which copied information.</param>
+		public void CopyTo(OrderRegisterMessage destination)
+		{
+			if (destination == null)
+				throw new ArgumentNullException(nameof(destination));
+
+			destination.Comment = Comment;
+			destination.Condition = Condition?.Clone();
+			destination.TillDate = TillDate;
+			destination.OrderType = OrderType;
+			destination.PortfolioName = PortfolioName;
+			destination.Price = Price;
+			destination.RepoInfo = RepoInfo?.Clone();
+			destination.RpsInfo = RpsInfo?.Clone();
+			//destination.SecurityId = SecurityId;
+			//destination.SecurityType = SecurityType;
+			destination.Side = Side;
+			destination.TimeInForce = TimeInForce;
+			destination.TransactionId = TransactionId;
+			destination.VisibleVolume = VisibleVolume;
+			destination.Volume = Volume;
+			//destination.Currency = Currency;
+			destination.UserOrderId = UserOrderId;
+			destination.ClientCode = ClientCode;
+			destination.BrokerCode = BrokerCode;
+			destination.IsMarketMaker = IsMarketMaker;
+			destination.IsMargin = IsMargin;
+			destination.Slippage = Slippage;
+
+			base.CopyTo(destination);
 		}
 
 		/// <summary>
@@ -170,7 +209,7 @@ namespace StockSharp.Messages
 		/// <returns>A string that represents the current object.</returns>
 		public override string ToString()
 		{
-			return base.ToString() + $",TransId={TransactionId},Price={Price},Side={Side},OrdType={OrderType},Vol={Volume},Sec={SecurityId}";
+			return base.ToString() + $",TransId={TransactionId},Price={Price},Side={Side},OrdType={OrderType},Vol={Volume},Sec={SecurityId},Pf={PortfolioName}";
 		}
 	}
 }

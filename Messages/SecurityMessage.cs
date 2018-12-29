@@ -17,8 +17,10 @@ namespace StockSharp.Messages
 {
 	using System;
 	using System.ComponentModel;
+	using System.ComponentModel.DataAnnotations;
 	using System.Runtime.Serialization;
 
+	using Ecng.Common;
 	using Ecng.Serialization;
 
 	using StockSharp.Localization;
@@ -109,6 +111,15 @@ namespace StockSharp.Messages
 		public SecurityTypes? SecurityType { get; set; }
 
 		/// <summary>
+		/// Type in ISO 10962 standard.
+		/// </summary>
+		[DataMember]
+		[DisplayNameLoc(LocalizedStrings.CfiCodeKey)]
+		[DescriptionLoc(LocalizedStrings.CfiCodeDescKey)]
+		[MainCategory]
+		public string CfiCode { get; set; }
+
+		/// <summary>
 		/// Security expiration date (for derivatives - expiration, for bonds — redemption).
 		/// </summary>
 		[DataMember]
@@ -188,6 +199,48 @@ namespace StockSharp.Messages
 		public string Class { get; set; }
 
 		/// <summary>
+		/// Number of issued contracts.
+		/// </summary>
+		[DataMember]
+		public decimal? IssueSize { get; set; }
+		
+		/// <summary>
+		/// Date of issue.
+		/// </summary>
+		[DataMember]
+		public DateTimeOffset? IssueDate { get; set; }
+
+		/// <summary>
+		/// Underlying security type.
+		/// </summary>
+		[DataMember]
+		[MainCategory]
+		public SecurityTypes? UnderlyingSecurityType { get; set; }
+
+		/// <summary>
+		/// Basket security type. Can be <see langword="null"/> in case of regular security.
+		/// </summary>
+		[DataMember]
+		[Display(
+			ResourceType = typeof(LocalizedStrings),
+			Name = LocalizedStrings.CodeKey,
+			Description = LocalizedStrings.BasketCodeKey,
+			GroupName = LocalizedStrings.BasketKey,
+			Order = 200)]
+		public string BasketCode { get; set; }
+
+		/// <summary>
+		/// Basket security expression. Can be <see langword="null"/> in case of regular security.
+		/// </summary>
+		[DataMember]
+		[Display(
+			ResourceType = typeof(LocalizedStrings),
+			Name = LocalizedStrings.ExpressionKey,
+			Description = LocalizedStrings.ExpressionDescKey,
+			GroupName = LocalizedStrings.BasketKey,
+			Order = 201)]
+		public string BasketExpression { get; set; }
+		/// <summary>
 		/// Initializes a new instance of the <see cref="SecurityMessage"/>.
 		/// </summary>
 		public SecurityMessage()
@@ -196,7 +249,7 @@ namespace StockSharp.Messages
 		}
 
 		/// <summary>
-		/// Initialize <see cref="SecurityMessage"/>.
+		/// Initializes a new instance of the <see cref="SecurityMessage"/>.
 		/// </summary>
 		/// <param name="type">Message type.</param>
 		protected SecurityMessage(MessageTypes type)
@@ -218,8 +271,9 @@ namespace StockSharp.Messages
 		/// <summary>
 		/// Copy the message into the <paramref name="destination" />.
 		/// </summary>
-		/// <param name="destination">The object, which copied information.</param>
-		public void CopyTo(SecurityMessage destination)
+		/// <param name="destination">The object, to which copied information.</param>
+		/// <param name="copyOriginalTransactionId">Copy <see cref="OriginalTransactionId"/>.</param>
+		public void CopyTo(SecurityMessage destination, bool copyOriginalTransactionId = true)
 		{
 			if (destination == null)
 				throw new ArgumentNullException(nameof(destination));
@@ -229,11 +283,11 @@ namespace StockSharp.Messages
 			destination.ShortName = ShortName;
 			destination.Currency = Currency;
 			destination.ExpiryDate = ExpiryDate;
-			destination.OriginalTransactionId = OriginalTransactionId;
 			destination.OptionType = OptionType;
 			destination.PriceStep = PriceStep;
 			destination.Decimals = Decimals;
 			destination.SecurityType = SecurityType;
+			destination.CfiCode = CfiCode;
 			destination.SettlementDate = SettlementDate;
 			destination.Strike = Strike;
 			destination.UnderlyingSecurityCode = UnderlyingSecurityCode;
@@ -242,15 +296,61 @@ namespace StockSharp.Messages
 			destination.Class = Class;
 			destination.BinaryOptionType = BinaryOptionType;
 			destination.LocalTime = LocalTime;
+			destination.IssueSize = IssueSize;
+			destination.IssueDate = IssueDate;
+			destination.UnderlyingSecurityType = UnderlyingSecurityType;
+			destination.BasketCode = BasketCode;
+			destination.BasketExpression = BasketExpression;
+
+			if (copyOriginalTransactionId)
+				destination.OriginalTransactionId = OriginalTransactionId;
 		}
 
-		/// <summary>
-		/// Returns a string that represents the current object.
-		/// </summary>
-		/// <returns>A string that represents the current object.</returns>
+		/// <inheritdoc />
 		public override string ToString()
 		{
-			return base.ToString() + $",Sec={SecurityId}";
+			var str = base.ToString() + $",Sec={SecurityId}";
+
+			if (SecurityType != null)
+				str += $",SecType={SecurityType}";
+
+			if (!Name.IsEmpty())
+				str += $",Name={Name}";
+
+			if (!ShortName.IsEmpty())
+				str += $",Short={ShortName}";
+
+			if (ExpiryDate != null)
+				str += $",Exp={ExpiryDate}";
+
+			if (PriceStep != null)
+				str += $",Price={PriceStep}";
+
+			if (VolumeStep != null)
+				str += $",Vol={VolumeStep}";
+
+			if (Decimals != null)
+				str += $",Dec={Decimals}";
+
+			if (Multiplier != null)
+				str += $",Mult={Multiplier}";
+
+			if (SettlementDate != null)
+				str += $",Sett={SettlementDate}";
+
+			if (Currency != null)
+				str += $",Cur={Currency}";
+
+			if (OptionType != null)
+				str += $",Opt={OptionType}";
+
+			if (Strike != null)
+				str += $",Strike={Strike}";
+
+			if (BasketCode != null)
+				str += $",Basket={BasketCode}/{BasketExpression}";
+
+			return str;
 		}
 	}
 }

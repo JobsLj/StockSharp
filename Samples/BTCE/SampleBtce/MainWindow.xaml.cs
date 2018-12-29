@@ -16,14 +16,11 @@ Copyright 2010 by StockSharp, LLC
 namespace SampleBtce
 {
 	using System;
-	using System.Collections.Generic;
 	using System.ComponentModel;
 	using System.Windows;
 
 	using Ecng.Common;
 	using Ecng.Xaml;
-
-	using MoreLinq;
 
 	using StockSharp.BusinessEntities;
 	using StockSharp.Btce;
@@ -90,85 +87,74 @@ namespace SampleBtce
 			{
 				if (Key.Text.IsEmpty())
 				{
-					MessageBox.Show(this, LocalizedStrings.Str2974);
+					MessageBox.Show(this, LocalizedStrings.Str3689);
 					return;
 				}
 				else if (Secret.Password.IsEmpty())
 				{
-					MessageBox.Show(this, LocalizedStrings.Str2975);
+					MessageBox.Show(this, LocalizedStrings.Str3690);
 					return;
 				}
 
 				if (Trader == null)
 				{
-					// создаем подключение
+					// create connector
 					Trader = new BtceTrader();// { LogLevel = LogLevels.Debug };
 
 					_logManager.Sources.Add(Trader);
 
 					Trader.Restored += () => this.GuiAsync(() =>
 					{
-						// разблокируем кнопку Экспорт (соединение было восстановлено)
+						// update gui labels
 						ChangeConnectStatus(true);
 						MessageBox.Show(this, LocalizedStrings.Str2958);
 					});
 
-					// подписываемся на событие успешного соединения
+					// subscribe on connection successfully event
 					Trader.Connected += () =>
 					{
-						// возводим флаг, что соединение установлено
+						// set flag (connection is established)
 						_isConnected = true;
 
-						// разблокируем кнопку Экспорт
+						// update gui labels
 						this.GuiAsync(() => ChangeConnectStatus(true));
 					};
 					Trader.Disconnected += () => this.GuiAsync(() => ChangeConnectStatus(false));
 
-					// подписываемся на событие разрыва соединения
+					// subscribe on connection error event
 					Trader.ConnectionError += error => this.GuiAsync(() =>
 					{
-						// заблокируем кнопку Экспорт (так как соединение было потеряно)
+						// update gui labels
 						ChangeConnectStatus(false);
 
 						MessageBox.Show(this, error.ToString(), LocalizedStrings.Str2959);
 					});
 
-					// подписываемся на ошибку обработки данных (транзакций и маркет)
+					// subscribe on error event
 					Trader.Error += error =>
 						this.GuiAsync(() => MessageBox.Show(this, error.ToString(), LocalizedStrings.Str2955));
 
-					// подписываемся на ошибку подписки маркет-данных
+					// subscribe on error of market data subscription event
 					Trader.MarketDataSubscriptionFailed += (security, msg, error) =>
 						this.GuiAsync(() => MessageBox.Show(this, error.ToString(), LocalizedStrings.Str2956Params.Put(msg.DataType, security)));
 
-					Trader.NewSecurities += securities => _securitiesWindow.SecurityPicker.Securities.AddRange(securities);
-					Trader.NewMyTrades += trades => _myTradesWindow.TradeGrid.Trades.AddRange(trades);
-					Trader.NewTrades += trades => _tradesWindow.TradeGrid.Trades.AddRange(trades);
-					Trader.NewOrders += orders => _ordersWindow.OrderGrid.Orders.AddRange(orders);
-					
-					Trader.NewPortfolios += portfolios =>
-					{
-						// регистрирует портфели на обновление данных
-						portfolios.ForEach(Trader.RegisterPortfolio);
+					Trader.NewSecurity += _securitiesWindow.SecurityPicker.Securities.Add;
+					Trader.NewMyTrade += _myTradesWindow.TradeGrid.Trades.Add;
+					Trader.NewTrade += _tradesWindow.TradeGrid.Trades.Add;
+					Trader.NewOrder += _ordersWindow.OrderGrid.Orders.Add;
 
-						_portfoliosWindow.PortfolioGrid.Portfolios.AddRange(portfolios);
-					};
-					Trader.NewPositions += positions => _portfoliosWindow.PortfolioGrid.Positions.AddRange(positions);
+					Trader.NewPortfolio += _portfoliosWindow.PortfolioGrid.Portfolios.Add;
+					Trader.NewPosition += _portfoliosWindow.PortfolioGrid.Positions.Add;
 
-					// подписываемся на событие о неудачной регистрации заявок
-					Trader.OrdersRegisterFailed += OrdersFailed;
-					// подписываемся на событие о неудачном снятии заявок
-					Trader.OrdersCancelFailed += OrdersFailed;
-
-					// подписываемся на событие о неудачной регистрации стоп-заявок
-					Trader.StopOrdersRegisterFailed += OrdersFailed;
-					// подписываемся на событие о неудачном снятии стоп-заявок
-					Trader.StopOrdersCancelFailed += OrdersFailed;
+					// subscribe on error of order registration event
+					Trader.OrderRegisterFailed += _ordersWindow.OrderGrid.AddRegistrationFail;
+					// subscribe on error of order cancelling event
+					Trader.OrderCancelFailed += OrderFailed;
 
 					Trader.MassOrderCancelFailed += (transId, error) =>
 						this.GuiAsync(() => MessageBox.Show(this, error.ToString(), LocalizedStrings.Str716));
 
-					// устанавливаем поставщик маркет-данных
+					// set market data provider
 					_securitiesWindow.SecurityPicker.MarketDataProvider = Trader;
 
 					ShowSecurities.IsEnabled = ShowTrades.IsEnabled =
@@ -179,7 +165,7 @@ namespace SampleBtce
 				Trader.Key = Key.Text;
 				Trader.Secret = Secret.Password;
 
-				// очищаем из текстового поля в целях безопасности
+				// clear password box for security reason
 				//Secret.Clear();
 
 				Trader.Connect();
@@ -190,12 +176,11 @@ namespace SampleBtce
 			}
 		}
 
-		private void OrdersFailed(IEnumerable<OrderFail> fails)
+		private void OrderFailed(OrderFail fail)
 		{
 			this.GuiAsync(() =>
 			{
-				foreach (var fail in fails)
-					MessageBox.Show(this, fail.Error.ToString(), LocalizedStrings.Str153);
+				MessageBox.Show(this, fail.Error.ToString(), LocalizedStrings.Str153);
 			});
 		}
 

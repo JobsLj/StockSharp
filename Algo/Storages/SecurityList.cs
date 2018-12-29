@@ -59,9 +59,7 @@ namespace StockSharp.Algo.Storages
 		{
 			_registry = registry;
 
-			var database = Storage as Database;
-
-			if (database == null)
+			if (!(Storage is Database database))
 				return;
 
 			var readAllByCodeAndType = database.CommandType == CommandType.StoredProcedure
@@ -156,20 +154,22 @@ namespace StockSharp.Algo.Storages
 			((ICollectionEx<Security>)this).RemovedRange += s => _removed?.Invoke(s);
 		}
 
+		DelayAction IStorageEntityList<Security>.DelayAction => DelayAction;
+
 		private Action<IEnumerable<Security>> _added;
 
 		event Action<IEnumerable<Security>> ISecurityProvider.Added
 		{
-			add { _added += value; }
-			remove { _added -= value; }
+			add => _added += value;
+			remove => _added -= value;
 		}
 
 		private Action<IEnumerable<Security>> _removed;
 
 		event Action<IEnumerable<Security>> ISecurityProvider.Removed
 		{
-			add { _removed += value; }
-			remove { _removed -= value; }
+			add => _removed += value;
+			remove => _removed -= value;
 		}
 
 		/// <summary>
@@ -271,10 +271,13 @@ namespace StockSharp.Algo.Storages
 			return Database.ReadAll<Security>(_readAllByType, new SerializationItemCollection(fields));
 		}
 
-		/// <summary>
-		/// To save the trading object.
-		/// </summary>
-		/// <param name="entity">The trading object.</param>
+		/// <inheritdoc />
+		public void Save(Security security, bool forced)
+		{
+			Save(security);
+		}
+
+		/// <inheritdoc />
 		public override void Save(Security entity)
 		{
 			_registry.Exchanges.Save(entity.Board.Exchange);
@@ -296,10 +299,7 @@ namespace StockSharp.Algo.Storages
 			return str.SplitByComma(",", true);
 		}
 
-		/// <summary>
-		/// It is called when adding element to the storage.
-		/// </summary>
-		/// <param name="entity">The trading object.</param>
+		/// <inheritdoc />
 		protected override void OnAdd(Security entity)
 		{
 			_registry.Exchanges.Save(entity.Board.Exchange);
@@ -308,19 +308,13 @@ namespace StockSharp.Algo.Storages
 			base.OnAdd(entity);
 		}
 
-		/// <summary>
-		/// Delete security.
-		/// </summary>
-		/// <param name="security">Security.</param>
+		/// <inheritdoc />
 		public void Delete(Security security)
 		{
 			Remove(security);
 		}
 
-		/// <summary>
-		/// To delete instruments by the criterion.
-		/// </summary>
-		/// <param name="criteria">The criterion.</param>
+		/// <inheritdoc />
 		public void DeleteBy(Security criteria)
 		{
 			this.Filter(criteria).ForEach(s => Remove(s));

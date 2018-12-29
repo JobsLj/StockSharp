@@ -16,7 +16,6 @@ Copyright 2010 by StockSharp, LLC
 namespace SampleOanda
 {
 	using System;
-	using System.Collections.Generic;
 	using System.ComponentModel;
 	using System.Windows.Media;
 	
@@ -30,17 +29,14 @@ namespace SampleOanda
 		private readonly CandleSeries _candleSeries;
 		private readonly ChartCandleElement _candleElem;
 
-		public ChartWindow(CandleSeries candleSeries, DateTime from, DateTime to)
+		public ChartWindow(CandleSeries candleSeries, DateTimeOffset? from = null, DateTimeOffset? to = null)
 		{
 			InitializeComponent();
 
-			if (candleSeries == null)
-				throw new ArgumentNullException(nameof(candleSeries));
-
-			_candleSeries = candleSeries;
+			_candleSeries = candleSeries ?? throw new ArgumentNullException(nameof(candleSeries));
 			_trader = MainWindow.Instance.Trader;
 
-			Chart.ChartTheme = "ExpressionDark";
+			Chart.ChartTheme = ChartThemes.ExpressionDark;
 
 			var area = new ChartArea();
 			Chart.Areas.Add(area);
@@ -56,24 +52,21 @@ namespace SampleOanda
 
 			area.Elements.Add(_candleElem);
 
-			_trader.NewCandles += ProcessNewCandles;
+			_trader.CandleSeriesProcessing += ProcessNewCandle;
 			_trader.SubscribeCandles(_candleSeries, from, to);
 		}
 
-		private void ProcessNewCandles(CandleSeries series, IEnumerable<Candle> candles)
+		private void ProcessNewCandle(CandleSeries series, Candle candle)
 		{
 			if (series != _candleSeries)
 				return;
 
-			foreach (var timeFrameCandle in candles)
-			{
-				Chart.Draw(_candleElem, timeFrameCandle);
-			}
+			Chart.Draw(_candleElem, candle);
 		}
 
 		protected override void OnClosing(CancelEventArgs e)
 		{
-			_trader.NewCandles -= ProcessNewCandles;
+			_trader.CandleSeriesProcessing -= ProcessNewCandle;
 			base.OnClosing(e);
 		}
 	}

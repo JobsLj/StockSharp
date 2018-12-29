@@ -15,8 +15,6 @@ Copyright 2010 by StockSharp, LLC
 #endregion S# License
 namespace StockSharp.Algo.Storages
 {
-	using System.Collections.Generic;
-
 	using StockSharp.BusinessEntities;
 
 	/// <summary>
@@ -28,7 +26,8 @@ namespace StockSharp.Algo.Storages
 		/// Save security.
 		/// </summary>
 		/// <param name="security">Security.</param>
-		void Save(Security security);
+		/// <param name="forced">Forced update.</param>
+		void Save(Security security, bool forced);
 
 		/// <summary>
 		/// Delete security.
@@ -41,11 +40,5 @@ namespace StockSharp.Algo.Storages
 		/// </summary>
 		/// <param name="criteria">The criterion.</param>
 		void DeleteBy(Security criteria);
-
-		/// <summary>
-		/// To get identifiers of saved instruments.
-		/// </summary>
-		/// <returns>IDs securities.</returns>
-		IEnumerable<string> GetSecurityIds();
 	}
 }

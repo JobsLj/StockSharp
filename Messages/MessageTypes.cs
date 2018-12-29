@@ -70,6 +70,7 @@ namespace StockSharp.Messages
 		/// <summary>
 		/// Order error (registration or cancel).
 		/// </summary>
+		[Obsolete]
 		OrderError,
 
 		/// <summary>
@@ -80,6 +81,7 @@ namespace StockSharp.Messages
 		/// <summary>
 		/// Position.
 		/// </summary>
+		[Obsolete]
 		Position,
 
 		/// <summary>
@@ -151,7 +153,7 @@ namespace StockSharp.Messages
 		/// <summary>
 		/// Session.
 		/// </summary>
-		Session,
+		BoardState,
 
 		/// <summary>
 		/// Order state request.
@@ -212,5 +214,55 @@ namespace StockSharp.Messages
 		/// Market data request finished.
 		/// </summary>
 		MarketDataFinished,
+
+		/// <summary>
+		/// Remove object request (security, portfolio etc.).
+		/// </summary>
+		Remove,
+
+		/// <summary>
+		/// User info.
+		/// </summary>
+		UserInfo,
+
+		/// <summary>
+		/// Users search.
+		/// </summary>
+		UserLookup,
+
+		/// <summary>
+		/// Users search result.
+		/// </summary>
+		UserLookupResult,
+
+		/// <summary>
+		/// Board subscription request.
+		/// </summary>
+		BoardRequest,
+
+		/// <summary>
+		/// Boards search.
+		/// </summary>
+		BoardLookup,
+
+		/// <summary>
+		/// Boards search result.
+		/// </summary>
+		BoardLookupResult,
+
+		/// <summary>
+		/// User subscription request.
+		/// </summary>
+		UserRequest,
+
+		/// <summary>
+		/// Time-frames search.
+		/// </summary>
+		TimeFrameLookup,
+
+		/// <summary>
+		/// Time-frames search result.
+		/// </summary>
+		TimeFrameLookupResult,
 	}
 }

@@ -72,11 +72,11 @@ namespace StockSharp.Algo.Export.Database
 				DbType = typeof(string),
 				ValueRestriction = new StringRestriction(32)
 			};
-			yield return new ColumnDescription(nameof(ExecutionMessage.DerivedOrderId))
-			{
-				DbType = typeof(string),
-				ValueRestriction = new StringRestriction(32)
-			};
+			//yield return new ColumnDescription(nameof(ExecutionMessage.DerivedOrderId))
+			//{
+			//	DbType = typeof(string),
+			//	ValueRestriction = new StringRestriction(32)
+			//};
 			yield return new ColumnDescription(nameof(ExecutionMessage.OrderPrice)) { DbType = typeof(decimal), ValueRestriction = new DecimalRestriction { Scale = security.PriceStep?.GetCachedDecimals() ?? 1 } };
 			yield return new ColumnDescription(nameof(ExecutionMessage.OrderVolume)) { DbType = typeof(decimal?), ValueRestriction = new DecimalRestriction { Scale = security.VolumeStep?.GetCachedDecimals() ?? 1 } };
 			yield return new ColumnDescription(nameof(ExecutionMessage.VisibleVolume)) { DbType = typeof(decimal?), ValueRestriction = new DecimalRestriction { Scale = security.VolumeStep?.GetCachedDecimals() ?? 1 } };
@@ -110,6 +110,11 @@ namespace StockSharp.Algo.Export.Database
 				ValueRestriction = new StringRestriction(1024)
 			};
 			yield return new ColumnDescription(nameof(ExecutionMessage.Commission)) { DbType = typeof(decimal?) };
+			yield return new ColumnDescription(nameof(ExecutionMessage.CommissionCurrency))
+			{
+				DbType = typeof(string),
+				ValueRestriction = new StringRestriction(32)
+			};
 			yield return new ColumnDescription(nameof(ExecutionMessage.Slippage)) { DbType = typeof(decimal?), ValueRestriction = new DecimalRestriction { Scale = security.PriceStep?.GetCachedDecimals() ?? 1 } };
 			yield return new ColumnDescription(nameof(ExecutionMessage.Latency)) { DbType = typeof(TimeSpan?) };
 			yield return new ColumnDescription(nameof(ExecutionMessage.Position)) { DbType = typeof(decimal?), ValueRestriction = new DecimalRestriction { Scale = security.VolumeStep?.GetCachedDecimals() ?? 1 } };
@@ -121,6 +126,8 @@ namespace StockSharp.Algo.Export.Database
 				DbType = typeof(string),
 				ValueRestriction = new StringRestriction(1024)
 			};
+			yield return new ColumnDescription(nameof(ExecutionMessage.IsMargin)) { DbType = typeof(bool?) };
+			yield return new ColumnDescription(nameof(ExecutionMessage.IsMarketMaker)) { DbType = typeof(bool?) };
 		}
 
 		protected override IDictionary<string, object> ConvertToParameters(ExecutionMessage value)
@@ -139,7 +146,7 @@ namespace StockSharp.Algo.Export.Database
 				{ nameof(ExecutionMessage.OriginalTransactionId), value.OriginalTransactionId },
 				{ nameof(ExecutionMessage.ExpiryDate), value.ExpiryDate },
 				{ nameof(ExecutionMessage.OrderId), value.OrderId == null ? value.OrderStringId : value.OrderId.To<string>() },
-				{ nameof(ExecutionMessage.DerivedOrderId), value.DerivedOrderId == null ? value.DerivedOrderStringId : value.DerivedOrderId.To<string>() },
+				//{ nameof(ExecutionMessage.DerivedOrderId), value.DerivedOrderId == null ? value.DerivedOrderStringId : value.DerivedOrderId.To<string>() },
 				{ nameof(ExecutionMessage.OrderPrice), value.OrderPrice },
 				{ nameof(ExecutionMessage.OrderVolume), value.OrderVolume },
 				{ nameof(ExecutionMessage.VisibleVolume), value.VisibleVolume },
@@ -161,6 +168,7 @@ namespace StockSharp.Algo.Export.Database
 				{ nameof(ExecutionMessage.Comment), value.Comment },
 				{ nameof(ExecutionMessage.SystemComment), value.SystemComment },
 				{ nameof(ExecutionMessage.Commission), value.Commission },
+				{ nameof(ExecutionMessage.CommissionCurrency), value.CommissionCurrency },
 				{ nameof(ExecutionMessage.Slippage), value.Slippage },
 				{ nameof(ExecutionMessage.Latency), value.Latency },
 				{ nameof(ExecutionMessage.Position), value.Position },
@@ -168,6 +176,8 @@ namespace StockSharp.Algo.Export.Database
 				{ nameof(ExecutionMessage.OpenInterest), value.OpenInterest },
 				{ nameof(ExecutionMessage.Currency), (int?)value.Currency },
 				{ nameof(ExecutionMessage.Error), value.Error?.Message },
+				{ nameof(ExecutionMessage.IsMargin), value.IsMargin },
+				{ nameof(ExecutionMessage.IsMarketMaker), value.IsMarketMaker },
 			};
 			return result;
 		}

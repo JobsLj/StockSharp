@@ -50,14 +50,8 @@ namespace StockSharp.Algo.Testing
 		/// </summary>
 		public IdGenerator IdGenerator
 		{
-			get { return _idGenerator; }
-			set
-			{
-				if (value == null)
-					throw new ArgumentNullException(nameof(value));
-
-				_idGenerator = value;
-			}
+			get => _idGenerator;
+			set => _idGenerator = value ?? throw new ArgumentNullException(nameof(value));
 		}
 	}
 
@@ -75,7 +69,6 @@ namespace StockSharp.Algo.Testing
 		public RandomWalkTradeGenerator(SecurityId securityId)
 			: base(securityId)
 		{
-			Interval = TimeSpan.FromMilliseconds(50);
 		}
 
 		/// <summary>

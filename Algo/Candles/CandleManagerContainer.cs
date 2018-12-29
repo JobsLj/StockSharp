@@ -53,10 +53,7 @@ namespace StockSharp.Algo.Candles
 
 			public SeriesInfo(CandleManagerContainer container)
 			{
-				if (container == null)
-					throw new ArgumentNullException(nameof(container));
-
-				_container = container;
+				_container = container ?? throw new ArgumentNullException(nameof(container));
 			}
 
 			public int CandleCount => _allCandles.Count;
@@ -160,7 +157,7 @@ namespace StockSharp.Algo.Candles
 		/// </remarks>
 		public TimeSpan CandlesKeepTime
 		{
-			get { return _candlesKeepTime; }
+			get => _candlesKeepTime;
 			set
 			{
 				if (value < TimeSpan.Zero)
@@ -221,10 +218,10 @@ namespace StockSharp.Algo.Candles
 		public Candle GetCandle(CandleSeries series, int candleIndex)
 		{
 			if (candleIndex < 0)
-				throw new ArgumentOutOfRangeException(nameof(candleIndex));
+				throw new ArgumentOutOfRangeException(nameof(candleIndex), candleIndex, LocalizedStrings.Str1219);
 
 			var info = GetInfo(series);
-			return info != null ? info.GetCandle(candleIndex) : null;
+			return info?.GetCandle(candleIndex);
 		}
 
 		/// <summary>
@@ -249,7 +246,7 @@ namespace StockSharp.Algo.Candles
 		public IEnumerable<Candle> GetCandles(CandleSeries series, int candleCount)
 		{
 			if (candleCount <= 0)
-				throw new ArgumentOutOfRangeException(nameof(candleCount));
+				throw new ArgumentOutOfRangeException(nameof(candleCount), candleCount, LocalizedStrings.Str1219);
 
 			return GetCandles(series)
 							.OrderByDescending(c => c.OpenTime)
@@ -265,7 +262,7 @@ namespace StockSharp.Algo.Candles
 		public int GetCandleCount(CandleSeries series)
 		{
 			var info = GetInfo(series);
-			return info == null ? 0 : info.CandleCount;
+			return info?.CandleCount ?? 0;
 		}
 
 		/// <summary>
@@ -274,13 +271,13 @@ namespace StockSharp.Algo.Candles
 		/// <param name="series">Candles series.</param>
 		/// <param name="from">The initial date from which the candles will be get.</param>
 		/// <param name="to">The final date by which the candles will be get.</param>
-		public void Start(CandleSeries series, DateTimeOffset from, DateTimeOffset to)
+		public void Start(CandleSeries series, DateTimeOffset? from, DateTimeOffset? to)
 		{
 			if (series == null)
 				throw new ArgumentNullException(nameof(series));
 
 			var info = _info.SafeAdd(series, key => new SeriesInfo(this));
-			info.Reset(from);
+			info.Reset(from ?? DateTimeOffset.MinValue);
 		}
 
 		private SeriesInfo GetInfo(CandleSeries series)

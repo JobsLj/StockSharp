@@ -3,17 +3,19 @@
   <developerConceptualDocument xmlns="http://ddue.schemas.microsoft.com/authoring/2003/5" xmlns:xlink="http://www.w3.org/1999/xlink">
     <introduction>
       <para>
-      	<token>openecry</token> предоставляет исторические свечи, которые можно использовать как для тестирования, так и для инициализации <link xlink:href="8b9125ee-9d74-444f-82d6-5dea51266fd4">индикаторов</link>.
+      	<token>openecry</token> предоставляет исторические свечи, которые можно использовать 
+      	как для тестирования, так и для инициализации <link xlink:href="8b9125ee-9d74-444f-82d6-5dea51266fd4">индикаторов</link>.
 	  </para>
     </introduction>
     
     <procedure>
-      <title>Работа с историческими свечи</title>
+      <title>Работа с историческими свечами</title>
       <steps class="ordered">
         <step>
           <content>
             <para>
-            	Для того, чтобы получить исторические свечи, необходимо вызвать метод <codeEntityReference qualifyHint="true">M:StockSharp.OpenECry.OpenECryTrader.SubscribeCandles(StockSharp.Algo.Candles.CandleSeries,System.DateTimeOffset,System.DateTimeOffset)</codeEntityReference>:
+            	Для того, чтобы получить исторические свечи, необходимо вызвать 
+            	метод <codeEntityReference qualifyHint="false">M:StockSharp.Algo.Connector.SubscribeCandles(StockSharp.Algo.Candles.CandleSeries,System.Nullable{System.DateTimeOffset},System.Nullable{System.DateTimeOffset},System.Nullable{System.Int64},System.Nullable{System.Int64},System.Collections.Generic.IDictionary{System.String,System.Object})</codeEntityReference>:
        		</para>
             <code language="C#">
             <![CDATA[
@@ -26,11 +28,11 @@ Trader.SubscribeCandles(SelectedSecurity, DateTime.Now.Subtract(TimeSpan.FromTic
         </step>
         <step>
         	<para>
-            	Исторически свечи передаются через событие <codeEntityReference qualifyHint="true">E:StockSharp.OpenECry.OpenECryTrader.NewCandles</codeEntityReference>:
+            	Исторически свечи передаются через событие <codeEntityReference qualifyHint="true">E:StockSharp.Algo.Connector.CandleSeriesProcessing</codeEntityReference>:
        		</para>
           <code language="C#">
             <![CDATA[
-Trader.NewCandles += _securitiesWindow.AddHistoricalCandles;
+Trader.CandleSeriesProcessing += ProcessCandle;
 			]]>
 			</code>
         </step>

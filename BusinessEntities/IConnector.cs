@@ -18,6 +18,7 @@ namespace StockSharp.BusinessEntities
 	using System;
 	using System.Collections.Generic;
 
+	using Ecng.Common;
 	using Ecng.Serialization;
 
 	using StockSharp.Logging;
@@ -26,7 +27,7 @@ namespace StockSharp.BusinessEntities
 	/// <summary>
 	/// The main interface providing the connection to the trading systems.
 	/// </summary>
-	public interface IConnector : IPersistable, ILogReceiver, IMarketDataProvider, ISecurityProvider, INewsProvider, IPortfolioProvider
+	public interface IConnector : IPersistable, ILogReceiver, IMarketDataProvider, ISecurityProvider, INewsProvider, IPortfolioProvider, IPositionProvider, IMessageSender
 	{
 		/// <summary>
 		/// Own trade received.
@@ -99,6 +100,11 @@ namespace StockSharp.BusinessEntities
 		event Action<long, Exception> MassOrderCancelFailed;
 
 		/// <summary>
+		/// Failed order status request event.
+		/// </summary>
+		event Action<long, Exception> OrderStatusFailed;
+
+		/// <summary>
 		/// Stop-order registration errors event.
 		/// </summary>
 		event Action<IEnumerable<OrderFail>> StopOrdersRegisterFailed;
@@ -163,30 +169,30 @@ namespace StockSharp.BusinessEntities
 		/// </summary>
 		event Action<IEnumerable<Portfolio>> NewPortfolios;
 
-		/// <summary>
-		/// Portfolio changed.
-		/// </summary>
-		event Action<Portfolio> PortfolioChanged;
+		///// <summary>
+		///// Portfolio changed.
+		///// </summary>
+		//event Action<Portfolio> PortfolioChanged;
 
 		/// <summary>
 		/// Portfolios changed.
 		/// </summary>
 		event Action<IEnumerable<Portfolio>> PortfoliosChanged;
 
-		/// <summary>
-		/// Position received.
-		/// </summary>
-		event Action<Position> NewPosition;
+		///// <summary>
+		///// Position received.
+		///// </summary>
+		//event Action<Position> NewPosition;
 
 		/// <summary>
 		/// Positions received.
 		/// </summary>
 		event Action<IEnumerable<Position>> NewPositions;
 
-		/// <summary>
-		/// Position changed.
-		/// </summary>
-		event Action<Position> PositionChanged;
+		///// <summary>
+		///// Position changed.
+		///// </summary>
+		//event Action<Position> PositionChanged;
 
 		/// <summary>
 		/// Positions changed.
@@ -269,7 +275,7 @@ namespace StockSharp.BusinessEntities
 		event Action<IMessageAdapter, Exception> ConnectionErrorEx;
 
 		/// <summary>
-		/// Dats process error.
+		/// Data process error.
 		/// </summary>
 		event Action<Exception> Error;
 
@@ -279,14 +285,19 @@ namespace StockSharp.BusinessEntities
 		event Action<TimeSpan> MarketTimeChanged;
 
 		/// <summary>
-		/// Lookup result <see cref="LookupSecurities(Security)"/> received.
+		/// Lookup result <see cref="LookupSecurities(Security,IMessageAdapter,MessageOfflineModes)"/> received.
 		/// </summary>
-		event Action<Exception, IEnumerable<Security>> LookupSecuritiesResult;
+		event Action<SecurityLookupMessage, IEnumerable<Security>, Exception> LookupSecuritiesResult;
 
 		/// <summary>
-		/// Lookup result <see cref="LookupPortfolios"/> received.
+		/// Lookup result <see cref="LookupPortfolios(Portfolio,IMessageAdapter,MessageOfflineModes)"/> received.
 		/// </summary>
-		event Action<Exception, IEnumerable<Portfolio>> LookupPortfoliosResult;
+		event Action<PortfolioLookupMessage, IEnumerable<Portfolio>, Exception> LookupPortfoliosResult;
+
+		/// <summary>
+		/// Lookup result <see cref="LookupBoards(ExchangeBoard,IMessageAdapter,MessageOfflineModes)"/> received.
+		/// </summary>
+		event Action<BoardLookupMessage, IEnumerable<ExchangeBoard>, Exception> LookupBoardsResult;
 
 		/// <summary>
 		/// Successful subscription market-data.
@@ -309,9 +320,19 @@ namespace StockSharp.BusinessEntities
 		event Action<Security, MarketDataMessage, Exception> MarketDataUnSubscriptionFailed;
 
 		/// <summary>
+		/// Subscription market-data finished.
+		/// </summary>
+		event Action<Security, MarketDataFinishedMessage> MarketDataSubscriptionFinished;
+
+		/// <summary>
 		/// Session changed.
 		/// </summary>
 		event Action<ExchangeBoard, SessionStates> SessionStateChanged;
+
+		/// <summary>
+		/// Transaction id generator.
+		/// </summary>
+		IdGenerator TransactionIdGenerator { get; }
 
 		/// <summary>
 		/// Get session state for required board.
@@ -360,10 +381,10 @@ namespace StockSharp.BusinessEntities
 		/// </summary>
 		IEnumerable<MyTrade> MyTrades { get; }
 
-		/// <summary>
-		/// Get all positions.
-		/// </summary>
-		IEnumerable<Position> Positions { get; }
+		///// <summary>
+		///// Get all positions.
+		///// </summary>
+		//IEnumerable<Position> Positions { get; }
 
 		/// <summary>
 		/// All news.
@@ -428,8 +449,10 @@ namespace StockSharp.BusinessEntities
 		/// <summary>
 		/// To find instruments that match the filter <paramref name="criteria" />. Found instruments will be passed through the event <see cref="LookupSecuritiesResult"/>.
 		/// </summary>
-		/// <param name="criteria">The instrument whose fields will be used as a filter.</param>
-		void LookupSecurities(Security criteria);
+		/// <param name="criteria">The criterion which fields will be used as a filter.</param>
+		/// <param name="adapter">Target adapter. Can be <see langword="null" />.</param>
+		/// <param name="offlineMode">Offline mode handling message.</param>
+		void LookupSecurities(Security criteria, IMessageAdapter adapter = null, MessageOfflineModes offlineMode = MessageOfflineModes.None);
 
 		/// <summary>
 		/// To find instruments that match the filter <paramref name="criteria" />. Found instruments will be passed through the event <see cref="LookupSecuritiesResult"/>.
@@ -438,20 +461,59 @@ namespace StockSharp.BusinessEntities
 		void LookupSecurities(SecurityLookupMessage criteria);
 
 		/// <summary>
-		/// To find portfolios that match the filter <paramref name="criteria" />. Found portfolios will be passed through the event <see cref="LookupPortfoliosResult"/>.
+		/// Get <see cref="SecurityId"/>.
 		/// </summary>
-		/// <param name="criteria">The portfolio which fields will be used as a filter.</param>
-		void LookupPortfolios(Portfolio criteria);
+		/// <param name="security">Security.</param>
+		/// <returns>Security ID.</returns>
+		SecurityId GetSecurityId(Security security);
 
 		/// <summary>
-		/// To get the position by portfolio and instrument.
+		/// To find boards that match the filter <paramref name="criteria" />. Found boards will be passed through the event <see cref="LookupBoardsResult"/>.
 		/// </summary>
-		/// <param name="portfolio">The portfolio on which the position should be found.</param>
-		/// <param name="security">The instrument on which the position should be found.</param>
-		/// <param name="clientCode">The client code.</param>
-		/// <param name="depoName">The depository name where the stock is located physically. By default, an empty string is passed, which means the total position by all depositories.</param>
-		/// <returns>Position.</returns>
-		Position GetPosition(Portfolio portfolio, Security security, string clientCode = "", string depoName = "");
+		/// <param name="criteria">The criterion which fields will be used as a filter.</param>
+		/// <param name="adapter">Target adapter. Can be <see langword="null" />.</param>
+		/// <param name="offlineMode">Offline mode handling message.</param>
+		void LookupBoards(ExchangeBoard criteria, IMessageAdapter adapter = null, MessageOfflineModes offlineMode = MessageOfflineModes.None);
+
+		/// <summary>
+		/// To find boards that match the filter <paramref name="criteria" />. Found boards will be passed through the event <see cref="LookupBoardsResult"/>.
+		/// </summary>
+		/// <param name="criteria">The criterion which fields will be used as a filter.</param>
+		void LookupBoards(BoardLookupMessage criteria);
+
+		/// <summary>
+		/// To find portfolios that match the filter <paramref name="criteria" />. Found portfolios will be passed through the event <see cref="LookupPortfoliosResult"/>.
+		/// </summary>
+		/// <param name="criteria">The criterion which fields will be used as a filter.</param>
+		/// <param name="adapter">Target adapter. Can be <see langword="null" />.</param>
+		/// <param name="offlineMode">Offline mode handling message.</param>
+		void LookupPortfolios(Portfolio criteria, IMessageAdapter adapter = null, MessageOfflineModes offlineMode = MessageOfflineModes.None);
+
+		/// <summary>
+		/// To find portfolios that match the filter <paramref name="criteria" />. Found portfolios will be passed through the event <see cref="LookupPortfoliosResult"/>.
+		/// </summary>
+		/// <param name="criteria">The criterion which fields will be used as a filter.</param>
+		void LookupPortfolios(PortfolioLookupMessage criteria);
+
+		/// <summary>
+		/// To find orders that match the filter <paramref name="criteria" />. Found orders will be passed through the event <see cref="NewOrder"/>.
+		/// </summary>
+		/// <param name="criteria">The order which fields will be used as a filter.</param>
+		/// <param name="adapter">Target adapter. Can be <see langword="null" />.</param>
+		void LookupOrders(Order criteria, IMessageAdapter adapter = null);
+
+		/// <summary>
+		/// To find orders that match the filter <paramref name="criteria" />. Found orders will be passed through the event <see cref="NewOrder"/>.
+		/// </summary>
+		/// <param name="criteria">The order which fields will be used as a filter.</param>
+		void LookupOrders(OrderStatusMessage criteria);
+
+		/// <summary>
+		/// Lookup security by identifier.
+		/// </summary>
+		/// <param name="securityId">Security ID.</param>
+		/// <returns>Security.</returns>
+		Security LookupSecurity(SecurityId securityId);
 
 		/// <summary>
 		/// Get filtered order book.
@@ -497,7 +559,8 @@ namespace StockSharp.BusinessEntities
 		/// <param name="board">Trading board. If the value is equal to <see langword="null" />, then the board does not match the orders cancel filter.</param>
 		/// <param name="security">Instrument. If the value is equal to <see langword="null" />, then the instrument does not match the orders cancel filter.</param>
 		/// <param name="securityType">Security type. If the value is <see langword="null" />, the type does not use.</param>
-		void CancelOrders(bool? isStopOrder = null, Portfolio portfolio = null, Sides? direction = null, ExchangeBoard board = null, Security security = null, SecurityTypes? securityType = null);
+		/// <param name="transactionId">Order cancellation transaction id.</param>
+		void CancelOrders(bool? isStopOrder = null, Portfolio portfolio = null, Sides? direction = null, ExchangeBoard board = null, Security security = null, SecurityTypes? securityType = null, long? transactionId = null);
 
 		/// <summary>
 		/// To sign up to get market data by the instrument.
@@ -517,7 +580,13 @@ namespace StockSharp.BusinessEntities
 		/// To start getting quotes (order book) by the instrument. Quotes values are available through the event <see cref="IConnector.MarketDepthsChanged"/>.
 		/// </summary>
 		/// <param name="security">The instrument by which quotes getting should be started.</param>
-		void RegisterMarketDepth(Security security);
+		/// <param name="from">The initial date from which you need to get data.</param>
+		/// <param name="to">The final date by which you need to get data.</param>
+		/// <param name="count">Max count.</param>
+		/// <param name="buildMode">Build mode.</param>
+		/// <param name="buildFrom">Which market-data type is used as a source value.</param>
+		/// <param name="maxDepth">Max depth of requested order book.</param>
+		void RegisterMarketDepth(Security security, DateTimeOffset? from = null, DateTimeOffset? to = null, long? count = null, MarketDataBuildModes buildMode = MarketDataBuildModes.LoadAndBuild, MarketDataTypes? buildFrom = null, int? maxDepth = null);
 
 		/// <summary>
 		/// To stop getting quotes by the instrument.
@@ -541,7 +610,12 @@ namespace StockSharp.BusinessEntities
 		/// To start getting trades (tick data) by the instrument. New trades will come through the event <see cref="IConnector.NewTrades"/>.
 		/// </summary>
 		/// <param name="security">The instrument by which trades getting should be started.</param>
-		void RegisterTrades(Security security);
+		/// <param name="from">The initial date from which you need to get data.</param>
+		/// <param name="to">The final date by which you need to get data.</param>
+		/// <param name="count">Max count.</param>
+		/// <param name="buildMode">Build mode.</param>
+		/// <param name="buildFrom">Which market-data type is used as a source value.</param>
+		void RegisterTrades(Security security, DateTimeOffset? from = null, DateTimeOffset? to = null, long? count = null, MarketDataBuildModes buildMode = MarketDataBuildModes.LoadAndBuild, MarketDataTypes? buildFrom = null);
 
 		/// <summary>
 		/// To stop getting trades (tick data) by the instrument.
@@ -553,7 +627,12 @@ namespace StockSharp.BusinessEntities
 		/// To start getting new information (for example, <see cref="Security.LastTrade"/> or <see cref="Security.BestBid"/>) by the instrument.
 		/// </summary>
 		/// <param name="security">The instrument by which new information getting should be started.</param>
-		void RegisterSecurity(Security security);
+		/// <param name="from">The initial date from which you need to get data.</param>
+		/// <param name="to">The final date by which you need to get data.</param>
+		/// <param name="count">Max count.</param>
+		/// <param name="buildMode">Build mode.</param>
+		/// <param name="buildFrom">Which market-data type is used as a source value.</param>
+		void RegisterSecurity(Security security, DateTimeOffset? from = null, DateTimeOffset? to = null, long? count = null, MarketDataBuildModes buildMode = MarketDataBuildModes.LoadAndBuild, MarketDataTypes? buildFrom = null);
 
 		/// <summary>
 		/// To stop getting new information.
@@ -565,7 +644,10 @@ namespace StockSharp.BusinessEntities
 		/// Subscribe on order log for the security.
 		/// </summary>
 		/// <param name="security">Security for subscription.</param>
-		void RegisterOrderLog(Security security);
+		/// <param name="from">The initial date from which you need to get data.</param>
+		/// <param name="to">The final date by which you need to get data.</param>
+		/// <param name="count">Max count.</param>
+		void RegisterOrderLog(Security security, DateTimeOffset? from = null, DateTimeOffset? to = null, long? count = null);
 
 		/// <summary>
 		/// Unsubscribe from order log for the security.
@@ -594,5 +676,17 @@ namespace StockSharp.BusinessEntities
 		/// Unsubscribe from news.
 		/// </summary>
 		void UnRegisterNews();
+
+		/// <summary>
+		/// Subscribe on the board changes.
+		/// </summary>
+		/// <param name="board">Board for subscription.</param>
+		void SubscribeBoard(ExchangeBoard board);
+
+		/// <summary>
+		/// Unsubscribe from the board changes.
+		/// </summary>
+		/// <param name="board">Board for unsubscription.</param>
+		void UnSubscribeBoard(ExchangeBoard board);
 	}
 }

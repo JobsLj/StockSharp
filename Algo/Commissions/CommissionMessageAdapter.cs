@@ -40,14 +40,8 @@ namespace StockSharp.Algo.Commissions
 		/// </summary>
 		public ICommissionManager CommissionManager
 		{
-			get { return _commissionManager; }
-			set
-			{
-				if (value == null)
-					throw new ArgumentNullException(nameof(value));
-
-				_commissionManager = value;
-			}
+			get => _commissionManager;
+			set => _commissionManager = value ?? throw new ArgumentNullException(nameof(value));
 		}
 
 		/// <summary>
@@ -56,6 +50,12 @@ namespace StockSharp.Algo.Commissions
 		/// <param name="message">Message.</param>
 		public override void SendInMessage(Message message)
 		{
+			if (message.IsBack)
+			{
+				base.SendInMessage(message);
+				return;
+			}
+
 			CommissionManager.Process(message);
 			base.SendInMessage(message);
 		}
@@ -66,9 +66,7 @@ namespace StockSharp.Algo.Commissions
 		/// <param name="message">The message.</param>
 		protected override void OnInnerAdapterNewOutMessage(Message message)
 		{
-			var execMsg = message as ExecutionMessage;
-
-			if (execMsg != null && execMsg.ExecutionType == ExecutionTypes.Transaction && execMsg.Commission == null)
+			if (!message.IsBack && message is ExecutionMessage execMsg && execMsg.ExecutionType == ExecutionTypes.Transaction && execMsg.Commission == null)
 				execMsg.Commission = CommissionManager.Process(execMsg);
 
 			base.OnInnerAdapterNewOutMessage(message);

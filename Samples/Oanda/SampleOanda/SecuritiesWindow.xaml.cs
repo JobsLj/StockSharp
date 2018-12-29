@@ -34,7 +34,7 @@ namespace SampleOanda
 		{
 			InitializeComponent();
 
-			CandlesPeriods.ItemsSource = OandaMessageAdapter.TimeFrames;
+			CandlesPeriods.ItemsSource = OandaMessageAdapter.AllTimeFrames;
 			CandlesPeriods.SelectedIndex = 0;
 		}
 
@@ -79,22 +79,28 @@ namespace SampleOanda
 
 		private void Level1Click(object sender, RoutedEventArgs e)
 		{
-			var security = SecurityPicker.SelectedSecurity;
 			var trader = MainWindow.Instance.Trader;
 
-			if (trader.RegisteredSecurities.Contains(security))
+			foreach (var security in SecurityPicker.SelectedSecurities)
 			{
-				trader.UnRegisterSecurity(security);
-			}
-			else
-			{
-				trader.RegisterSecurity(security);
+				if (trader.RegisteredSecurities.Contains(security))
+				{
+					trader.UnRegisterSecurity(security);
+				}
+				else
+				{
+					trader.RegisterSecurity(security);
+				}
 			}
 		}
 
 		private void FindClick(object sender, RoutedEventArgs e)
 		{
-			var wnd = new SecurityLookupWindow { Criteria = new Security { Code = "USD" } };
+			var wnd = new SecurityLookupWindow
+			{
+				ShowAllOption = MainWindow.Instance.Trader.MarketDataAdapter.IsSupportSecuritiesLookupAll,
+				Criteria = new Security { Code = "USD" }
+			};
 
 			if (!wnd.ShowModal(this))
 				return;
@@ -104,10 +110,13 @@ namespace SampleOanda
 
 		private void CandlesClick(object sender, RoutedEventArgs e)
 		{
-			var tf = (TimeSpan)CandlesPeriods.SelectedItem;
-			var series = new CandleSeries(typeof(TimeFrameCandle), SecurityPicker.SelectedSecurity, tf);
+			foreach (var security in SecurityPicker.SelectedSecurities)
+			{
+				var tf = (TimeSpan)CandlesPeriods.SelectedItem;
+				var series = new CandleSeries(typeof(TimeFrameCandle), security, tf);
 
-			new ChartWindow(series, tf.Ticks == 1 ? DateTime.Today : DateTime.Now.Subtract(TimeSpan.FromTicks(tf.Ticks * 10000)), DateTime.Now).Show();
+				new ChartWindow(series, tf.Ticks == 1 ? DateTime.Today : DateTime.Now.Subtract(TimeSpan.FromTicks(tf.Ticks * 10000))).Show();
+			}
 		}
 
 		private void CandlesPeriods_SelectionChanged(object sender, SelectionChangedEventArgs e)

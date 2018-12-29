@@ -20,25 +20,19 @@ namespace StockSharp.Messages
 	/// <summary>
 	/// Message adapter, forward messages through a transport channel <see cref="IMessageChannel"/>.
 	/// </summary>
-	public class ChannelMessageAdapter : MessageAdapterWrapper
+	public class ChannelMessageAdapter : MessageAdapterWrapper, IMessageSender
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ChannelMessageAdapter"/>.
 		/// </summary>
 		/// <param name="innerAdapter">Underlying adapter.</param>
-		/// <param name="inputChannel">Incomming messages channgel.</param>
+		/// <param name="inputChannel">Incoming messages channel.</param>
 		/// <param name="outputChannel">Outgoing message channel.</param>
 		public ChannelMessageAdapter(IMessageAdapter innerAdapter, IMessageChannel inputChannel, IMessageChannel outputChannel)
 			: base(innerAdapter)
 		{
-			if (inputChannel == null)
-				throw new ArgumentNullException(nameof(inputChannel));
-
-			if (outputChannel == null)
-				throw new ArgumentNullException(nameof(outputChannel));
-
-			InputChannel = inputChannel;
-			OutputChannel = outputChannel;
+			InputChannel = inputChannel ?? throw new ArgumentNullException(nameof(inputChannel));
+			OutputChannel = outputChannel ?? throw new ArgumentNullException(nameof(outputChannel));
 
 			InputChannel.NewOutMessage += InputChannelOnNewOutMessage;
 			OutputChannel.NewOutMessage += OutputChannelOnNewOutMessage;
@@ -113,6 +107,15 @@ namespace StockSharp.Messages
 				InputChannel.Open();
 
 			InputChannel.SendInMessage(message);
+		}
+
+		/// <inheritdoc />
+		public void SendOutMessage(Message message)
+		{
+			if (!OutputChannel.IsOpened)
+				OutputChannel.Open();
+
+			OutputChannel.SendInMessage(message);
 		}
 
 		/// <summary>

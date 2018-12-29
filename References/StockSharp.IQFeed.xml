@@ -4,6 +4,31 @@
     <name>StockSharp.IQFeed</name>
   </assembly>
   <members>
+    <member name="T:StockSharp.IQFeed.IQFeedLevel1ColumnComboBox">
+      <summary>
+            The drop-down list to select a set of fields <see cref="T:StockSharp.Messages.Level1Fields" />.
+            </summary>
+    </member>
+    <member name="M:StockSharp.IQFeed.IQFeedLevel1ColumnComboBox.#ctor">
+      <summary>
+            Initializes a new instance of the <see cref="T:StockSharp.IQFeed.IQFeedLevel1ColumnComboBox" />.
+            </summary>
+    </member>
+    <member name="M:StockSharp.IQFeed.IQFeedLevel1ColumnComboBox.OnLoadedInternal">
+      <summary>
+            Control loading handler.
+            </summary>
+    </member>
+    <member name="F:StockSharp.IQFeed.IQFeedLevel1ColumnComboBox.SelectedFieldsProperty">
+      <summary>
+        <see cref="T:System.Windows.DependencyProperty" /> for <see cref="P:StockSharp.IQFeed.IQFeedLevel1ColumnComboBox.SelectedFields" />.
+            </summary>
+    </member>
+    <member name="P:StockSharp.IQFeed.IQFeedLevel1ColumnComboBox.SelectedFields">
+      <summary>
+            The list of selected fields.
+            </summary>
+    </member>
     <member name="T:StockSharp.IQFeed.IQFeedMarketDataMessageAdapter">
       <summary>
             The messages adapter for IQFeed.
@@ -54,14 +79,14 @@
             Path to file with IQFeed list of securities, downloaded from the website. If path is specified, then secondary download from website does not occur, and only the local copy gets parsed.
             </summary>
     </member>
+    <member name="F:StockSharp.IQFeed.IQFeedMarketDataMessageAdapter.DefaultVersion">
+      <summary>
+            Default value for <see cref="P:StockSharp.IQFeed.IQFeedMarketDataMessageAdapter.Version" />.
+            </summary>
+    </member>
     <member name="P:StockSharp.IQFeed.IQFeedMarketDataMessageAdapter.Version">
       <summary>
             Protocol version.
-            </summary>
-    </member>
-    <member name="P:StockSharp.IQFeed.IQFeedMarketDataMessageAdapter.IsValid">
-      <summary>
-            The parameters validity check.
             </summary>
     </member>
     <member name="P:StockSharp.IQFeed.IQFeedMarketDataMessageAdapter.Level1ColumnRegistry">
@@ -69,22 +94,19 @@
             The list of all available <see cref="T:StockSharp.IQFeed.IQFeedLevel1Column" />.
             </summary>
     </member>
-    <member name="P:StockSharp.IQFeed.IQFeedMarketDataMessageAdapter.TimeFrames">
+    <member name="P:StockSharp.IQFeed.IQFeedMarketDataMessageAdapter.AllTimeFrames">
       <summary>
-            Available time frames.
+            Possible time-frames.
             </summary>
+    </member>
+    <member name="P:StockSharp.IQFeed.IQFeedMarketDataMessageAdapter.TimeFrames">
+      <inheritdoc />
     </member>
     <member name="M:StockSharp.IQFeed.IQFeedMarketDataMessageAdapter.Load(Ecng.Serialization.SettingsStorage)">
-      <summary>
-            Load settings.
-            </summary>
-      <param name="storage">Settings storage.</param>
+      <inheritdoc />
     </member>
     <member name="M:StockSharp.IQFeed.IQFeedMarketDataMessageAdapter.Save(Ecng.Serialization.SettingsStorage)">
-      <summary>
-            Save settings.
-            </summary>
-      <param name="storage">Settings storage.</param>
+      <inheritdoc />
     </member>
     <member name="M:StockSharp.IQFeed.IQFeedMarketDataMessageAdapter.ToString">
       <summary>
@@ -99,20 +121,19 @@
       <param name="transactionIdGenerator">Transaction id generator.</param>
     </member>
     <member name="P:StockSharp.IQFeed.IQFeedMarketDataMessageAdapter.IsSupportNativeSecurityLookup">
-      <summary>
-            Gets a value indicating whether the connector supports security lookup.
-            </summary>
+      <inheritdoc />
     </member>
     <member name="P:StockSharp.IQFeed.IQFeedMarketDataMessageAdapter.SecurityLookupRequired">
-      <summary>
-        <see cref="T:StockSharp.Messages.SecurityLookupMessage" /> required to get securities.
-            </summary>
+      <inheritdoc />
+    </member>
+    <member name="P:StockSharp.IQFeed.IQFeedMarketDataMessageAdapter.IsSupportSecuritiesLookupAll">
+      <inheritdoc />
+    </member>
+    <member name="P:StockSharp.IQFeed.IQFeedMarketDataMessageAdapter.IsSupportCandlesUpdates">
+      <inheritdoc />
     </member>
     <member name="M:StockSharp.IQFeed.IQFeedMarketDataMessageAdapter.OnSendInMessage(StockSharp.Messages.Message)">
-      <summary>
-            Send message.
-            </summary>
-      <param name="message">Message.</param>
+      <inheritdoc />
     </member>
     <member name="T:StockSharp.IQFeed.IQFeedAddresses">
       <summary>
@@ -175,12 +196,27 @@
             The list of all available <see cref="T:StockSharp.IQFeed.IQFeedLevel1Column" />.
             </summary>
     </member>
+    <member name="P:StockSharp.IQFeed.IQFeedLevel1ColumnRegistry.Instance">
+      <summary>
+            The <see cref="T:StockSharp.IQFeed.IQFeedLevel1ColumnRegistry" /> instance.
+            </summary>
+    </member>
     <member name="P:StockSharp.IQFeed.IQFeedLevel1ColumnRegistry.Item(System.String)">
       <summary>
             To get the column by name <see cref="P:StockSharp.IQFeed.IQFeedLevel1Column.Name" />.
             </summary>
       <param name="name">Column name.</param>
       <returns>Found column. If the column does not exist then <see langword="null" /> is returned.</returns>
+    </member>
+    <member name="P:StockSharp.IQFeed.IQFeedLevel1ColumnRegistry.AllColumns">
+      <summary>
+            All <see cref="T:StockSharp.IQFeed.IQFeedLevel1Column" /> columns.
+            </summary>
+    </member>
+    <member name="P:StockSharp.IQFeed.IQFeedLevel1ColumnRegistry.OptionalColumns">
+      <summary>
+            Optional <see cref="T:StockSharp.IQFeed.IQFeedLevel1Column" /> columns.
+            </summary>
     </member>
     <member name="F:StockSharp.IQFeed.IQFeedLevel1ColumnRegistry.Symbol">
       <summary>
@@ -259,7 +295,7 @@
     </member>
     <member name="F:StockSharp.IQFeed.IQFeedLevel1ColumnRegistry.ShortSaleRestrictedCode">
       <summary>
-            The flag which means the short sales allowability.
+            The flag which means the short sales allow ability.
             </summary>
     </member>
     <member name="F:StockSharp.IQFeed.IQFeedLevel1ColumnRegistry.NetAssetValueMutualFonds">
@@ -309,7 +345,7 @@
     </member>
     <member name="F:StockSharp.IQFeed.IQFeedLevel1ColumnRegistry.CloseRange1">
       <summary>
-            Сlosing range.
+            Closing range.
             </summary>
     </member>
     <member name="F:StockSharp.IQFeed.IQFeedLevel1ColumnRegistry.OpenRange2">
@@ -319,7 +355,7 @@
     </member>
     <member name="F:StockSharp.IQFeed.IQFeedLevel1ColumnRegistry.CloseRange2">
       <summary>
-            Сlosing range.
+            Closing range.
             </summary>
     </member>
     <member name="F:StockSharp.IQFeed.IQFeedLevel1ColumnRegistry.TradeCount">
@@ -570,42 +606,8 @@
       <param name="isSuccess">Whether all data were obtained successfully or the download process has been interrupted.</param>
       <returns>Historical candles.</returns>
     </member>
-    <member name="M:StockSharp.IQFeed.IQFeedTrader.GetSupportedRanges(StockSharp.Algo.Candles.CandleSeries)">
-      <summary>
-            To get time ranges for which this source of passed candles series has data.
-            </summary>
-      <param name="series">Candles series.</param>
-      <returns>Time ranges.</returns>
-    </member>
-    <member name="E:StockSharp.IQFeed.IQFeedTrader.NewCandles">
-      <summary>
-            Event of new candles occurring, that are received after the subscription by <see cref="M:StockSharp.IQFeed.IQFeedTrader.SubscribeCandles(StockSharp.Algo.Candles.CandleSeries,System.DateTimeOffset,System.DateTimeOffset)" />.
-            </summary>
-    </member>
-    <member name="E:StockSharp.IQFeed.IQFeedTrader.Stopped">
-      <summary>
-            The series processing end event.
-            </summary>
-    </member>
-    <member name="M:StockSharp.IQFeed.IQFeedTrader.SubscribeCandles(StockSharp.Algo.Candles.CandleSeries,System.DateTimeOffset,System.DateTimeOffset)">
-      <summary>
-            Subscribe to receive new candles.
-            </summary>
-      <param name="series">Candles series.</param>
-      <param name="from">The initial date from which you need to get data.</param>
-      <param name="to">The final date by which you need to get data.</param>
-    </member>
-    <member name="M:StockSharp.IQFeed.IQFeedTrader.UnSubscribeCandles(StockSharp.Algo.Candles.CandleSeries)">
-      <summary>
-            To stop the candles receiving subscription, previously created by <see cref="M:StockSharp.IQFeed.IQFeedTrader.SubscribeCandles(StockSharp.Algo.Candles.CandleSeries,System.DateTimeOffset,System.DateTimeOffset)" />.
-            </summary>
-      <param name="series">Candles series.</param>
-    </member>
     <member name="M:StockSharp.IQFeed.IQFeedTrader.OnProcessMessage(StockSharp.Messages.Message)">
-      <summary>
-            Process message.
-            </summary>
-      <param name="message">Message.</param>
+      <inheritdoc />
     </member>
   </members>
 </doc>

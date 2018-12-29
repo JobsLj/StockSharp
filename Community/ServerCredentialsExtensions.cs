@@ -20,7 +20,7 @@ namespace StockSharp.Community
 		/// <summary>
 		/// Try load credentials from <see cref="StockSharpFolder"/>.
 		/// </summary>
-		/// <param name="credentials">The class that contains a login and password to access the services http://stocksharp.com .</param>
+		/// <param name="credentials">The class that contains a login and password to access the services https://stocksharp.com .</param>
 		/// <returns><see langword="true"/> if the specified credentials was loaded successfully, otherwise, <see langword="false"/>.</returns>
 		public static bool TryLoadCredentials(this ServerCredentials credentials)
 		{
@@ -39,15 +39,33 @@ namespace StockSharp.Community
 		/// <summary>
 		/// Save the credentials to <see cref="StockSharpFolder"/>.
 		/// </summary>
-		/// <param name="credentials">The class that contains a login and password to access the services http://stocksharp.com .</param>
+		/// <param name="credentials">The class that contains a login and password to access the services https://stocksharp.com .</param>
 		public static void SaveCredentials(this ServerCredentials credentials)
 		{
 			if (credentials == null)
 				throw new ArgumentNullException(nameof(credentials));
 
+			credentials.SaveCredentials(credentials.AutoLogon);
+		}
+
+		/// <summary>
+		/// Save the credentials to <see cref="StockSharpFolder"/>.
+		/// </summary>
+		/// <param name="credentials">The class that contains a login and password to access the services https://stocksharp.com .</param>
+		/// <param name="savePassword">Save password.</param>
+		public static void SaveCredentials(this ServerCredentials credentials, bool savePassword)
+		{
+			if (credentials == null)
+				throw new ArgumentNullException(nameof(credentials));
+
+			var clone = credentials;
+
+			if (!savePassword)
+				clone.Password = null;
+
 			var file = Path.Combine(StockSharpFolder, _credentialsFile);
 
-			new XmlSerializer<SettingsStorage>().Serialize(credentials.Save(), file);
+			new XmlSerializer<SettingsStorage>().Serialize(clone.Save(), file);
 		}
 	}
 }

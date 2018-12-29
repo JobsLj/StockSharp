@@ -18,17 +18,13 @@ namespace StockSharp.Configuration
 	using System;
 	using System.Collections;
 	using System.Collections.Generic;
-	using System.Data.Common;
-	using System.IO;
+	using System.ComponentModel;
 	using System.Linq;
 	using System.Windows;
 
 	using Ecng.Collections;
 	using Ecng.Common;
 	using Ecng.Configuration;
-	using Ecng.Data;
-	using Ecng.Data.Sql;
-	using Ecng.Interop;
 	using Ecng.Serialization;
 	using Ecng.Xaml;
 
@@ -36,41 +32,76 @@ namespace StockSharp.Configuration
 	using StockSharp.Algo;
 	using StockSharp.Algo.Candles;
 	using StockSharp.Algo.Indicators;
-	using StockSharp.Algo.Storages;
+	using StockSharp.AlphaVantage;
 	using StockSharp.BarChart;
+	using StockSharp.Binance;
+	using StockSharp.Bitbank;
+	using StockSharp.Bitexbook;
+	using StockSharp.Bitfinex;
+	using StockSharp.Bithumb;
+	using StockSharp.Bitmex;
 	using StockSharp.BitStamp;
+	using StockSharp.Bittrex;
 	using StockSharp.Blackwood;
 	using StockSharp.Btce;
-	using StockSharp.CQG;
+	using StockSharp.Cex;
+	using StockSharp.Coinbase;
+	using StockSharp.Coincheck;
+	using StockSharp.CoinExchange;
+	using StockSharp.Cqg.Continuum;
+	using StockSharp.Cqg.Com;
+	using StockSharp.Cryptopia;
+	using StockSharp.Deribit;
+	using StockSharp.Digifinex;
 	using StockSharp.ETrade;
+	using StockSharp.Exmo;
 	using StockSharp.Fix;
+	using StockSharp.Fxcm;
+	using StockSharp.Gdax;
+	using StockSharp.HitBtc;
+	using StockSharp.Huobi;
+	using StockSharp.Idax;
+	using StockSharp.IEX;
 	using StockSharp.InteractiveBrokers;
 	using StockSharp.IQFeed;
 	using StockSharp.ITCH;
+	using StockSharp.Kraken;
+	using StockSharp.Kucoin;
+	using StockSharp.Liqui;
+	using StockSharp.LiveCoin;
 	using StockSharp.LMAX;
 	using StockSharp.Logging;
 	using StockSharp.Micex;
 	using StockSharp.Oanda;
+	using StockSharp.Okcoin;
+	using StockSharp.Okex;
 	using StockSharp.OpenECry;
 	using StockSharp.Plaza;
+	using StockSharp.Poloniex;
+	using StockSharp.QuantHouse;
 	using StockSharp.Quik;
 	using StockSharp.Quik.Lua;
+	using StockSharp.Quoinex;
 	using StockSharp.Rithmic;
 	using StockSharp.Rss;
 	using StockSharp.SmartCom;
+	using StockSharp.SpbEx;
 	using StockSharp.Sterling;
+	using StockSharp.TradeOgre;
 	using StockSharp.Transaq;
 	using StockSharp.Twime;
 	using StockSharp.Xaml;
 	using StockSharp.Xaml.Charting;
 	using StockSharp.Xaml.Charting.IndicatorPainters;
+	using StockSharp.Yobit;
+	using StockSharp.Zaif;
 
 	/// <summary>
 	/// Extension class.
 	/// </summary>
 	public static class Extensions
 	{
-		private static readonly ConnectorInfo[] _customConnections = ArrayHelper.Empty<ConnectorInfo>();
+		private static readonly Type[] _customAdapters = ArrayHelper.Empty<Type>();
 		private static readonly IndicatorType[] _customIndicators = ArrayHelper.Empty<IndicatorType>();
 		private static readonly Type[] _customCandles = ArrayHelper.Empty<Type>();
 		private static readonly Type[] _customDiagramElements = ArrayHelper.Empty<Type>();
@@ -82,7 +113,7 @@ namespace StockSharp.Configuration
 			if (section == null)
 				return;
 
-			_customConnections = SafeAdd<ConnectionElement, ConnectorInfo>(section.CustomConnections, elem => new ConnectorInfo(elem.Type.To<Type>()));
+			_customAdapters = SafeAdd<ConnectionElement, Type>(section.CustomConnections, elem => elem.Type.To<Type>());
 			_customIndicators = SafeAdd<IndicatorElement, IndicatorType>(section.CustomIndicators, elem => new IndicatorType(elem.Type.To<Type>(), elem.Painter.To<Type>()));
 			_customCandles = SafeAdd<CandleElement, Type>(section.CustomCandles, elem => elem.Type.To<Type>());
 			_customDiagramElements = SafeAdd<DiagramElement, Type>(section.CustomDiagramElements, elem => elem.Type.To<Type>());
@@ -135,8 +166,92 @@ namespace StockSharp.Configuration
 		public static bool Configure(this BasketMessageAdapter adapter, Window owner)
 		{
 			var autoConnect = false;
-			return adapter.Configure(owner, ref autoConnect);
+			SettingsStorage settings = null;
+			return adapter.Configure(owner, ref autoConnect, ref settings);
 		}
+
+		private static readonly Lazy<Func<Type>[]> _adapters = new Lazy<Func<Type>[]>(() => new[]
+		{
+			(Func<Type>)(() => typeof(AlfaDirectMessageAdapter)),
+			() => typeof(BarChartMessageAdapter),
+			() => typeof(BitStampMessageAdapter),
+			() => typeof(BlackwoodMessageAdapter),
+			() => typeof(BtceMessageAdapter),
+			() => typeof(CqgComMessageAdapter),
+			() => typeof(CqgContinuumMessageAdapter),
+			() => typeof(ETradeMessageAdapter),
+			() => typeof(FixMessageAdapter),
+			() => typeof(FastMessageAdapter),
+			() => typeof(InteractiveBrokersMessageAdapter),
+			() => typeof(IQFeedMarketDataMessageAdapter),
+			() => typeof(ItchMessageAdapter),
+			() => typeof(LmaxMessageAdapter),
+			() => typeof(MicexMessageAdapter),
+			() => typeof(OandaMessageAdapter),
+			() => typeof(OpenECryMessageAdapter),
+			() => typeof(PlazaMessageAdapter),
+			() => typeof(LuaFixTransactionMessageAdapter),
+			() => typeof(LuaFixMarketDataMessageAdapter),
+			() => typeof(QuikTrans2QuikAdapter),
+			() => typeof(QuikDdeAdapter),
+			() => typeof(RithmicMessageAdapter),
+			() => typeof(RssMarketDataMessageAdapter),
+			() => typeof(SmartComMessageAdapter),
+			() => typeof(SterlingMessageAdapter),
+			() => typeof(TransaqMessageAdapter),
+			() => typeof(TwimeMessageAdapter),
+			() => typeof(SpbExMessageAdapter),
+			() => typeof(FxcmMessageAdapter),
+			() => typeof(QuantFeedMessageAdapter),
+			() => typeof(BitfinexMessageAdapter),
+			() => typeof(BithumbMessageAdapter),
+			() => typeof(BittrexMessageAdapter),
+			() => typeof(CoinbaseMessageAdapter),
+			() => typeof(CoincheckMessageAdapter),
+			() => typeof(GdaxMessageAdapter),
+			() => typeof(HitBtcMessageAdapter),
+			() => typeof(KrakenMessageAdapter),
+			() => typeof(OkcoinMessageAdapter),
+			() => typeof(PoloniexMessageAdapter),
+			() => typeof(BinanceMessageAdapter),
+			() => typeof(BitexbookMessageAdapter),
+			() => typeof(BitmexMessageAdapter),
+			() => typeof(CexMessageAdapter),
+			() => typeof(CoinExchangeMessageAdapter),
+			() => typeof(CryptopiaMessageAdapter),
+			() => typeof(DeribitMessageAdapter),
+			() => typeof(ExmoMessageAdapter),
+			() => typeof(HuobiMessageAdapter),
+			() => typeof(KucoinMessageAdapter),
+			() => typeof(LiquiMessageAdapter),
+			() => typeof(LiveCoinMessageAdapter),
+			() => typeof(OkexMessageAdapter),
+			() => typeof(YobitMessageAdapter),
+			() => typeof(AlphaVantageMessageAdapter),
+			() => typeof(IEXMessageAdapter),
+			() => typeof(QuoinexMessageAdapter),
+			() => typeof(BitbankMessageAdapter),
+			() => typeof(ZaifMessageAdapter),
+			() => typeof(DigifinexMessageAdapter),
+			() => typeof(IdaxMessageAdapter),
+			() => typeof(TradeOgreMessageAdapter),
+		});
+
+		/// <summary>
+		/// All available adapters.
+		/// </summary>
+		public static IEnumerable<Type> Adapters => _customAdapters.Concat(_adapters.Value.Select(v =>
+		{
+			try
+			{
+				return v();
+			}
+			catch (Exception e)
+			{
+				e.LogError();
+				return null;
+			}
+		}).Where(t => t != null));
 
 		/// <summary>
 		/// Configure connection using <see cref="ConnectorWindow"/>.
@@ -144,8 +259,9 @@ namespace StockSharp.Configuration
 		/// <param name="adapter">The connection.</param>
 		/// <param name="owner">UI thread owner.</param>
 		/// <param name="autoConnect">Auto connect.</param>
+		/// <param name="windowSettings"><see cref="ConnectorWindow"/> settings.</param>
 		/// <returns><see langword="true"/> if the specified connection was configured, otherwise, <see langword="false"/>.</returns>
-		public static bool Configure(this BasketMessageAdapter adapter, Window owner, ref bool autoConnect)
+		public static bool Configure(this BasketMessageAdapter adapter, Window owner, ref bool autoConnect, ref SettingsStorage windowSettings)
 		{
 			if (adapter == null)
 				throw new ArgumentNullException(nameof(adapter));
@@ -155,43 +271,26 @@ namespace StockSharp.Configuration
 
 			var wnd = new ConnectorWindow();
 
-			wnd.ConnectorsInfo.AddRange(_customConnections);
+			if (windowSettings != null)
+				wnd.Load(windowSettings);
 
-			AddConnectorInfo(wnd, typeof(AlfaDirectMessageAdapter));
-			AddConnectorInfo(wnd, typeof(BarChartMessageAdapter));
-			AddConnectorInfo(wnd, typeof(BitStampMessageAdapter));
-			AddConnectorInfo(wnd, typeof(BlackwoodMessageAdapter));
-			AddConnectorInfo(wnd, typeof(BtceMessageAdapter));
-			AddConnectorInfo(wnd, typeof(CQGMessageAdapter));
-			AddConnectorInfo(wnd, typeof(ETradeMessageAdapter));
-			AddConnectorInfo(wnd, typeof(FixMessageAdapter));
-			AddConnectorInfo(wnd, typeof(InteractiveBrokersMessageAdapter));
-			AddConnectorInfo(wnd, typeof(IQFeedMarketDataMessageAdapter));
-			AddConnectorInfo(wnd, typeof(ItchMessageAdapter));
-			AddConnectorInfo(wnd, typeof(LmaxMessageAdapter));
-			AddConnectorInfo(wnd, typeof(MicexMessageAdapter));
-			AddConnectorInfo(wnd, typeof(OandaMessageAdapter));
-			AddConnectorInfo(wnd, typeof(OpenECryMessageAdapter));
-			AddConnectorInfo(wnd, typeof(PlazaMessageAdapter));
-			AddConnectorInfo(wnd, typeof(LuaFixTransactionMessageAdapter));
-			AddConnectorInfo(wnd, typeof(LuaFixMarketDataMessageAdapter));
-			AddConnectorInfo(wnd, typeof(QuikTrans2QuikAdapter));
-			AddConnectorInfo(wnd, typeof(QuikDdeAdapter));
-			AddConnectorInfo(wnd, typeof(RithmicMessageAdapter));
-			AddConnectorInfo(wnd, typeof(RssMarketDataMessageAdapter));
-			AddConnectorInfo(wnd, typeof(SmartComMessageAdapter));
-			AddConnectorInfo(wnd, typeof(SterlingMessageAdapter));
-			AddConnectorInfo(wnd, typeof(TransaqMessageAdapter));
-			AddConnectorInfo(wnd, typeof(TwimeMessageAdapter));
+			foreach (var a in Adapters)
+			{
+				AddConnectorInfo(wnd, a);
+			}
 
 			wnd.Adapter = (BasketMessageAdapter)adapter.Clone();
 			wnd.AutoConnect = autoConnect;
 
 			if (!wnd.ShowModal(owner))
+			{
+				windowSettings = wnd.Save();
 				return false;
+			}
 
 			adapter.Load(wnd.Adapter.Save());
 			autoConnect = wnd.AutoConnect;
+			windowSettings = wnd.Save();
 
 			return true;
 		}
@@ -218,13 +317,13 @@ namespace StockSharp.Configuration
 
 				var rendererTypes = typeof(Chart).Assembly
 					.GetTypes()
-					.Where(t => !t.IsAbstract && typeof(BaseChartIndicatorPainter).IsAssignableFrom(t))
-					.ToDictionary(t => t.Name);
+					.Where(t => !t.IsAbstract && typeof(BaseChartIndicatorPainter).IsAssignableFrom(t) && t.GetAttribute<IndicatorAttribute>() != null)
+					.ToDictionary(t => t.GetAttribute<IndicatorAttribute>().Type);
 
 				_indicatorTypes = typeof(IIndicator).Assembly
 					.GetTypes()
-					.Where(t => t.Namespace == ns && !t.IsAbstract && typeof(IIndicator).IsAssignableFrom(t))
-					.Select(t => new IndicatorType(t, rendererTypes.TryGetValue(t.Name + "Painter")))
+					.Where(t => t.Namespace == ns && !t.IsAbstract && typeof(IIndicator).IsAssignableFrom(t) && t.GetConstructor(Type.EmptyTypes) != null && t.GetAttribute<BrowsableAttribute>()?.Browsable != false)
+					.Select(t => new IndicatorType(t, rendererTypes.TryGetValue(t)))
 					.Concat(_customIndicators)
 					.OrderBy(t => t.Name)
 					.ToArray();
@@ -260,8 +359,7 @@ namespace StockSharp.Configuration
 					.GetTypes()
 					.Where(t => !t.IsAbstract && 
 						t.IsSubclassOf(typeof(Xaml.Diagram.DiagramElement)) && 
-						t != typeof(Xaml.Diagram.CompositionDiagramElement) &&
-						t != typeof(Xaml.Diagram.ExportDiagramElement))
+						t != typeof(Xaml.Diagram.CompositionDiagramElement))
 					.Concat(_customDiagramElements)
 					.OrderBy(t => t.Name)
 					.ToArray();
@@ -285,75 +383,6 @@ namespace StockSharp.Configuration
 				.Where(t => !t.IsAbstract && t.IsCandle())
 				.Concat(_customCandles)
 				.ToArray());
-		}
-
-		/// <summary>
-		/// First time database initialization.
-		/// </summary>
-		/// <param name="entityRegistry">The storage of trade objects.</param>
-		/// <param name="databaseRaw">Raw bytes of database file.</param>
-		/// <param name="init">Initialization callback.</param>
-		/// <returns>Path to the database file.</returns>
-		public static string FirstTimeInit(this IEntityRegistry entityRegistry, byte[] databaseRaw, Action<Database> init = null)
-		{
-			if (entityRegistry == null)
-				throw new ArgumentNullException(nameof(entityRegistry));
-
-			if (databaseRaw == null)
-				throw new ArgumentNullException(nameof(databaseRaw));
-
-			var database = entityRegistry.Storage as Database;
-			return database?.FirstTimeInit(databaseRaw, init);
-		}
-
-		/// <summary>
-		/// First time database initialization.
-		/// </summary>
-		/// <param name="database">The database.</param>
-		/// <param name="databaseRaw">Raw bytes of database file.</param>
-		/// <param name="init">Initialization callback.</param>
-		/// <returns>Path to the database file.</returns>
-		public static string FirstTimeInit(this Database database, byte[] databaseRaw, Action<Database> init = null)
-		{
-			if (database == null)
-				throw new ArgumentNullException(nameof(database));
-
-			if (databaseRaw == null)
-				throw new ArgumentNullException(nameof(databaseRaw));
-
-			var conStr = new DbConnectionStringBuilder
-			{
-				ConnectionString = database.ConnectionString
-			};
-
-			var dbFile = (string)conStr.Cast<KeyValuePair<string, object>>().ToDictionary(StringComparer.InvariantCultureIgnoreCase).TryGetValue("Data Source");
-
-			if (dbFile == null)
-				return null;
-
-			dbFile = dbFile.ToFullPathIfNeed();
-
-			conStr["Data Source"] = dbFile;
-			database.ConnectionString = conStr.ToString();
-
-			dbFile.CreateDirIfNotExists();
-
-			if (!File.Exists(dbFile))
-			{
-				databaseRaw.Save(dbFile);
-				UpdateDatabaseWalMode(database);
-
-				init?.Invoke(database);
-			}
-
-			return dbFile;
-		}
-
-		private static void UpdateDatabaseWalMode(Database database)
-		{
-			var walQuery = Query.Execute("PRAGMA journal_mode=WAL;");
-			var walCmd = database.GetCommand(walQuery, null, new FieldList(), new FieldList(), false);
-			database.Execute(walCmd, new SerializationItemCollection(), false);
 		}
 	}
 }

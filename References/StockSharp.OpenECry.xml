@@ -21,10 +21,10 @@
             </summary>
     </member>
     <member name="M:StockSharp.OpenECry.OpenECryMessageAdapter.CreateOrderCondition">
-      <summary>
-            Create condition for order type <see cref="F:StockSharp.Messages.OrderTypes.Conditional" />, that supports the adapter.
-            </summary>
-      <returns>Order condition. If the connection does not support the order type <see cref="F:StockSharp.Messages.OrderTypes.Conditional" />, it will be returned <see langword="null" />.</returns>
+      <inheritdoc />
+    </member>
+    <member name="P:StockSharp.OpenECry.OpenECryMessageAdapter.IsSupportStopLoss">
+      <inheritdoc />
     </member>
     <member name="P:StockSharp.OpenECry.OpenECryMessageAdapter.SecurityLookupRequired">
       <summary>
@@ -41,6 +41,9 @@
             Gets a value indicating whether the connector supports security lookup.
             </summary>
     </member>
+    <member name="P:StockSharp.OpenECry.OpenECryMessageAdapter.IsSupportCandlesUpdates">
+      <inheritdoc />
+    </member>
     <member name="M:StockSharp.OpenECry.OpenECryMessageAdapter.OnSendInMessage(StockSharp.Messages.Message)">
       <summary>
             Send message.
@@ -50,6 +53,14 @@
     <member name="P:StockSharp.OpenECry.OpenECryMessageAdapter.SecurityExtendedFields">
       <summary>
             Names of extended security fields in <see cref="T:StockSharp.Messages.SecurityMessage" />.
+            </summary>
+    </member>
+    <member name="P:StockSharp.OpenECry.OpenECryMessageAdapter.IsSupportSecuritiesLookupAll">
+      <inheritdoc />
+    </member>
+    <member name="F:StockSharp.OpenECry.OpenECryMessageAdapter.DefaultHeartbeatInterval">
+      <summary>
+            Default value for <see cref="P:StockSharp.Messages.MessageAdapter.HeartbeatInterval" />.
             </summary>
     </member>
     <member name="P:StockSharp.OpenECry.OpenECryMessageAdapter.Address">
@@ -87,10 +98,13 @@
             Use OpenECry API logging.
             </summary>
     </member>
-    <member name="P:StockSharp.OpenECry.OpenECryMessageAdapter.TimeFrames">
+    <member name="P:StockSharp.OpenECry.OpenECryMessageAdapter.AllTimeFrames">
       <summary>
-            Available time frames.
+            Possible time-frames.
             </summary>
+    </member>
+    <member name="P:StockSharp.OpenECry.OpenECryMessageAdapter.TimeFrames">
+      <inheritdoc />
     </member>
     <member name="M:StockSharp.OpenECry.OpenECryMessageAdapter.Save(Ecng.Serialization.SettingsStorage)">
       <summary>
@@ -116,7 +130,7 @@
     </member>
     <member name="F:StockSharp.OpenECry.OpenECryRemoting.Primary">
       <summary>
-            If there is another connection with the same Login/Password, it can be diconnected.
+            If there is another connection with the same Login/Password, it can be disconnected.
             </summary>
     </member>
     <member name="F:StockSharp.OpenECry.OpenECryRemoting.Secondary">
@@ -149,42 +163,42 @@
             Production server. Address is prod.gainfutures.com, port 9200.
             </summary>
     </member>
-    <member name="T:StockSharp.OpenECry.OpenECryStopType">
+    <member name="T:StockSharp.OpenECry.OpenECryStopTypes">
       <summary>
             The type of the conditional order OpenECry.
             </summary>
     </member>
-    <member name="F:StockSharp.OpenECry.OpenECryStopType.StopMarket">
+    <member name="F:StockSharp.OpenECry.OpenECryStopTypes.StopMarket">
       <summary>
             The market order is automatically registered after reaching the stop price.
             </summary>
     </member>
-    <member name="F:StockSharp.OpenECry.OpenECryStopType.StopLimit">
+    <member name="F:StockSharp.OpenECry.OpenECryStopTypes.StopLimit">
       <summary>
             The limit order is automatically registered after reaching the stop price.
             </summary>
     </member>
-    <member name="F:StockSharp.OpenECry.OpenECryStopType.TrailingStopMarket">
+    <member name="F:StockSharp.OpenECry.OpenECryStopTypes.TrailingStopMarket">
       <summary>
             Stop price automatically follows the market, but only in a profitable direction for position, staying on specified in advance interval from market price. If the market reaches the stop price, the market order is automatically registered.
             </summary>
     </member>
-    <member name="F:StockSharp.OpenECry.OpenECryStopType.TrailingStopLimit">
+    <member name="F:StockSharp.OpenECry.OpenECryStopTypes.TrailingStopLimit">
       <summary>
-            As <see cref="F:StockSharp.OpenECry.OpenECryStopType.TrailingStopMarket" />, but when it reaches the stop price the limit order is registered.
+            As <see cref="F:StockSharp.OpenECry.OpenECryStopTypes.TrailingStopMarket" />, but when it reaches the stop price the limit order is registered.
             </summary>
     </member>
-    <member name="F:StockSharp.OpenECry.OpenECryStopType.MarketOnClose">
+    <member name="F:StockSharp.OpenECry.OpenECryStopTypes.MarketOnClose">
       <summary>
             To match at the market price, if the closing price is higher than the expected price.
             </summary>
     </member>
-    <member name="F:StockSharp.OpenECry.OpenECryStopType.MarketIfTouched">
+    <member name="F:StockSharp.OpenECry.OpenECryStopTypes.MarketIfTouched">
       <summary>
             With the market price when the condition is fulfilled.
             </summary>
     </member>
-    <member name="F:StockSharp.OpenECry.OpenECryStopType.MarketOnOpen">
+    <member name="F:StockSharp.OpenECry.OpenECryStopTypes.MarketOnOpen">
       <summary>
             At trading opening.
             </summary>
@@ -211,7 +225,7 @@
     </member>
     <member name="P:StockSharp.OpenECry.OpenECryOrderCondition.Delta">
       <summary>
-            Trailing stop follows the market if price change is larger than Delta.
+            Trailing stop follows the market if price change is larger than <see cref="P:StockSharp.OpenECry.OpenECryOrderCondition.Delta" />.
             </summary>
     </member>
     <member name="P:StockSharp.OpenECry.OpenECryOrderCondition.IsPercentDelta">
@@ -226,7 +240,7 @@
     </member>
     <member name="P:StockSharp.OpenECry.OpenECryOrderCondition.ReferencePrice">
       <summary>
-            Trailing stop begins tracking once the price reaches ReferencePrice.
+            Trailing stop begins tracking once the price reaches <see cref="P:StockSharp.OpenECry.OpenECryOrderCondition.ReferencePrice" />.
             </summary>
     </member>
     <member name="P:StockSharp.OpenECry.OpenECryOrderCondition.SplitVolume">
@@ -241,7 +255,7 @@
     </member>
     <member name="T:StockSharp.OpenECry.OpenECryTrader">
       <summary>
-            The interface <see cref="T:StockSharp.BusinessEntities.IConnector" /> implementation which provides a connection to the OEC broker.
+            The interface <see cref="T:StockSharp.BusinessEntities.IConnector" /> implementation which provides a connection to the <see cref="N:StockSharp.OpenECry" />.
             </summary>
     </member>
     <member name="M:StockSharp.OpenECry.OpenECryTrader.#ctor">
@@ -290,36 +304,6 @@
             </summary>
       <param name="userName">The recipient name.</param>
       <param name="text">Message text.</param>
-    </member>
-    <member name="E:StockSharp.OpenECry.OpenECryTrader.NewCandles">
-      <summary>
-            Event of new candles occurring, that are received after the subscription by <see cref="M:StockSharp.OpenECry.OpenECryTrader.SubscribeCandles(StockSharp.Algo.Candles.CandleSeries,System.DateTimeOffset,System.DateTimeOffset)" />.
-            </summary>
-    </member>
-    <member name="E:StockSharp.OpenECry.OpenECryTrader.Stopped">
-      <summary>
-            The series processing end event.
-            </summary>
-    </member>
-    <member name="M:StockSharp.OpenECry.OpenECryTrader.SubscribeCandles(StockSharp.Algo.Candles.CandleSeries,System.DateTimeOffset,System.DateTimeOffset)">
-      <summary>
-            Subscribe to receive new candles.
-            </summary>
-      <param name="series">Candles series.</param>
-      <param name="from">The initial date from which you need to get data.</param>
-      <param name="to">The final date by which you need to get data.</param>
-    </member>
-    <member name="M:StockSharp.OpenECry.OpenECryTrader.UnSubscribeCandles(StockSharp.Algo.Candles.CandleSeries)">
-      <summary>
-            To stop the candles receiving subscription, previously created by <see cref="M:StockSharp.OpenECry.OpenECryTrader.SubscribeCandles(StockSharp.Algo.Candles.CandleSeries,System.DateTimeOffset,System.DateTimeOffset)" />.
-            </summary>
-      <param name="series">Candles series.</param>
-    </member>
-    <member name="M:StockSharp.OpenECry.OpenECryTrader.OnProcessMessage(StockSharp.Messages.Message)">
-      <summary>
-            Process message.
-            </summary>
-      <param name="message">Message.</param>
     </member>
     <member name="T:StockSharp.OpenECry.Xaml.OpenECryAddressComboBox">
       <summary>

@@ -40,14 +40,8 @@ namespace StockSharp.Algo.Slippage
 		/// </summary>
 		public ISlippageManager SlippageManager
 		{
-			get { return _slippageManager; }
-			set
-			{
-				if (value == null)
-					throw new ArgumentNullException(nameof(value));
-
-				_slippageManager = value;
-			}
+			get => _slippageManager;
+			set => _slippageManager = value ?? throw new ArgumentNullException(nameof(value));
 		}
 
 		/// <summary>
@@ -56,8 +50,14 @@ namespace StockSharp.Algo.Slippage
 		/// <param name="message">Message.</param>
 		public override void SendInMessage(Message message)
 		{
+			if (message.IsBack)
+			{
+				base.SendInMessage(message);
+				return;
+			}
+
 			SlippageManager.ProcessMessage(message);
-			InnerAdapter.SendInMessage(message);
+			base.SendInMessage(message);
 		}
 
 		/// <summary>
@@ -66,14 +66,17 @@ namespace StockSharp.Algo.Slippage
 		/// <param name="message">The message.</param>
 		protected override void OnInnerAdapterNewOutMessage(Message message)
 		{
-			var slippage = SlippageManager.ProcessMessage(message);
-
-			if (slippage != null)
+			if (!message.IsBack)
 			{
-				var execMsg = (ExecutionMessage)message;
+				var slippage = SlippageManager.ProcessMessage(message);
 
-				if (execMsg.Slippage == null)
-					execMsg.Slippage = slippage;
+				if (slippage != null)
+				{
+					var execMsg = (ExecutionMessage)message;
+
+					if (execMsg.Slippage == null)
+						execMsg.Slippage = slippage;
+				}	
 			}
 
 			base.OnInnerAdapterNewOutMessage(message);

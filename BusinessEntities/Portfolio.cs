@@ -18,6 +18,7 @@ namespace StockSharp.BusinessEntities
 	using System;
 	using System.ComponentModel;
 	using System.Runtime.Serialization;
+	using System.Xml.Serialization;
 
 	using Ecng.Serialization;
 
@@ -52,7 +53,7 @@ namespace StockSharp.BusinessEntities
 		[MainCategory]
 		public string Name
 		{
-			get { return _name; }
+			get => _name;
 			set
 			{
 				if (_name == value)
@@ -69,20 +70,20 @@ namespace StockSharp.BusinessEntities
 		/// Margin leverage.
 		/// </summary>
 		[DataMember]
-		[DisplayNameLoc(LocalizedStrings.Str542Key)]
+		[DisplayNameLoc(LocalizedStrings.LeverageKey)]
 		[DescriptionLoc(LocalizedStrings.Str261Key, true)]
 		[MainCategory]
 		[Nullable]
 		public decimal? Leverage
 		{
-			get { return _leverage; }
+			get => _leverage;
 			set
 			{
 				if (_leverage == value)
 					return;
 
 				if (value < 0)
-					throw new ArgumentOutOfRangeException(nameof(value));
+					throw new ArgumentOutOfRangeException(nameof(value), value, LocalizedStrings.Str1219);
 
 				_leverage = value;
 				NotifyChanged(nameof(Leverage));
@@ -128,7 +129,7 @@ namespace StockSharp.BusinessEntities
 		[Browsable(false)]
 		public PortfolioStates? State
 		{
-			get { return _state; }
+			get => _state;
 			set
 			{
 				if (_state == value)
@@ -139,12 +140,46 @@ namespace StockSharp.BusinessEntities
 			}
 		}
 
-		private static readonly Portfolio _anonymousPortfolio = new Portfolio { Name = LocalizedStrings.Str545 };
+		private decimal? _commissionTaker;
+
+		/// <summary>
+		/// Commission (taker).
+		/// </summary>
+		[Ignore]
+		[XmlIgnore]
+		[Browsable(false)]
+		public decimal? CommissionTaker
+		{
+			get => _commissionTaker;
+			set
+			{
+				_commissionTaker = value;
+				NotifyChanged(nameof(CommissionTaker));
+			}
+		}
+
+		private decimal? _commissionMaker;
+
+		/// <summary>
+		/// Commission (maker).
+		/// </summary>
+		[Ignore]
+		[XmlIgnore]
+		[Browsable(false)]
+		public decimal? CommissionMaker
+		{
+			get => _commissionMaker;
+			set
+			{
+				_commissionMaker = value;
+				NotifyChanged(nameof(CommissionMaker));
+			}
+		}
 
 		/// <summary>
 		/// Portfolio associated with the orders received through the orders log.
 		/// </summary>
-		public static Portfolio AnonymousPortfolio => _anonymousPortfolio;
+		public static Portfolio AnonymousPortfolio { get; } = new Portfolio { Name = LocalizedStrings.Str545 };
 
 		/// <summary>
 		/// Create a copy of <see cref="Portfolio"/>.
@@ -171,6 +206,8 @@ namespace StockSharp.BusinessEntities
 			destination.Leverage = Leverage;
 			//destination.Connector = Connector;
 			destination.State = State;
+			destination.CommissionMaker = CommissionMaker;
+			destination.CommissionTaker = CommissionTaker;
 		}
 
 		/// <summary>

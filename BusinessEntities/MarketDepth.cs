@@ -23,8 +23,6 @@ namespace StockSharp.BusinessEntities
 	using Ecng.Collections;
 	using Ecng.Common;
 
-	using MoreLinq;
-
 	using StockSharp.Messages;
 	using StockSharp.Localization;
 
@@ -34,20 +32,15 @@ namespace StockSharp.BusinessEntities
 	[System.Runtime.Serialization.DataContract]
 	[Serializable]
 	//[EntityFactory(typeof(UnitializedEntityFactory<MarketDepth>))]
-	public class MarketDepth : Cloneable<MarketDepth>, IEnumerable<Quote>, ISynchronizedCollection
+	public class MarketDepth : Cloneable<MarketDepth>, IEnumerable<Quote>//, ISynchronizedCollection
 	{
-		private readonly SyncObject _syncRoot = new SyncObject();
-
 		/// <summary>
 		/// Create order book.
 		/// </summary>
 		/// <param name="security">Security.</param>
 		public MarketDepth(Security security)
 		{
-			if (ReferenceEquals(security, null))
-				throw new ArgumentNullException(nameof(security));
-
-			Security = security;
+			Security = security ?? throw new ArgumentNullException(nameof(security));
 			_bids = _asks = ArrayHelper.Empty<Quote>();
 		}
 
@@ -59,9 +52,11 @@ namespace StockSharp.BusinessEntities
 		/// <remarks>
 		/// The default value is 100. If the exceeded the maximum depth the event <see cref="MarketDepth.QuoteOutOfDepth"/> will triggered.
 		/// </remarks>
+		[DisplayNameLoc(LocalizedStrings.Str1660Key)]
+		[Obsolete]
 		public int MaxDepth
 		{
-			get { return _maxDepth; }
+			get => _maxDepth;
 			set
 			{
 				if (value < 1)
@@ -69,7 +64,7 @@ namespace StockSharp.BusinessEntities
 
 				_maxDepth = value;
 
-				Truncate(Bids, Asks, default(DateTimeOffset));
+				//Truncate(Bids, Asks, default(DateTimeOffset));
 			}
 		}
 
@@ -119,31 +114,17 @@ namespace StockSharp.BusinessEntities
 		/// </summary>
 		public DateTimeOffset LocalTime { get; set; }
 
-		// TODO
-		//private Quote[] _bidsCache;
 		private Quote[] _bids;
 
 		/// <summary>
 		/// Get the array of bids sorted by descending price. The first (best) bid will be the maximum price.
 		/// </summary>
+		[DisplayNameLoc(LocalizedStrings.Str281Key)]
+		[DescriptionLoc(LocalizedStrings.Str282Key)]
 		public Quote[] Bids 
 		{
-			get
-			{
-				return _bids;
-				//lock (_syncRoot)
-				//{
-				//    return _bidsCache ?? (_bidsCache = _bids.Select(q => q.Clone()).ToArray());
-				//}
-			}
-			private set
-			{
-				if (value == null)
-					throw new ArgumentNullException(nameof(value));
-
-				_bids = value;
-				//_bidsCache = null;
-			}
+			get => _bids;
+			private set => _bids = value ?? throw new ArgumentNullException(nameof(value));
 		}
 
 		//private Quote[] _asksCache;
@@ -152,138 +133,89 @@ namespace StockSharp.BusinessEntities
 		/// <summary>
 		/// Get the array of asks sorted by ascending price. The first (best) ask will be the minimum price.
 		/// </summary>
+		[DisplayNameLoc(LocalizedStrings.Str283Key)]
+		[DescriptionLoc(LocalizedStrings.Str284Key)]
 		public Quote[] Asks 
 		{ 
-			get
-			{
-				return _asks;
-				//lock (_syncRoot)
-				//{
-				//    return _asksCache ?? (_asksCache = _asks.Select(q => q.Clone()).ToArray());
-				//}
-			}
-			private set
-			{
-				if (value == null)
-					throw new ArgumentNullException(nameof(value));
-
-				_asks = value;
-				//_asksCache = null;
-			}
+			get => _asks;
+			private set => _asks = value ?? throw new ArgumentNullException(nameof(value));
 		}
 
 		/// <summary>
 		/// Trading security currency.
 		/// </summary>
+		[DisplayNameLoc(LocalizedStrings.CurrencyKey)]
 		public CurrencyTypes? Currency { get; set; }
 
 		/// <summary>
 		/// The best bid. If the order book does not contain bids, will be returned <see langword="null" />.
 		/// </summary>
+		[DisplayNameLoc(LocalizedStrings.Str291Key)]
 		public Quote BestBid { get; private set; }
 
 		/// <summary>
 		/// The best ask. If the order book does not contain asks, will be returned <see langword="null" />.
 		/// </summary>
+		[DisplayNameLoc(LocalizedStrings.Str292Key)]
 		public Quote BestAsk { get; private set; }
 
 		/// <summary>
 		/// The best pair. If the order book is empty, will be returned <see langword="null" />.
 		/// </summary>
+		[DisplayNameLoc(LocalizedStrings.BestPairKey)]
 		public MarketDepthPair BestPair => GetPair(0);
 
 		/// <summary>
 		/// To get the total price size by bids.
 		/// </summary>
-		public decimal TotalBidsPrice
-		{
-			get
-			{
-				lock (_syncRoot)
-					return _bids.Length > 0 ? Security.ShrinkPrice(_bids.Sum(b => b.Price)) : 0;
-			}
-		}
+		[DisplayNameLoc(LocalizedStrings.TotalBidsPriceKey)]
+		public decimal TotalBidsPrice =>  _bids.Length > 0 ? Security.ShrinkPrice(_bids.Sum(b => b.Price)) : 0;
 
 		/// <summary>
 		/// To get the total price size by offers.
 		/// </summary>
-		public decimal TotalAsksPrice
-		{
-			get
-			{
-				lock (_syncRoot)
-					return _asks.Length > 0 ? Security.ShrinkPrice(_asks.Sum(a => a.Price)) : 0;
-			}
-		}
+		[DisplayNameLoc(LocalizedStrings.TotalAsksPriceKey)]
+		public decimal TotalAsksPrice => _asks.Length > 0 ? Security.ShrinkPrice(_asks.Sum(a => a.Price)) : 0;
 
 		/// <summary>
 		/// Get bids total volume.
 		/// </summary>
-		public decimal TotalBidsVolume
-		{
-			get
-			{
-				lock (_syncRoot)
-					return _bids.Sum(b => b.Volume);
-			}
-		}
+		[DisplayNameLoc(LocalizedStrings.TotalBidsVolumeKey)]
+		public decimal TotalBidsVolume => _bids.Sum(b => b.Volume);
 
 		/// <summary>
 		/// Get asks total volume.
 		/// </summary>
-		public decimal TotalAsksVolume
-		{
-			get
-			{
-				lock (_syncRoot)
-					return _asks.Sum(a => a.Volume);
-			}
-		}
+		[DisplayNameLoc(LocalizedStrings.TotalAsksVolumeKey)]
+		public decimal TotalAsksVolume => _asks.Sum(a => a.Volume);
 
 		/// <summary>
 		/// Get total volume.
 		/// </summary>
-		public decimal TotalVolume
-		{
-			get
-			{
-				lock (_syncRoot)
-					return TotalBidsVolume + TotalAsksVolume;
-			}
-		}
+		[DisplayNameLoc(LocalizedStrings.TotalVolumeKey)]
+		public decimal TotalVolume => TotalBidsVolume + TotalAsksVolume;
 
 		/// <summary>
 		/// To get the total price size.
 		/// </summary>
-		public decimal TotalPrice
-		{
-			get
-			{
-				lock (_syncRoot)
-					return TotalBidsPrice + TotalAsksPrice;
-			}
-		}
+		[DisplayNameLoc(LocalizedStrings.TotalPriceKey)]
+		public decimal TotalPrice => TotalBidsPrice + TotalAsksPrice;
 
 		/// <summary>
 		/// Total quotes count (bids + asks).
 		/// </summary>
-		public int Count
-		{
-			get
-			{
-				lock (_syncRoot)
-					return _bids.Length + _asks.Length;
-			}
-		}
+		[DisplayNameLoc(LocalizedStrings.TotalQuotesCountKey)]
+		public int Count => _bids.Length + _asks.Length;
 
 		private int _depth;
 
 		/// <summary>
 		/// Depth of book.
 		/// </summary>
+		[DisplayNameLoc(LocalizedStrings.Str1197Key)]
 		public int Depth
 		{
-			get { return _depth; }
+			get => _depth;
 			private set
 			{
 				if (_depth == value)
@@ -297,7 +229,10 @@ namespace StockSharp.BusinessEntities
 		/// <summary>
 		/// Event on exceeding the maximum allowable depth of quotes.
 		/// </summary>
+		[Obsolete]
+#pragma warning disable 67
 		public event Action<Quote> QuoteOutOfDepth;
+#pragma warning restore 67
 
 		/// <summary>
 		/// Depth <see cref="MarketDepth.Depth"/> changed.
@@ -322,14 +257,10 @@ namespace StockSharp.BusinessEntities
 			else if (newDepth > currentDepth)
 				throw new ArgumentOutOfRangeException(nameof(newDepth), newDepth, LocalizedStrings.Str482Params.Put(currentDepth));
 
-			lock (_syncRoot)
-			{
-				Bids = Decrease(_bids, newDepth);
-				Asks = Decrease(_asks, newDepth);
+			Bids = Decrease(_bids, newDepth);
+			Asks = Decrease(_asks, newDepth);
 
-				UpdateDepthAndTime();
-			}
-
+			UpdateDepthAndTime();
 			RaiseQuotesChanged();
 		}
 
@@ -352,8 +283,7 @@ namespace StockSharp.BusinessEntities
 		/// <returns>Quote. If a quote does not exist for specified depth, then the <see langword="null" /> will be returned.</returns>
 		public Quote GetQuote(Sides orderDirection, int depthIndex)
 		{
-			lock (_syncRoot)
-				return GetQuotesInternal(orderDirection).ElementAtOrDefault(depthIndex);
+			return GetQuotesInternal(orderDirection).ElementAtOrDefault(depthIndex);
 		}
 
 		/// <summary>
@@ -398,16 +328,13 @@ namespace StockSharp.BusinessEntities
 			if (depthIndex < 0)
 				throw new ArgumentOutOfRangeException(nameof(depthIndex), depthIndex, LocalizedStrings.Str483);
 
-			lock (_syncRoot)
-			{
-				var bid = GetQuote(Sides.Buy, depthIndex);
-				var ask = GetQuote(Sides.Sell, depthIndex);
+			var bid = GetQuote(Sides.Buy, depthIndex);
+			var ask = GetQuote(Sides.Sell, depthIndex);
 
-				if (bid == null && ask == null)
-					return null;
+			if (bid == null && ask == null)
+				return null;
 				
-				return new MarketDepthPair(Security, bid, ask);
-			}
+			return new MarketDepthPair(Security, bid, ask);
 		}
 
 		/// <summary>
@@ -422,17 +349,14 @@ namespace StockSharp.BusinessEntities
 
 			var retVal = new List<MarketDepthPair>();
 
-			lock (_syncRoot)
+			for (var i = 0; i < depth; i++)
 			{
-				for (var i = 0; i < depth; i++)
-				{
-					var single = GetPair(i);
+				var single = GetPair(i);
 
-					if (single != null)
-						retVal.Add(single);
-					else
-						break;
-				}
+				if (single != null)
+					retVal.Add(single);
+				else
+					break;
 			}
 
 			return retVal;
@@ -450,25 +374,22 @@ namespace StockSharp.BusinessEntities
 
 			var retVal = new List<Quote>();
 
-			lock (_syncRoot)
+			for (var i = depth - 1; i >= 0; i--)
 			{
-				for (var i = depth - 1; i >= 0; i--)
-				{
-					var single = GetQuote(Sides.Buy, i);
+				var single = GetQuote(Sides.Buy, i);
 
-					if (single != null)
-						retVal.Add(single);
-				}
+				if (single != null)
+					retVal.Add(single);
+			}
 
-				for (var i = 0; i < depth; i++)
-				{
-					var single = GetQuote(Sides.Sell, i);
+			for (var i = 0; i < depth; i++)
+			{
+				var single = GetQuote(Sides.Sell, i);
 
-					if (single != null)
-						retVal.Add(single);
-					else
-						break;
-				}
+				if (single != null)
+					retVal.Add(single);
+				else
+					break;
 			}
 
 			return retVal;
@@ -527,57 +448,57 @@ namespace StockSharp.BusinessEntities
 				asks = asks.OrderBy(q => q.Price);
 			}
 
-			bids = bids.ToArray();
-			asks = asks.ToArray();
+			var bidsArr = bids.ToArray();
+			var asksArr = asks.ToArray();
 
 			if (AutoVerify)
 			{
-				if (!Verify(bids, asks))
+				if (!Verify(bidsArr, asksArr))
 					throw new ArgumentException(LocalizedStrings.Str485);
 			}
 
-			Truncate((Quote[])bids, (Quote[])asks, lastChangeTime);
+			//Truncate(bidsArr, asksArr, lastChangeTime);
+			
+			Update(bidsArr, asksArr, lastChangeTime);
+
 			return this;
 		}
 
-		private void Truncate(Quote[] bids, Quote[] asks, DateTimeOffset lastChangeTime)
-		{
-			Quote[] outOfRangeBids;
-			Quote[] outOfRangeAsks;
+		//private void Truncate(Quote[] bids, Quote[] asks, DateTimeOffset lastChangeTime)
+		//{
+		//	Quote[] outOfRangeBids;
+		//	Quote[] outOfRangeAsks;
 
-			lock (_syncRoot)
-			{
-				Update(Truncate(bids, out outOfRangeBids), Truncate(asks, out outOfRangeAsks), lastChangeTime);
-			}
+		//	lock (_syncRoot)
+		//	{
+		//		Update(Truncate(bids, out outOfRangeBids), Truncate(asks, out outOfRangeAsks), lastChangeTime);
+		//	}
 
-			var evt = QuoteOutOfDepth;
+		//	var evt = QuoteOutOfDepth;
 
-			if (evt != null)
-			{
-				if (outOfRangeBids != null)
-					outOfRangeBids.ForEach(evt);
+		//	if (evt != null)
+		//	{
+		//		outOfRangeBids?.ForEach(evt);
+		//		outOfRangeAsks?.ForEach(evt);
+		//	}
+		//}
 
-				if (outOfRangeAsks != null)
-					outOfRangeAsks.ForEach(evt);
-			}
-		}
+		//private Quote[] Truncate(Quote[] quotes, out Quote[] outOfRangeQuotes)
+		//{
+		//	if (quotes.Length > MaxDepth)
+		//	{
+		//		outOfRangeQuotes = new Quote[quotes.Length - MaxDepth];
+		//		Array.Copy(quotes, MaxDepth, outOfRangeQuotes, 0, outOfRangeQuotes.Length);
 
-		private Quote[] Truncate(Quote[] quotes, out Quote[] outOfRangeQuotes)
-		{
-			if (quotes.Length > MaxDepth)
-			{
-				outOfRangeQuotes = new Quote[quotes.Length - MaxDepth];
-				Array.Copy(quotes, MaxDepth, outOfRangeQuotes, 0, outOfRangeQuotes.Length);
+		//		Array.Resize(ref quotes, MaxDepth);
+		//	}
+		//	else
+		//	{
+		//		outOfRangeQuotes = null;
+		//	}
 
-				Array.Resize(ref quotes, MaxDepth);
-			}
-			else
-			{
-				outOfRangeQuotes = null;
-			}
-
-			return quotes;
-		}
+		//	return quotes;
+		//}
 
 		/// <summary>
 		/// To update the order book. The version without checks and blockings.
@@ -595,8 +516,7 @@ namespace StockSharp.BusinessEntities
 
 			UpdateDepthAndTime(lastChangeTime, false);
 
-			if (null != QuotesChanged)
-				QuotesChanged();
+			QuotesChanged?.Invoke();
 			//RaiseQuotesChanged();
 		}
 
@@ -654,10 +574,10 @@ namespace StockSharp.BusinessEntities
 		{
 			CheckQuote(quote);
 
-			Quote outOfDepthQuote = null;
+			//Quote outOfDepthQuote = null;
 
-			lock (_syncRoot)
-			{
+			//lock (_syncRoot)
+			//{
 				var quotes = GetQuotes(quote.OrderDirection);
 
 				var index = GetQuoteIndex(quotes, quote.Price);
@@ -670,9 +590,7 @@ namespace StockSharp.BusinessEntities
 
 						if (UseAggregatedQuotes)
 						{
-							var aggQuote = existedQuote as AggregatedQuote;
-
-							if (aggQuote == null)
+							if (!(existedQuote is AggregatedQuote aggQuote))
 							{
 								aggQuote = new AggregatedQuote
 								{
@@ -721,11 +639,11 @@ namespace StockSharp.BusinessEntities
 
 					quotes[index] = quote;
 
-					if (quotes.Length > MaxDepth)
-					{
-						outOfDepthQuote = quotes[quotes.Length - 1];
-						quotes = RemoveAt(quotes, quotes.Length - 1);
-					}
+					//if (quotes.Length > MaxDepth)
+					//{
+					//	outOfDepthQuote = quotes[quotes.Length - 1];
+					//	quotes = RemoveAt(quotes, quotes.Length - 1);
+					//}
 
 					if (quote.OrderDirection == Sides.Buy)
 						Bids = quotes;
@@ -735,14 +653,14 @@ namespace StockSharp.BusinessEntities
 
 				UpdateDepthAndTime();
 
-				if (quotes.Length > MaxDepth)
-					throw new InvalidOperationException(LocalizedStrings.Str486Params.Put(MaxDepth, quotes.Length));
-			}
+				//if (quotes.Length > MaxDepth)
+				//	throw new InvalidOperationException(LocalizedStrings.Str486Params.Put(MaxDepth, quotes.Length));
+			//}
 
 			RaiseQuotesChanged();
 
-			if (outOfDepthQuote != null)
-				QuoteOutOfDepth?.Invoke(outOfDepthQuote);
+			//if (outOfDepthQuote != null)
+			//	QuoteOutOfDepth?.Invoke(outOfDepthQuote);
 		}
 
 		#region IEnumerable<Quote>
@@ -753,7 +671,7 @@ namespace StockSharp.BusinessEntities
 		/// <returns>The enumerator object.</returns>
 		public IEnumerator<Quote> GetEnumerator()
 		{
-			return this.SyncGet(c => Bids.Reverse().Concat(Asks)).Cast<Quote>().GetEnumerator();
+			return Bids.Reverse().Concat(Asks).Cast<Quote>().GetEnumerator();
 		}
 
 		/// <summary>
@@ -797,15 +715,12 @@ namespace StockSharp.BusinessEntities
 		/// <param name="lastChangeTime">Order book change time.</param>
 		public void Remove(decimal price, decimal volume = 0, DateTimeOffset lastChangeTime = default(DateTimeOffset))
 		{
-			lock (_syncRoot)
-			{
-				var dir = GetDirection(price);
+			var dir = GetDirection(price);
 
-				if (dir == null)
-					throw new ArgumentOutOfRangeException(nameof(price), price, LocalizedStrings.Str487);
+			if (dir == null)
+				throw new ArgumentOutOfRangeException(nameof(price), price, LocalizedStrings.Str487);
 
-				Remove((Sides)dir, price, volume, lastChangeTime);
-			}
+			Remove((Sides)dir, price, volume, lastChangeTime);
 		}
 
 		/// <summary>
@@ -823,68 +738,63 @@ namespace StockSharp.BusinessEntities
 			if (volume < 0)
 				throw new ArgumentOutOfRangeException(nameof(volume), volume, LocalizedStrings.Str489);
 
-			lock (_syncRoot)
+			var quotes = GetQuotesInternal(direction);
+			var index = GetQuoteIndex(quotes, price);
+
+			if (index == -1)
+				throw new ArgumentOutOfRangeException(nameof(price), price, LocalizedStrings.Str487);
+
+			var quote = quotes[index];
+
+			decimal leftVolume;
+
+			if (volume > 0)
 			{
-				var quotes = GetQuotesInternal(direction);
-				var index = GetQuoteIndex(quotes, price);
+				if (quote.Volume < volume)
+					throw new ArgumentOutOfRangeException(nameof(volume), volume, LocalizedStrings.Str490Params.Put(quote));
 
-				if (index == -1)
-					throw new ArgumentOutOfRangeException(nameof(price), price, LocalizedStrings.Str487);
+				leftVolume = quote.Volume - volume;
 
-				var quote = quotes[index];
-
-				decimal leftVolume;
-
-				if (volume > 0)
+				if (UseAggregatedQuotes)
 				{
-					if (quote.Volume < volume)
-						throw new ArgumentOutOfRangeException(nameof(volume), volume, LocalizedStrings.Str490Params.Put(quote));
-
-					leftVolume = quote.Volume - volume;
-
-					if (UseAggregatedQuotes)
+					if (quote is AggregatedQuote aggQuote)
 					{
-						var aggQuote = quote as AggregatedQuote;
-
-						if (aggQuote != null)
+						while (volume > 0)
 						{
-							while (volume > 0)
-							{
-								var innerQuote = aggQuote.InnerQuotes.First();
+							var innerQuote = aggQuote.InnerQuotes.First();
 
-								if (innerQuote.Volume > volume)
-								{
-									innerQuote.Volume -= volume;
-									break;
-								}
-								else
-								{
-									aggQuote.InnerQuotes.Remove(innerQuote);
-									volume -= innerQuote.Volume;
-								}
+							if (innerQuote.Volume > volume)
+							{
+								innerQuote.Volume -= volume;
+								break;
+							}
+							else
+							{
+								aggQuote.InnerQuotes.Remove(innerQuote);
+								volume -= innerQuote.Volume;
 							}
 						}
 					}
 				}
+			}
+			else
+				leftVolume = 0;
+
+			if (leftVolume == 0)
+			{
+				quotes = RemoveAt(quotes, index);
+
+				if (quote.OrderDirection == Sides.Buy)
+					Bids = quotes;
 				else
-					leftVolume = 0;
+					Asks = quotes;
 
-				if (leftVolume == 0)
-				{
-					quotes = RemoveAt(quotes, index);
-
-					if (quote.OrderDirection == Sides.Buy)
-						Bids = quotes;
-					else
-						Asks = quotes;
-
-					UpdateDepthAndTime(lastChangeTime);
-				}
-				else
-				{
-					quote.Volume = leftVolume;
-					UpdateTime(lastChangeTime);
-				}
+				UpdateDepthAndTime(lastChangeTime);
+			}
+			else
+			{
+				quote.Volume = leftVolume;
+				UpdateTime(lastChangeTime);
 			}
 
 			RaiseQuotesChanged();
@@ -992,8 +902,9 @@ namespace StockSharp.BusinessEntities
 			if (quote.Security == null)
 				quote.Security = Security;
 
-			if (quote.Price <= 0)
-				throw new ArgumentOutOfRangeException(nameof(quote), quote.Price, LocalizedStrings.Str488);
+			// quotes for indecies may have zero prices
+			//if (quote.Price <= 0)
+			//	throw new ArgumentOutOfRangeException(nameof(quote), quote.Price, LocalizedStrings.Str488);
 
 			if (quote.Volume < 0)
 				throw new ArgumentOutOfRangeException(nameof(quote), quote.Volume, LocalizedStrings.Str489);
@@ -1037,17 +948,14 @@ namespace StockSharp.BusinessEntities
 		{
 			var clone = new MarketDepth(Security)
 			{
-				MaxDepth = MaxDepth,
+				//MaxDepth = MaxDepth,
 				UseAggregatedQuotes = UseAggregatedQuotes,
 				AutoVerify = AutoVerify,
 				Currency = Currency,
 			};
 
-			lock (_syncRoot)
-			{
-				clone.Update(_bids.Select(q => q.Clone()), _asks.Select(q => q.Clone()), true, LastChangeTime);
-				clone.LocalTime = LocalTime;
-			}
+			clone.Update(_bids.Select(q => q.Clone()), _asks.Select(q => q.Clone()), true, LastChangeTime);
+			clone.LocalTime = LocalTime;
 
 			return clone;
 		}
@@ -1070,11 +978,10 @@ namespace StockSharp.BusinessEntities
 		/// </remarks>
 		public bool Verify()
 		{
-			lock (_syncRoot)
-				return Verify(_bids, _asks);
+			return Verify(_bids, _asks);
 		}
 
-		private bool Verify(IEnumerable<Quote> bids, IEnumerable<Quote> asks)
+		private bool Verify(Quote[] bids, Quote[] asks)
 		{
 			var bestBid = bids.FirstOrDefault();
 			var bestAsk = asks.FirstOrDefault();
@@ -1089,7 +996,7 @@ namespace StockSharp.BusinessEntities
 			}
 		}
 
-		private bool Verify(IEnumerable<Quote> quotes, bool isBids)
+		private bool Verify(Quote[] quotes, bool isBids)
 		{
 			if (quotes.IsEmpty())
 				return true;
@@ -1132,7 +1039,5 @@ namespace StockSharp.BusinessEntities
 				quote.OrderDirection == (isBids ? Sides.Buy : Sides.Sell) &&
 				quote.Security == Security;
 		}
-
-		SyncObject ISynchronizedCollection.SyncRoot => _syncRoot;
 	}
 }

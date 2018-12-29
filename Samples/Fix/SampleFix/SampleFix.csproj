@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SampleFix</RootNamespace>
     <AssemblyName>SampleFix</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
@@ -68,17 +68,26 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DevExpress.Xpf.Core.v15.2">
-      <HintPath>..\..\..\References\DevExpress.Xpf.Core.v15.2.dll</HintPath>
+    <Reference Include="DevExpress.Data.v18.1">
+      <HintPath>..\..\..\References\DevExpress.Data.v18.1.dll</HintPath>
     </Reference>
-    <Reference Include="DevExpress.Xpf.Grid.v15.2">
-      <HintPath>..\..\..\References\DevExpress.Xpf.Grid.v15.2.dll</HintPath>
+    <Reference Include="DevExpress.Xpf.Core.v18.1">
+      <HintPath>..\..\..\References\DevExpress.Xpf.Core.v18.1.dll</HintPath>
     </Reference>
-    <Reference Include="DevExpress.Xpf.Grid.v15.2.Core">
-      <HintPath>..\..\..\References\DevExpress.Xpf.Grid.v15.2.Core.dll</HintPath>
+    <Reference Include="DevExpress.Xpf.Grid.v18.1">
+      <HintPath>..\..\..\References\DevExpress.Xpf.Grid.v18.1.dll</HintPath>
     </Reference>
-    <Reference Include="DevExpress.Xpf.PropertyGrid.v15.2">
-      <HintPath>..\..\..\References\DevExpress.Xpf.PropertyGrid.v15.2.dll</HintPath>
+    <Reference Include="DevExpress.Xpf.Grid.v18.1.Core">
+      <HintPath>..\..\..\References\DevExpress.Xpf.Grid.v18.1.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Xpf.LayoutControl.v18.1">
+      <HintPath>..\..\..\References\DevExpress.Xpf.LayoutControl.v18.1.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Xpf.PropertyGrid.v18.1">
+      <HintPath>..\..\..\References\DevExpress.Xpf.PropertyGrid.v18.1.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Xpf.Themes.Office2016White.v18.1">
+      <HintPath>..\..\..\References\DevExpress.Xpf.Themes.Office2016White.v18.1.dll</HintPath>
     </Reference>
     <Reference Include="Ecng.Localization">
       <HintPath>..\..\..\References\Ecng.Localization.dll</HintPath>
@@ -110,9 +119,6 @@
     <Reference Include="Ecng.Xaml">
       <HintPath>..\..\..\References\Ecng.Xaml.dll</HintPath>
     </Reference>
-    <Reference Include="Xceed.Wpf.Toolkit">
-      <HintPath>..\..\..\References\Xceed.Wpf.Toolkit.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -130,6 +136,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ChartWindow.xaml.cs">
+      <DependentUpon>ChartWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
@@ -138,6 +147,9 @@
     </Compile>
     <Compile Include="NewsWindow.xaml.cs">
       <DependentUpon>NewsWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="OrdersLogWindow.xaml.cs">
+      <DependentUpon>OrdersLogWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="OrdersWindow.xaml.cs">
       <DependentUpon>OrdersWindow.xaml</DependentUpon>
@@ -180,6 +192,10 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="ChartWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -193,6 +209,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="NewsWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="OrdersLogWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

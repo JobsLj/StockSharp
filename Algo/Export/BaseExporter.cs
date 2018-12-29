@@ -40,39 +40,36 @@ namespace StockSharp.Algo.Export
 		/// </summary>
 		/// <param name="security">Security.</param>
 		/// <param name="arg">The data parameter.</param>
-		/// <param name="isCancelled">The processor, returning export interruption sign.</param>
+		/// <param name="isCancelled">The processor, returning process interruption sign.</param>
 		/// <param name="path">The path to file.</param>
 		protected BaseExporter(Security security, object arg, Func<int, bool> isCancelled, string path)
 		{
 			//if (security == null)
 			//	throw new ArgumentNullException(nameof(security));
 
-			if (isCancelled == null)
-				throw new ArgumentNullException(nameof(isCancelled));
-
 			if (path.IsEmpty())
 				throw new ArgumentNullException(nameof(path));
 
 			Security = security;
 			Arg = arg;
-			_isCancelled = isCancelled;
+			_isCancelled = isCancelled ?? throw new ArgumentNullException(nameof(isCancelled));
 			Path = path;
 		}
 
 		/// <summary>
 		/// Security.
 		/// </summary>
-		protected Security Security { get; private set; }
+		protected Security Security { get; }
 
 		/// <summary>
 		/// The data parameter.
 		/// </summary>
-		public object Arg { get; private set; }
+		public object Arg { get; }
 
 		/// <summary>
 		/// The path to file.
 		/// </summary>
-		protected string Path { get; private set; }
+		protected string Path { get; }
 
 		/// <summary>
 		/// To export values.
@@ -110,6 +107,10 @@ namespace StockSharp.Algo.Export
 					Export(((IEnumerable<Security>)values).Select(s => s.ToMessage()));
 				else if (dataType == typeof(SecurityMessage))
 					Export((IEnumerable<SecurityMessage>)values);
+				else if (dataType == typeof(PositionChangeMessage))
+					Export((IEnumerable<PositionChangeMessage>)values);
+				else if (dataType == typeof(IndicatorValue))
+					Export((IEnumerable<IndicatorValue>)values);
 				else
 					throw new ArgumentOutOfRangeException(nameof(dataType), dataType, LocalizedStrings.Str721);
 			});
@@ -160,5 +161,17 @@ namespace StockSharp.Algo.Export
 		/// </summary>
 		/// <param name="messages">Messages.</param>
 		protected abstract void Export(IEnumerable<SecurityMessage> messages);
+
+		/// <summary>
+		/// To export <see cref="PositionChangeMessage"/>.
+		/// </summary>
+		/// <param name="messages">Messages.</param>
+		protected abstract void Export(IEnumerable<PositionChangeMessage> messages);
+
+		/// <summary>
+		/// To export <see cref="IndicatorValue"/>.
+		/// </summary>
+		/// <param name="values">Values.</param>
+		protected abstract void Export(IEnumerable<IndicatorValue> values);
 	}
 }

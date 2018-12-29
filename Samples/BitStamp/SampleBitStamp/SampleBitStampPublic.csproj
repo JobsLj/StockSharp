@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SampleBitStamp</RootNamespace>
     <AssemblyName>SampleBitStamp</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
@@ -60,6 +60,9 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="StockSharp.BitStamp">
+      <HintPath>..\..\..\References\StockSharp.BitStamp.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
@@ -89,23 +92,20 @@
     <Reference Include="Ecng.Xaml">
       <HintPath>..\..\..\References\Ecng.Xaml.dll</HintPath>
     </Reference>
-    <Reference Include="Xceed.Wpf.Toolkit">
-      <HintPath>..\..\..\References\Xceed.Wpf.Toolkit.dll</HintPath>
+    <Reference Include="DevExpress.Data.v18.1">
+      <HintPath>..\..\..\References\DevExpress.Data.v18.1.dll</HintPath>
     </Reference>
-    <Reference Include="DevExpress.Data.v15.2">
-      <HintPath>..\..\..\References\DevExpress.Data.v15.2.dll</HintPath>
+    <Reference Include="DevExpress.Xpf.Core.v18.1">
+      <HintPath>..\..\..\References\DevExpress.Xpf.Core.v18.1.dll</HintPath>
     </Reference>
-    <Reference Include="DevExpress.Xpf.Core.v15.2">
-      <HintPath>..\..\..\References\DevExpress.Xpf.Core.v15.2.dll</HintPath>
+    <Reference Include="DevExpress.Xpf.Grid.v18.1">
+      <HintPath>..\..\..\References\DevExpress.Xpf.Grid.v18.1.dll</HintPath>
     </Reference>
-    <Reference Include="DevExpress.Xpf.Grid.v15.2">
-      <HintPath>..\..\..\References\DevExpress.Xpf.Grid.v15.2.dll</HintPath>
+    <Reference Include="DevExpress.Xpf.Grid.v18.1.Core">
+      <HintPath>..\..\..\References\DevExpress.Xpf.Grid.v18.1.Core.dll</HintPath>
     </Reference>
-    <Reference Include="DevExpress.Xpf.Grid.v15.2.Core">
-      <HintPath>..\..\..\References\DevExpress.Xpf.Grid.v15.2.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="DevExpress.Xpf.LayoutControl.v15.2">
-      <HintPath>..\..\..\References\DevExpress.Xpf.LayoutControl.v15.2.dll</HintPath>
+    <Reference Include="DevExpress.Xpf.LayoutControl.v18.1">
+      <HintPath>..\..\..\References\DevExpress.Xpf.LayoutControl.v18.1.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -129,6 +129,9 @@
     </Compile>
     <Compile Include="MyTradesWindow.xaml.cs">
       <DependentUpon>MyTradesWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="OrdersLogWindow.xaml.cs">
+      <DependentUpon>OrdersLogWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="OrdersWindow.xaml.cs">
       <DependentUpon>OrdersWindow.xaml</DependentUpon>
@@ -177,6 +180,10 @@
     <Page Include="MyTradesWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="OrdersLogWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -232,10 +239,6 @@
     </Resource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\StockSharpApps\Connectors\BitStamp\BitStamp.csproj">
-      <Project>{90B93AF4-3168-4415-B916-9E078F192696}</Project>
-      <Name>BitStamp</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\..\StockSharpApps\Xaml\Xaml.csproj">
       <Project>{64e4d6f0-36b6-4904-9ba7-fffbe5ff71d8}</Project>
       <Name>Xaml</Name>

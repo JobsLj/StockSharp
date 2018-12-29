@@ -17,6 +17,7 @@ namespace StockSharp.Messages
 {
 	using System;
 	using System.ComponentModel;
+	using System.ComponentModel.DataAnnotations;
 	using System.Runtime.Serialization;
 
 	using StockSharp.Localization;
@@ -32,66 +33,107 @@ namespace StockSharp.Messages
 		/// Level 1.
 		/// </summary>
 		[EnumMember]
+		[Display(ResourceType = typeof(LocalizedStrings), Name = LocalizedStrings.Level1Key)]
 		Level1,
 
 		/// <summary>
 		/// Market depth (order book).
 		/// </summary>
 		[EnumMember]
+		[Display(ResourceType = typeof(LocalizedStrings), Name = LocalizedStrings.MarketDepthKey)]
 		MarketDepth,
 
 		/// <summary>
 		/// Tick trades.
 		/// </summary>
 		[EnumMember]
+		[Display(ResourceType = typeof(LocalizedStrings), Name = LocalizedStrings.TicksKey)]
 		Trades,
 
 		/// <summary>
 		/// Order log.
 		/// </summary>
 		[EnumMember]
+		[Display(ResourceType = typeof(LocalizedStrings), Name = LocalizedStrings.OrderLogKey)]
 		OrderLog,
 
 		/// <summary>
 		/// News.
 		/// </summary>
 		[EnumMember]
+		[Display(ResourceType = typeof(LocalizedStrings), Name = LocalizedStrings.NewsKey)]
 		News,
 
 		/// <summary>
 		/// Candles (time-frame).
 		/// </summary>
 		[EnumMember]
+		[Display(ResourceType = typeof(LocalizedStrings), Name = LocalizedStrings.TimeFrameCandleKey)]
 		CandleTimeFrame,
 
 		/// <summary>
 		/// Candle (tick).
 		/// </summary>
+		[EnumMember]
+		[Display(ResourceType = typeof(LocalizedStrings), Name = LocalizedStrings.TickCandleKey)]
 		CandleTick,
 
 		/// <summary>
 		/// Candle (volume).
 		/// </summary>
 		[EnumMember]
+		[Display(ResourceType = typeof(LocalizedStrings), Name = LocalizedStrings.VolumeCandleKey)]
 		CandleVolume,
 
 		/// <summary>
 		/// Candle (range).
 		/// </summary>
 		[EnumMember]
+		[Display(ResourceType = typeof(LocalizedStrings), Name = LocalizedStrings.RangeCandleKey)]
 		CandleRange,
 
 		/// <summary>
 		/// Candle (X&amp;0).
 		/// </summary>
 		[EnumMember]
+		[Display(ResourceType = typeof(LocalizedStrings), Name = LocalizedStrings.PnFCandleKey)]
 		CandlePnF,
 
 		/// <summary>
 		/// Candle (renko).
 		/// </summary>
 		[EnumMember]
+		[Display(ResourceType = typeof(LocalizedStrings), Name = LocalizedStrings.RenkoCandleKey)]
 		CandleRenko,
+	}
+
+	/// <summary>
+	/// Build modes.
+	/// </summary>
+	[DataContract]
+	[Serializable]
+	public enum MarketDataBuildModes
+	{
+		/// <summary>
+		/// Request built data and build the missing data from trades, depths etc.
+		/// </summary>
+		[EnumMember]
+		[Display(ResourceType = typeof(LocalizedStrings), Name = LocalizedStrings.LoadAndBuildKey)]
+		LoadAndBuild,
+
+		/// <summary>
+		/// Request only built data.
+		/// </summary>
+		[EnumMember]
+		[Display(ResourceType = typeof(LocalizedStrings), Name = LocalizedStrings.LoadKey)]
+		Load,
+
+		/// <summary>
+		/// Build from trades, depths etc.
+		/// </summary>
+		[EnumMember]
+		[Display(ResourceType = typeof(LocalizedStrings), Name = LocalizedStrings.BuildKey)]
+		Build
 	}
 
 	/// <summary>
@@ -148,13 +190,13 @@ namespace StockSharp.Messages
 		public long TransactionId { get; set; }
 
 		/// <summary>
-		/// The message is not supported by adapter. To be setted if the answer.
+		/// The message is not supported by adapter. To be set if the answer.
 		/// </summary>
 		[DataMember]
 		public bool IsNotSupported { get; set; }
 
 		/// <summary>
-		/// Subscribe or unsubscribe error info. Заполняется в случае ответа.
+		/// Subscribe or unsubscribe error info. To be set if the answer.
 		/// </summary>
 		[DataMember]
 		public Exception Error { get; set; }
@@ -166,7 +208,7 @@ namespace StockSharp.Messages
 		public long? Count { get; set; }
 
 		/// <summary>
-		/// Max depth or requested order book. Uses in case <see cref="MarketDataMessage.DataType"/> = <see cref="MarketDataTypes.MarketDepth"/>.
+		/// Max depth of requested order book. Uses in case <see cref="MarketDataMessage.DataType"/> = <see cref="MarketDataTypes.MarketDepth"/>.
 		/// </summary>
 		[DataMember]
 		public int? MaxDepth { get; set; }
@@ -176,6 +218,51 @@ namespace StockSharp.Messages
 		/// </summary>
 		[DataMember]
 		public string NewsId { get; set; }
+
+		/// <summary>
+		/// To perform the calculation <see cref="CandleMessage.PriceLevels"/>. By default, it is disabled.
+		/// </summary>
+		[DataMember]
+		public bool IsCalcVolumeProfile { get; set; }
+
+		/// <summary>
+		/// Build mode.
+		/// </summary>
+		[DataMember]
+		public MarketDataBuildModes BuildMode { get; set; }
+
+		/// <summary>
+		/// Which market-data type is used as a source value.
+		/// </summary>
+		[DataMember]
+		public MarketDataTypes? BuildFrom { get; set; }
+
+		/// <summary>
+		/// Extra info for the <see cref="BuildFrom"/>.
+		/// </summary>
+		[DataMember]
+		public Level1Fields? BuildField { get; set; }
+
+		/// <summary>
+		/// Allow build candles from smaller timeframe.
+		/// </summary>
+		/// <remarks>
+		/// Available only for <see cref="TimeFrameCandleMessage"/>.
+		/// </remarks>
+		[DataMember]
+		public bool AllowBuildFromSmallerTimeFrame { get; set; } = true;
+
+		/// <summary>
+		/// Request history market data only.
+		/// </summary>
+		[DataMember]
+		public bool IsHistory { get; set; }
+
+		/// <summary>
+		/// Use only the regular trading hours for which data will be requested.
+		/// </summary>
+		[DataMember]
+		public bool IsRegularTradingHours { get; set; }
 
 		/// <summary>
 		/// The default depth of order book.
@@ -218,7 +305,14 @@ namespace StockSharp.Messages
 				MaxDepth = MaxDepth,
 				NewsId = NewsId,
 				LocalTime = LocalTime,
-				IsNotSupported = IsNotSupported
+				IsNotSupported = IsNotSupported,
+				BuildMode = BuildMode,
+				BuildFrom = BuildFrom,
+				BuildField = BuildField,
+				IsCalcVolumeProfile = IsCalcVolumeProfile,
+				IsHistory = IsHistory,
+				AllowBuildFromSmallerTimeFrame = AllowBuildFromSmallerTimeFrame,
+				IsRegularTradingHours = IsRegularTradingHours,
 			};
 
 			CopyTo(clone);
@@ -226,13 +320,42 @@ namespace StockSharp.Messages
 			return clone;
 		}
 
-		/// <summary>
-		/// Returns a string that represents the current object.
-		/// </summary>
-		/// <returns>A string that represents the current object.</returns>
+		/// <inheritdoc />
 		public override string ToString()
 		{
-			return base.ToString() + $",Sec={SecurityId},Types={DataType},IsSubscribe={IsSubscribe},TransId={TransactionId},OrigId={OriginalTransactionId}";
+			var str = base.ToString() + $",Sec={SecurityId},Type={DataType},IsSubscribe={IsSubscribe},Arg={Arg},TransId={TransactionId},OrigId={OriginalTransactionId}";
+
+			if (MaxDepth != null)
+				str += $",MaxDepth={MaxDepth}";
+
+			if (Count != null)
+				str += $",Cnt={Count}";
+
+			if (From != null)
+				str += $",From={From}";
+
+			if (To != null)
+				str += $",To={To}";
+
+			if (BuildMode == MarketDataBuildModes.Build)
+				str += $",Build={BuildMode}/{BuildFrom}/{BuildField}";
+
+			if (AllowBuildFromSmallerTimeFrame)
+				str += $",SmallTF={AllowBuildFromSmallerTimeFrame}";
+
+			if (IsRegularTradingHours)
+				str += $",RegularTH={IsRegularTradingHours}";
+
+			if (IsHistory)
+				str += $",Hist={IsHistory}";
+
+			if (IsCalcVolumeProfile)
+				str += $",Profile={IsCalcVolumeProfile}";
+
+			if (Error != null)
+				str += $",Error={Error.Message}";
+
+			return str;
 		}
 	}
 }

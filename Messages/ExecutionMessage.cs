@@ -19,7 +19,6 @@ namespace StockSharp.Messages
 	using System.ComponentModel;
 	using System.Runtime.Serialization;
 
-	using Ecng.Common;
 	using Ecng.Serialization;
 
 	using StockSharp.Localization;
@@ -131,8 +130,8 @@ namespace StockSharp.Messages
 		/// ID of original transaction, for which this message is the answer.
 		/// </summary>
 		[DataMember]
-		[DisplayNameLoc(LocalizedStrings.OriginalTrasactionKey)]
-		[DescriptionLoc(LocalizedStrings.OriginalTrasactionIdKey)]
+		[DisplayNameLoc(LocalizedStrings.OriginalTransactionKey)]
+		[DescriptionLoc(LocalizedStrings.OriginalTransactionIdKey)]
 		[MainCategory]
 		public long OriginalTransactionId { get; set; }
 
@@ -183,24 +182,24 @@ namespace StockSharp.Messages
 		[MainCategory]
 		public string OrderBoardId { get; set; }
 
-		/// <summary>
-		/// Derived order ID (e.g., conditional order generated a real exchange order).
-		/// </summary>
-		[DataMember]
-		[DisplayNameLoc(LocalizedStrings.DerivedKey)]
-		[DescriptionLoc(LocalizedStrings.DerivedOrderIdKey)]
-		[MainCategory]
-		[Nullable]
-		public long? DerivedOrderId { get; set; }
+		///// <summary>
+		///// Derived order ID (e.g., conditional order generated a real exchange order).
+		///// </summary>
+		//[DataMember]
+		//[DisplayNameLoc(LocalizedStrings.DerivedKey)]
+		//[DescriptionLoc(LocalizedStrings.DerivedOrderIdKey)]
+		//[MainCategory]
+		//[Nullable]
+		//public long? DerivedOrderId { get; set; }
 
-		/// <summary>
-		/// Derived order ID (e.g., conditional order generated a real exchange order).
-		/// </summary>
-		[DataMember]
-		[DisplayNameLoc(LocalizedStrings.DerivedStringKey)]
-		[DescriptionLoc(LocalizedStrings.DerivedStringDescKey)]
-		[MainCategory]
-		public string DerivedOrderStringId { get; set; }
+		///// <summary>
+		///// Derived order ID (e.g., conditional order generated a real exchange order).
+		///// </summary>
+		//[DataMember]
+		//[DisplayNameLoc(LocalizedStrings.DerivedStringKey)]
+		//[DescriptionLoc(LocalizedStrings.DerivedStringDescKey)]
+		//[MainCategory]
+		//public string DerivedOrderStringId { get; set; }
 
 		/// <summary>
 		/// Is the message contains order info.
@@ -222,7 +221,7 @@ namespace StockSharp.Messages
 		public decimal OrderPrice { get; set; }
 
 		/// <summary>
-		/// Number of contracts in an order.
+		/// Number of contracts in the order.
 		/// </summary>
 		[DataMember]
 		[DisplayNameLoc(LocalizedStrings.VolumeOrderKey)]
@@ -232,7 +231,7 @@ namespace StockSharp.Messages
 		public decimal? OrderVolume { get; set; }
 
 		/// <summary>
-		/// Number of contracts in an trade.
+		/// Number of contracts in the trade.
 		/// </summary>
 		[DataMember]
 		[DisplayNameLoc(LocalizedStrings.VolumeTradeKey)]
@@ -261,7 +260,7 @@ namespace StockSharp.Messages
 		public Sides Side { get; set; }
 
 		/// <summary>
-		/// Order contracts remainder.
+		/// Order contracts balance.
 		/// </summary>
 		[DataMember]
 		[DisplayNameLoc(LocalizedStrings.Str130Key)]
@@ -328,7 +327,7 @@ namespace StockSharp.Messages
 		/// Order expiry time. The default is <see langword="null" />, which mean (GTC).
 		/// </summary>
 		/// <remarks>
-		/// If the value is equal <see langword="null" /> or <see cref="DateTimeOffset.MaxValue"/>, order will be GTC (good til cancel). Or uses exact date.
+		/// If the value is equal <see langword="null" />, order will be GTC (good til cancel). Or uses exact date.
 		/// </remarks>
 		[DataMember]
 		[DisplayNameLoc(LocalizedStrings.Str141Key)]
@@ -448,6 +447,11 @@ namespace StockSharp.Messages
 		public decimal? Commission { get; set; }
 
 		/// <summary>
+		/// Commission currency. Can be <see lnagword="null"/>.
+		/// </summary>
+		public string CommissionCurrency { get; set; }
+
+		/// <summary>
 		/// Network latency. Uses when <see cref="ExecutionType"/> set to <see cref="ExecutionTypes.Transaction"/>.
 		/// </summary>
 		[DataMember]
@@ -507,6 +511,22 @@ namespace StockSharp.Messages
 		public decimal? Position { get; set; }
 
 		/// <summary>
+		/// Is the order of market-maker.
+		/// </summary>
+		[DataMember]
+		[DisplayNameLoc(LocalizedStrings.MarketMakerKey)]
+		[DescriptionLoc(LocalizedStrings.MarketMakerOrderKey, true)]
+		public bool? IsMarketMaker { get; set; }
+
+		/// <summary>
+		/// Is margin enabled.
+		/// </summary>
+		[DataMember]
+		[DisplayNameLoc(LocalizedStrings.MarginKey)]
+		[DescriptionLoc(LocalizedStrings.IsMarginKey)]
+		public bool? IsMargin { get; set; }
+
+		/// <summary>
 		/// Initializes a new instance of the <see cref="ExecutionMessage"/>.
 		/// </summary>
 		public ExecutionMessage()
@@ -533,7 +553,7 @@ namespace StockSharp.Messages
 			{
 				Balance = Balance,
 				Comment = Comment,
-				Condition = Condition.CloneNullable(),
+				Condition = Condition?.Clone(),
 				ClientCode = ClientCode,
 				BrokerCode = BrokerCode,
 				Currency = Currency,
@@ -576,14 +596,19 @@ namespace StockSharp.Messages
 				Slippage = Slippage,
 				UserOrderId = UserOrderId,
 
-				DerivedOrderId = DerivedOrderId,
-				DerivedOrderStringId = DerivedOrderStringId,
+				//DerivedOrderId = DerivedOrderId,
+				//DerivedOrderStringId = DerivedOrderStringId,
 
 				PnL = PnL,
 				Position = Position,
 
 				HasTradeInfo = HasTradeInfo,
-				HasOrderInfo = HasOrderInfo
+				HasOrderInfo = HasOrderInfo,
+
+				IsMarketMaker = IsMarketMaker,
+				IsMargin = IsMargin,
+
+				CommissionCurrency = CommissionCurrency,
 			};
 
 			this.CopyExtensionInfo(clone);

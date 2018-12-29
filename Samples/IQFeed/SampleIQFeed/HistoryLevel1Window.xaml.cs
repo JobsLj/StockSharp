@@ -39,19 +39,18 @@ namespace SampleIQFeed
 			InitializeComponent();
 			Title = _security.Code + LocalizedStrings.Str3749;
 
-			DatePicker.Value = DateTime.Today.AddDays(-7);
+			DatePicker.EditValue = DateTime.Today.AddDays(-7);
 		}
 
 		private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
 		{
-			if (DatePicker.Value == null)
+			if (DatePicker.EditValue == null)
 			{
 				MessageBox.Show(LocalizedStrings.Str3750, Title, MessageBoxButton.OK, MessageBoxImage.Information);
 				return;
 			}
 
-			var date = ((DateTime)DatePicker.Value).Date;
-			bool isSuccess;
+			var date = ((DateTime)DatePicker.EditValue).Date;
 
 			BusyIndicator.IsBusy = true;
 
@@ -59,7 +58,7 @@ namespace SampleIQFeed
 			{
 				try
 				{
-					var ticks = MainWindow.Instance.Trader.GetHistoricalLevel1(_security.ToSecurityId(), date, date.AddDays(1), out isSuccess);
+					var ticks = MainWindow.Instance.Trader.GetHistoricalLevel1(_security.ToSecurityId(), date, date.AddDays(1), out var _);
 
 					this.GuiAsync(() =>
 					{

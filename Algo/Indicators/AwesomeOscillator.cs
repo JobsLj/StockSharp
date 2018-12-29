@@ -47,14 +47,8 @@ namespace StockSharp.Algo.Indicators
 		/// <param name="shortSma">Short moving average.</param>
 		public AwesomeOscillator(SimpleMovingAverage longSma, SimpleMovingAverage shortSma)
 		{
-			if (longSma == null)
-				throw new ArgumentNullException(nameof(longSma));
-
-			if (shortSma == null)
-				throw new ArgumentNullException(nameof(shortSma));
-
-			ShortMa = shortSma;
-			LongMa = longSma;
+			ShortMa = shortSma ?? throw new ArgumentNullException(nameof(shortSma));
+			LongMa = longSma ?? throw new ArgumentNullException(nameof(longSma));
 			MedianPrice = new MedianPrice();
 		}
 
@@ -113,9 +107,9 @@ namespace StockSharp.Algo.Indicators
 		{
 			base.Load(settings);
 
-			LongMa.LoadNotNull(settings, "LongMa");
-			ShortMa.LoadNotNull(settings, "ShortMa");
-			MedianPrice.LoadNotNull(settings, "MedianPrice");
+			LongMa.LoadNotNull(settings, nameof(LongMa));
+			ShortMa.LoadNotNull(settings, nameof(ShortMa));
+			MedianPrice.LoadNotNull(settings, nameof(MedianPrice));
 		}
 
 		/// <summary>
@@ -126,9 +120,9 @@ namespace StockSharp.Algo.Indicators
 		{
 			base.Save(settings);
 
-			settings.SetValue("LongMa", LongMa.Save());
-			settings.SetValue("ShortMa", ShortMa.Save());
-			settings.SetValue("MedianPrice", MedianPrice.Save());
+			settings.SetValue(nameof(LongMa), LongMa.Save());
+			settings.SetValue(nameof(ShortMa), ShortMa.Save());
+			settings.SetValue(nameof(MedianPrice), MedianPrice.Save());
 		}
 	}
 }

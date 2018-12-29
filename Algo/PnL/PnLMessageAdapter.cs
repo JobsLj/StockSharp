@@ -40,14 +40,8 @@ namespace StockSharp.Algo.PnL
 		/// </summary>
 		public IPnLManager PnLManager
 		{
-			get { return _pnLManager; }
-			set
-			{
-				if (value == null)
-					throw new ArgumentNullException(nameof(value));
-
-				_pnLManager = value;
-			}
+			get => _pnLManager;
+			set => _pnLManager = value ?? throw new ArgumentNullException(nameof(value));
 		}
 
 		/// <summary>
@@ -56,8 +50,13 @@ namespace StockSharp.Algo.PnL
 		/// <param name="message">Message.</param>
 		public override void SendInMessage(Message message)
 		{
-			PnLManager.ProcessMessage(message);
+			if (message.IsBack)
+			{
+				base.SendInMessage(message);
+				return;
+			}
 
+			PnLManager.ProcessMessage(message);
 			base.SendInMessage(message);
 		}
 
@@ -67,10 +66,13 @@ namespace StockSharp.Algo.PnL
 		/// <param name="message">The message.</param>
 		protected override void OnInnerAdapterNewOutMessage(Message message)
 		{
-			var info = PnLManager.ProcessMessage(message);
+			if (!message.IsBack)
+			{
+				var info = PnLManager.ProcessMessage(message);
 
-			if (info != null && info.PnL != 0)
-				((ExecutionMessage)message).PnL = info.PnL;
+				if (info != null && info.PnL != 0)
+					((ExecutionMessage)message).PnL = info.PnL;	
+			}
 
 			base.OnInnerAdapterNewOutMessage(message);
 		}

@@ -99,7 +99,7 @@ namespace SampleIQFeed
 				{
 					Trader.RegisterNews();
 
-					// update gui labes
+					// update gui labels
 					this.GuiAsync(() => ChangeConnectStatus(true));
 				};
 				Trader.Disconnected += () => this.GuiAsync(() => ChangeConnectStatus(false));
@@ -107,7 +107,7 @@ namespace SampleIQFeed
 				// subscribe on connection error event
 				Trader.ConnectionError += error => this.GuiAsync(() =>
 				{
-					// update gui labes
+					// update gui labels
 					this.GuiAsync(() => ChangeConnectStatus(false));
 
 					MessageBox.Show(this, error.ToString(), LocalizedStrings.Str2959);
@@ -121,8 +121,8 @@ namespace SampleIQFeed
 				Trader.MarketDataSubscriptionFailed += (security, msg, error) =>
 					this.GuiAsync(() => MessageBox.Show(this, error.ToString(), LocalizedStrings.Str2956Params.Put(msg.DataType, security)));
 
-				Trader.NewSecurities += securities => _securitiesWindow.SecurityPicker.Securities.AddRange(securities);
-				Trader.NewNews += news => _newsWindow.NewsGrid.News.Add(news);
+				Trader.NewSecurity += _securitiesWindow.SecurityPicker.Securities.Add;
+				Trader.NewNews += _newsWindow.NewsGrid.News.Add;
 
 				// set market data provider
 				_securitiesWindow.SecurityPicker.MarketDataProvider = Trader;

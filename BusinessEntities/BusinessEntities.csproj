@@ -49,9 +49,6 @@
     <Reference Include="Ecng.ComponentModel">
       <HintPath>..\References\Ecng.ComponentModel.dll</HintPath>
     </Reference>
-    <Reference Include="Ecng.Configuration">
-      <HintPath>..\References\Ecng.Configuration.dll</HintPath>
-    </Reference>
     <Reference Include="Ecng.Reflection">
       <HintPath>..\References\Ecng.Reflection.dll</HintPath>
     </Reference>
@@ -81,17 +78,16 @@
     </Compile>
     <Compile Include="AggregatedQuote.cs" />
     <Compile Include="BasePosition.cs" />
-    <Compile Include="BasketSecurity.cs" />
     <Compile Include="CategoryAttributes.cs" />
     <Compile Include="Exchange.cs" />
     <Compile Include="ExchangeBoard.cs" />
     <Compile Include="ExchangeBoard_Instances.cs" />
     <Compile Include="Exchange_Instances.cs" />
     <Compile Include="IConnector.cs" />
-    <Compile Include="IExchangeInfoProvider.cs" />
     <Compile Include="IMarketDataProvider.cs" />
     <Compile Include="INewsProvider.cs" />
     <Compile Include="IPortfolioProvider.cs" />
+    <Compile Include="IPositionProvider.cs" />
     <Compile Include="ISecurityProvider.cs" />
     <Compile Include="MarketDepth.cs" />
     <Compile Include="MarketDepthPair.cs" />

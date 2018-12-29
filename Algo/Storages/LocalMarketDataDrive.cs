@@ -17,6 +17,7 @@ namespace StockSharp.Algo.Storages
 {
 	using System;
 	using System.Collections.Generic;
+	using System.Diagnostics;
 	using System.Globalization;
 	using System.IO;
 	using System.Linq;
@@ -33,6 +34,7 @@ namespace StockSharp.Algo.Storages
 
 	using StockSharp.Messages;
 	using StockSharp.Localization;
+	using StockSharp.Logging;
 
 	/// <summary>
 	/// The file storage for market data.
@@ -51,9 +53,6 @@ namespace StockSharp.Algo.Storages
 
 			public LocalMarketDataStorageDrive(string fileName, string path, StorageFormats format, IMarketDataDrive drive)
 			{
-				if (drive == null)
-					throw new ArgumentNullException(nameof(drive));
-
 				if (fileName.IsEmpty())
 					throw new ArgumentNullException(nameof(fileName));
 
@@ -61,7 +60,7 @@ namespace StockSharp.Algo.Storages
 					throw new ArgumentNullException(nameof(path));
 
 				_path = path;
-				_drive = drive;
+				_drive = drive ?? throw new ArgumentNullException(nameof(drive));
 				_fileNameWithExtension = fileName + GetExtension(format);
 				_datesPath = IOPath.Combine(_path, fileName + format + "Dates.txt");
 
@@ -255,7 +254,7 @@ namespace StockSharp.Algo.Storages
 			{
 				var result = IOPath.Combine(GetDataPath(date), _fileNameWithExtension);
 
-				System.Diagnostics.Trace.WriteLine("FileAccess ({0}): {1}".Put(isLoad ? "Load" : "Save", result));
+				Debug.WriteLine("FileAccess ({0}): {1}".Put(isLoad ? "Load" : "Save", result));
 				return result;
 			}
 
@@ -301,7 +300,7 @@ namespace StockSharp.Algo.Storages
 		/// </summary>
 		public override string Path
 		{
-			get { return _path; }
+			get => _path;
 			set
 			{
 				if (value.IsEmpty())
@@ -343,23 +342,27 @@ namespace StockSharp.Algo.Storages
 		/// <summary>
 		/// Get all available instruments.
 		/// </summary>
-		public override IEnumerable<SecurityId> AvailableSecurities
+		public override IEnumerable<SecurityId> AvailableSecurities => GetAvailableSecurities(Path);
+
+		/// <summary>
+		/// Get all available instruments.
+		/// </summary>
+		/// <param name="path">The path to the directory with data.</param>
+		/// <returns>All available instruments.</returns>
+		public static IEnumerable<SecurityId> GetAvailableSecurities(string path)
 		{
-			get
-			{
-				var idGenerator = new SecurityIdGenerator();
+			var idGenerator = new SecurityIdGenerator();
 
-				if (!Directory.Exists(Path))
-					return Enumerable.Empty<SecurityId>();
+			if (!Directory.Exists(path))
+				return Enumerable.Empty<SecurityId>();
 
-				return Directory
-					.EnumerateDirectories(Path)
-					.SelectMany(Directory.EnumerateDirectories)
-					.Select(System.IO.Path.GetFileName)
-					.Select(TraderHelper.FolderNameToSecurityId)
-					.Select(n => idGenerator.Split(n, true))
-					.Where(t => !t.IsDefault());
-			}
+			return Directory
+				.EnumerateDirectories(path)
+				.SelectMany(Directory.EnumerateDirectories)
+				.Select(IOPath.GetFileName)
+				.Select(TraderHelper.FolderNameToSecurityId)
+				.Select(n => idGenerator.Split(n, true))
+				.Where(t => !t.IsDefault());
 		}
 
 		/// <summary>
@@ -379,7 +382,8 @@ namespace StockSharp.Algo.Storages
 
 			return InteropHelper
 				.GetDirectories(secPath)
-				.SelectMany(dir => Directory.GetFiles(dir, "candles_*" + ext).Select(IOPath.GetFileNameWithoutExtension))
+			    .SelectMany(dir => Directory.GetFiles(dir, "*" + ext))
+				.Select(IOPath.GetFileNameWithoutExtension)
 				.Distinct()
 				.Select(GetDataType)
 				.Where(t => t != null);
@@ -416,18 +420,19 @@ namespace StockSharp.Algo.Storages
 				case StorageFormats.Csv:
 					return ".csv";
 				default:
-					throw new ArgumentOutOfRangeException(nameof(format));
+					throw new ArgumentOutOfRangeException(nameof(format), format, LocalizedStrings.Str1219);
 			}
 		}
 
 		private static readonly SynchronizedPairSet<DataType, string> _fileNames = new SynchronizedPairSet<DataType, string>
 		{
-			{ DataType.Create(typeof(ExecutionMessage), ExecutionTypes.Tick), "trades" },
-			{ DataType.Create(typeof(ExecutionMessage), ExecutionTypes.OrderLog), "orderLog" },
-			{ DataType.Create(typeof(ExecutionMessage), ExecutionTypes.Transaction), "transactions" },
-			{ DataType.Create(typeof(QuoteChangeMessage), null), "quotes" },
-			{ DataType.Create(typeof(Level1ChangeMessage), null), "security" },
-			{ DataType.Create(typeof(NewsMessage), null), "news" },
+			{ DataType.Ticks, "trades" },
+			{ DataType.OrderLog, "orderLog" },
+			{ DataType.Transactions, "transactions" },
+			{ DataType.MarketDepth, "quotes" },
+			{ DataType.Level1, "security" },
+			{ DataType.PositionChanges, "position" },
+			{ DataType.News, "news" },
 		};
 
 		/// <summary>
@@ -442,14 +447,26 @@ namespace StockSharp.Algo.Storages
 			if (info != null)
 				return info;
 
-			if (!fileName.ContainsIgnoreCase("Candle"))
+			if (!fileName.StartsWithIgnoreCase("candles_"))
 				return null;
 
 			var parts = fileName.Split('_');
-			var type = "{0}.{1}Message, {2}".Put(typeof(CandleMessage).Namespace, parts[1], typeof(CandleMessage).Assembly.FullName).To<Type>();
-			var arg = type.ToCandleArg(parts[2]);
 
-			return DataType.Create(type, arg);
+			if (parts.Length < 2)
+				return null;
+
+			try
+			{
+				var type = "{0}.{1}Message, {2}".Put(typeof(CandleMessage).Namespace, parts[1], typeof(CandleMessage).Assembly.FullName).To<Type>();
+				var arg = type.ToCandleArg(parts[2]);
+
+				return DataType.Create(type, arg);
+			}
+			catch (Exception ex)
+			{
+				ex.LogError();
+				return null;
+			}
 		}
 
 		/// <summary>
@@ -542,7 +559,7 @@ namespace StockSharp.Algo.Storages
 			var folderName = id.SecurityIdToFolderName();
 
 			return //UseAlphabeticPath
-				IOPath.Combine(Path, id.Substring(0, 1), folderName);
+				IOPath.Combine(Path, folderName.Substring(0, 1), folderName);
 			//: IOPath.Combine(Path, folderName);
 		}
 //#pragma warning restore 612

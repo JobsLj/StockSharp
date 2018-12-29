@@ -23,7 +23,7 @@ namespace StockSharp.Algo.Indicators
 	using StockSharp.Localization;
 
 	/// <summary>
-	/// Acceleration / Decelration Indicator.
+	/// Acceleration / Deceleration Indicator.
 	/// </summary>
 	/// <remarks>
 	/// http://ta.mql4.com/indicators/bills/acceleration_deceleration.
@@ -47,14 +47,8 @@ namespace StockSharp.Algo.Indicators
 		/// <param name="sma">The moving average.</param>
 		public Acceleration(AwesomeOscillator ao, SimpleMovingAverage sma)
 		{
-			if (ao == null)
-				throw new ArgumentNullException(nameof(ao));
-
-			if (sma == null)
-				throw new ArgumentNullException(nameof(sma));
-
-			Ao = ao;
-			Sma = sma;
+			Ao = ao ?? throw new ArgumentNullException(nameof(ao));
+			Sma = sma ?? throw new ArgumentNullException(nameof(sma));
 		}
 
 		/// <summary>
@@ -103,8 +97,8 @@ namespace StockSharp.Algo.Indicators
 		{
 			base.Load(settings);
 
-			Sma.LoadNotNull(settings, "Sma");
-			Ao.LoadNotNull(settings, "Ao");
+			Sma.LoadNotNull(settings, nameof(Sma));
+			Ao.LoadNotNull(settings, nameof(Ao));
 		}
 
 		/// <summary>
@@ -115,8 +109,8 @@ namespace StockSharp.Algo.Indicators
 		{
 			base.Save(settings);
 
-			settings.SetValue("Sma", Sma.Save());
-			settings.SetValue("Ao", Ao.Save());
+			settings.SetValue(nameof(Sma), Sma.Save());
+			settings.SetValue(nameof(Ao), Ao.Save());
 		}
 	}
 }

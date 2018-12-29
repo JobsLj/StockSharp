@@ -26,6 +26,27 @@ namespace StockSharp.Messages
 	using StockSharp.Localization;
 
 	/// <summary>
+	/// <see cref="Message"/> offline modes.
+	/// </summary>
+	public enum MessageOfflineModes
+	{
+		/// <summary>
+		/// None.
+		/// </summary>
+		None,
+
+		/// <summary>
+		/// Ignore offline mode and continue processing.
+		/// </summary>
+		Force,
+
+		/// <summary>
+		/// Cancel message processing and create reply.
+		/// </summary>
+		Cancel,
+	}
+
+	/// <summary>
 	/// A message containing market data or command.
 	/// </summary>
 	[System.Runtime.Serialization.DataContract]
@@ -33,7 +54,7 @@ namespace StockSharp.Messages
 	public abstract class Message : Cloneable<Message>, IExtendableEntity
 	{
 		/// <summary>
-		/// Local time label when a message was received/created.
+		/// Local timestamp when a message was received/created.
 		/// </summary>
 		[DisplayNameLoc(LocalizedStrings.Str203Key)]
 		[DescriptionLoc(LocalizedStrings.Str204Key)]
@@ -50,7 +71,7 @@ namespace StockSharp.Messages
 		public MessageTypes Type => _type;
 
 		[field: NonSerialized]
-		private IDictionary<object, object> _extensionInfo;
+		private IDictionary<string, object> _extensionInfo;
 
 		/// <summary>
 		/// Extended information.
@@ -63,16 +84,21 @@ namespace StockSharp.Messages
 		[DisplayNameLoc(LocalizedStrings.ExtendedInfoKey)]
 		[DescriptionLoc(LocalizedStrings.Str427Key)]
 		[MainCategory]
-		public IDictionary<object, object> ExtensionInfo
+		public IDictionary<string, object> ExtensionInfo
 		{
-			get { return _extensionInfo; }
-			set { _extensionInfo = value; }
+			get => _extensionInfo;
+			set => _extensionInfo = value;
 		}
 
 		/// <summary>
 		/// Is loopback message.
 		/// </summary>
 		public bool IsBack { get; set; }
+
+		/// <summary>
+		/// Offline mode handling message.
+		/// </summary>
+		public MessageOfflineModes OfflineMode { get; set; }
 
 		/// <summary>
 		/// Source adapter. Can be <see langword="null" />.
@@ -101,9 +127,10 @@ namespace StockSharp.Messages
 		/// Create a copy of <see cref="Message"/>.
 		/// </summary>
 		/// <returns>Copy.</returns>
-		public override Message Clone()
-		{
-			throw new NotSupportedException();
-		}
+		public abstract override Message Clone();
+
+		//{
+		//	throw new NotSupportedException(LocalizedStrings.Str17 + " " + GetType().FullName);
+		//}
 	}
 }

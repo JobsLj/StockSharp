@@ -17,11 +17,11 @@ namespace StockSharp.Algo
 {
 	using System;
     
-	using StockSharp.Logging;
-
 	using Ecng.Collections;
 	using Ecng.Common;
+
 	using StockSharp.Localization;
+	using StockSharp.Logging;
 
 	/// <summary>
 	/// The interface of the rule, activating action at occurrence of market condition.
@@ -160,7 +160,7 @@ namespace StockSharp.Algo
 		/// </summary>
 		public string Name
 		{
-			get { return _name; }
+			get => _name;
 			set
 			{
 				if (value.IsEmpty())
@@ -182,13 +182,12 @@ namespace StockSharp.Algo
 		/// </summary>
 		public virtual bool IsSuspended
 		{
-			get { return _isSuspended; }
+			get => _isSuspended;
 			set
 			{
 				_isSuspended = value;
 
-				if (_container != null)
-					_container.AddRuleLog(LogLevels.Info, this, value ? LocalizedStrings.Str1089 : LocalizedStrings.Str1090);
+				_container?.AddRuleLog(LogLevels.Info, this, value ? LocalizedStrings.Str1089 : LocalizedStrings.Str1090);
 			}
 		}
 
@@ -213,16 +212,13 @@ namespace StockSharp.Algo
 		/// </summary>
 		public virtual IMarketRuleContainer Container
 		{
-			get { return _container; }
+			get => _container;
 			set
 			{
-				if (value == null)
-					throw new ArgumentNullException(nameof(value));
-
 				if (Container != null)
 					throw new ArgumentException(LocalizedStrings.Str1091Params.Put(Name, Container));
 
-				_container = value;
+				_container = value ?? throw new ArgumentNullException(nameof(value));
 
 				//_container.AddRuleLog(LogLevels.Info, this, "Добавлено.");
 			}
@@ -235,10 +231,7 @@ namespace StockSharp.Algo
 		/// <returns>Rule.</returns>
 		public MarketRule<TToken, TArg> Until(Func<bool> canFinish)
 		{
-			if (canFinish == null)
-				throw new ArgumentNullException(nameof(canFinish));
-
-			_canFinish = canFinish;
+			_canFinish = canFinish ?? throw new ArgumentNullException(nameof(canFinish));
 			return this;
 		}
 
@@ -249,13 +242,10 @@ namespace StockSharp.Algo
 		/// <returns>Rule.</returns>
 		public MarketRule<TToken, TArg> Do(Action<TArg> action)
 		{
-			if (action == null)
-				throw new ArgumentNullException(nameof(action));
-
 			//return Do((r, a) => action(a));
 
 			_process = ProcessRuleVoid;
-			_actionVoid = action;
+			_actionVoid = action ?? throw new ArgumentNullException(nameof(action));
 
 			return this;
 		}
@@ -388,9 +378,7 @@ namespace StockSharp.Algo
 		{
 			var result = _action(_arg);
 
-			var ah = _activatedHandler;
-			if (ah != null)
-				ah(result);
+			_activatedHandler?.Invoke(result);
 
 			return _canFinish();
 		}

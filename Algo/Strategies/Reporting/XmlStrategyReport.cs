@@ -63,10 +63,10 @@ namespace StockSharp.Algo.Strategies.Reporting
 						new XElement("security", strategy.Security != null ? strategy.Security.Id : string.Empty),
 						new XElement("portfolio", strategy.Portfolio != null ? strategy.Portfolio.Name : string.Empty),
 						new XElement("parameters",
-							strategy.Parameters.SyncGet(c => c.ToArray()).Select(p =>
+							strategy.Parameters.CachedValues.Select(p =>
 								new XElement("parameter",
 									new XElement("name", p.Name),
-									new XElement("value", p.Value is TimeSpan ? Format((TimeSpan)p.Value) : p.Value)
+									new XElement("value", p.Value is TimeSpan ts ? Format(ts) : p.Value)
 									))),
 						new XElement("totalWorkingTime", Format(strategy.TotalWorkingTime)),
 						new XElement("commission", strategy.Commission),
@@ -78,7 +78,7 @@ namespace StockSharp.Algo.Strategies.Reporting
 							strategy.StatisticManager.Parameters.SyncGet(c => c.ToArray()).Select(p =>
 								new XElement("parameter",
 									new XElement("name", p.Name),
-									new XElement("value", p.Value is TimeSpan ? Format((TimeSpan)p.Value) : p.Value)
+									new XElement("value", p.Value is TimeSpan ts ? Format(ts) : p.Value)
 									))),
 						new XElement("orders",
 							strategy.Orders.OrderBy(o => o.TransactionId).Select(o =>
@@ -120,9 +120,9 @@ namespace StockSharp.Algo.Strategies.Reporting
 									new XElement("volume", o.Volume),
 									new XElement("latencyRegistration", Format(o.LatencyRegistration)),
 									new XElement("latencyCancellation", Format(o.LatencyCancellation)),
-									new XElement("derivedOrderId", o.DerivedOrder != null ? (object)o.DerivedOrder.Id : string.Empty),
+									//new XElement("derivedOrderId", o.DerivedOrder != null ? (object)o.DerivedOrder.Id : string.Empty),
 									new XElement("parameters", o.Condition.Parameters.Select(p => new XElement(p.Key, p.Value)))
-									)))
+								)))
 					))
 				).Save(FileName);
 		}

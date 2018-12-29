@@ -4,6 +4,62 @@
     <name>StockSharp.Xaml.Charting</name>
   </assembly>
   <members>
+    <member name="T:StockSharp.Xaml.Charting.BubbleChart">
+      <summary>
+            The graphical component to display bubble chart.
+            </summary>
+      <summary>
+            BubbleChart
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.BubbleChart.#ctor">
+      <summary>
+            Initializes a new instance of the <see cref="T:StockSharp.Xaml.Charting.BubbleChart" />.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.BubbleChart.ChartTheme">
+      <summary>
+            The name of the graphic theme.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.BubbleChart.Append(System.DateTime,System.Decimal,System.Decimal)">
+      <summary>
+            Append new values.
+            </summary>
+      <param name="x">X value.</param>
+      <param name="y">Y value.</param>
+      <param name="z">Z value.</param>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.BubbleChart.Update(System.DateTime,System.Decimal,System.Decimal)">
+      <summary>
+            Update values.
+            </summary>
+      <param name="x">X value.</param>
+      <param name="y">Y value.</param>
+      <param name="z">Z value.</param>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.BubbleChart.Clear">
+      <summary>
+            Clear chart.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.BubbleChart.Load(Ecng.Serialization.SettingsStorage)">
+      <summary>
+            Load settings.
+            </summary>
+      <param name="storage">Settings storage.</param>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.BubbleChart.Save(Ecng.Serialization.SettingsStorage)">
+      <summary>
+            Save settings.
+            </summary>
+      <param name="storage">Settings storage.</param>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.BubbleChart.InitializeComponent">
+      <summary>
+            InitializeComponent
+            </summary>
+    </member>
     <member name="T:StockSharp.Xaml.Charting.Chart">
       <summary>
             The graphic component of the candles charts display.
@@ -24,7 +80,7 @@
     </member>
     <member name="P:StockSharp.Xaml.Charting.Chart.IsAutoScroll">
       <summary>
-            To scroll <see cref="P:StockSharp.Xaml.Charting.Chart.Areas" /> areas automatically when new data occured. The default is off.
+            To scroll <see cref="P:StockSharp.Xaml.Charting.Chart.Areas" /> areas automatically when new data occurred. The default is off.
             </summary>
     </member>
     <member name="P:StockSharp.Xaml.Charting.Chart.IsAutoRange">
@@ -32,9 +88,24 @@
             To use automatic range for the X-axis. The default is off.
             </summary>
     </member>
+    <member name="P:StockSharp.Xaml.Charting.Chart.XAxisType">
+      <summary>
+            Type of X axis for this chart.
+            </summary>
+    </member>
     <member name="P:StockSharp.Xaml.Charting.Chart.AutoRangeInterval">
       <summary>
             Chart range/scroll interval. Default is 200ms.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.Chart.SecurityProvider">
+      <summary>
+            The provider of information about instruments.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.Chart.DisableIndicatorReset">
+      <summary>
+            Disable tracking indicator reset.
             </summary>
     </member>
     <member name="M:StockSharp.Xaml.Charting.Chart.AddArea(StockSharp.Xaml.Charting.ChartArea)">
@@ -52,6 +123,11 @@
     <member name="M:StockSharp.Xaml.Charting.Chart.ClearAreas">
       <summary>
             To remove all areas from the chart.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.Chart.Elements">
+      <summary>
+            Chart elements.
             </summary>
     </member>
     <member name="M:StockSharp.Xaml.Charting.Chart.AddElement(StockSharp.Xaml.Charting.ChartArea,StockSharp.Xaml.Charting.IChartElement)">
@@ -177,12 +253,17 @@
     </member>
     <member name="P:StockSharp.Xaml.Charting.Chart.TimeZone">
       <summary>
-            Local time zone for all <see cref="T:System.DateTimeOffset" /> values convertion.
+            Local time zone for all <see cref="T:System.DateTimeOffset" /> values conversion.
             </summary>
     </member>
     <member name="P:StockSharp.Xaml.Charting.Chart.IndicatorTypes">
       <summary>
             The list of available indicators types.
+            </summary>
+    </member>
+    <member name="E:StockSharp.Xaml.Charting.Chart.AreaAdded">
+      <summary>
+            The chart area creation event.
             </summary>
     </member>
     <member name="E:StockSharp.Xaml.Charting.Chart.AddCandles">
@@ -225,6 +306,51 @@
             Cancel order event.
             </summary>
     </member>
+    <member name="E:StockSharp.Xaml.Charting.Chart.AnnotationCreated">
+      <summary>
+            Annotation created event.
+            </summary>
+    </member>
+    <member name="E:StockSharp.Xaml.Charting.Chart.AnnotationModified">
+      <summary>
+            Annotation created event.
+            </summary>
+    </member>
+    <member name="E:StockSharp.Xaml.Charting.Chart.AnnotationDeleted">
+      <summary>
+            Annotation deleted event.
+            </summary>
+    </member>
+    <member name="E:StockSharp.Xaml.Charting.Chart.AnnotationSelected">
+      <summary>
+            Annotation selection event.
+            </summary>
+    </member>
+    <member name="E:StockSharp.Xaml.Charting.Chart.SubscribeCandleElement">
+      <summary>
+            The event of the subscription to getting data for the element.
+            </summary>
+    </member>
+    <member name="E:StockSharp.Xaml.Charting.Chart.SubscribeIndicatorElement">
+      <summary>
+            The event of the subscription to getting data for the element.
+            </summary>
+    </member>
+    <member name="E:StockSharp.Xaml.Charting.Chart.SubscribeOrderElement">
+      <summary>
+            The event of the subscription to getting data for the element.
+            </summary>
+    </member>
+    <member name="E:StockSharp.Xaml.Charting.Chart.SubscribeTradeElement">
+      <summary>
+            The event of the subscription to getting data for the element.
+            </summary>
+    </member>
+    <member name="E:StockSharp.Xaml.Charting.Chart.UnSubscribeElement">
+      <summary>
+            The event of the unsubscribe from getting data for the element.
+            </summary>
+    </member>
     <member name="M:StockSharp.Xaml.Charting.Chart.Reset(System.Collections.Generic.IEnumerable{StockSharp.Xaml.Charting.IChartElement})">
       <summary>
             To reset the chart elements values drawn previously.
@@ -248,6 +374,11 @@
             Save settings.
             </summary>
       <param name="storage">Settings storage.</param>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.Chart.ReSubscribeElements">
+      <summary>
+            To re-subscribe to getting data for all elements.
+            </summary>
     </member>
     <member name="M:StockSharp.Xaml.Charting.Chart.InitializeComponent">
       <summary>
@@ -314,9 +445,9 @@
             Do not allow user to edit the order from chart.
             </summary>
     </member>
-    <member name="M:StockSharp.Xaml.Charting.ChartActiveOrderInfo.#ctor(StockSharp.Xaml.Charting.ChartActiveOrderInfo)">
+    <member name="P:StockSharp.Xaml.Charting.ChartActiveOrderInfo.Element">
       <summary>
-            Initializes a new instance of the <see cref="T:StockSharp.Xaml.Charting.ChartActiveOrderInfo" />.
+            The chart element representing active orders.
             </summary>
     </member>
     <member name="M:StockSharp.Xaml.Charting.ChartActiveOrderInfo.UpdateOrderState(StockSharp.BusinessEntities.Order,System.Boolean,System.Boolean)">
@@ -325,7 +456,7 @@
             </summary>
       <param name="order">The order.</param>
       <param name="isError">Whether an order operation has failed.</param>
-      <param name="freeze">Do not allow user to edit the order from chart.</param>
+      <param name="isFrozen">Do not allow user to edit the order from chart.</param>
     </member>
     <member name="M:StockSharp.Xaml.Charting.ChartActiveOrderInfo.Load(Ecng.Serialization.SettingsStorage)">
       <summary>
@@ -347,11 +478,6 @@
     <member name="M:StockSharp.Xaml.Charting.ChartActiveOrdersElement.#ctor">
       <summary>
             Initializes a new instance of the <see cref="T:StockSharp.Xaml.Charting.ChartActiveOrdersElement" />.
-            </summary>
-    </member>
-    <member name="P:StockSharp.Xaml.Charting.ChartActiveOrdersElement.IsVisible">
-      <summary>
-            Show chart element.
             </summary>
     </member>
     <member name="P:StockSharp.Xaml.Charting.ChartActiveOrdersElement.BuyPendingColor">
@@ -409,6 +535,9 @@
             Orders to display on chart.
             </summary>
     </member>
+    <member name="M:StockSharp.Xaml.Charting.ChartActiveOrdersElement.OnDraw(StockSharp.Xaml.Charting.ChartDrawData)">
+      <inheritdoc />
+    </member>
     <member name="M:StockSharp.Xaml.Charting.ChartActiveOrdersElement.Load(Ecng.Serialization.SettingsStorage)">
       <summary>
             Load settings.
@@ -420,12 +549,6 @@
             Save settings.
             </summary>
       <param name="storage">Settings storage.</param>
-    </member>
-    <member name="M:StockSharp.Xaml.Charting.ChartActiveOrdersElement.Clone">
-      <summary>
-            Create a copy of <see cref="T:StockSharp.Xaml.Charting.ChartActiveOrdersElement" />.
-            </summary>
-      <returns>Copy.</returns>
     </member>
     <member name="T:StockSharp.Xaml.Charting.ChartAnnotationTypes">
       <summary>
@@ -467,6 +590,30 @@
             Vertical line.
             </summary>
     </member>
+    <member name="T:StockSharp.Xaml.Charting.ChartAnnotation">
+      <summary>
+            Annotation.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.ChartAnnotation.Type">
+      <summary>
+            Annotation type.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.ChartAnnotation.#ctor">
+      <summary>
+            Initializes a new instance of the <see cref="T:StockSharp.Xaml.Charting.ChartAnnotation" />.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.ChartAnnotation.OnDraw(StockSharp.Xaml.Charting.ChartDrawData)">
+      <inheritdoc />
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.ChartAnnotation.Load(Ecng.Serialization.SettingsStorage)">
+      <inheritdoc />
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.ChartAnnotation.Save(Ecng.Serialization.SettingsStorage)">
+      <inheritdoc />
+    </member>
     <member name="T:StockSharp.Xaml.Charting.ChartArea">
       <summary>
             Chart area.
@@ -485,6 +632,16 @@
     <member name="M:StockSharp.Xaml.Charting.ChartArea.#ctor">
       <summary>
             Initializes a new instance of the <see cref="T:StockSharp.Xaml.Charting.ChartArea" />.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.ChartArea.Chart">
+      <summary>
+            Chart.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.ChartArea.XAxisType">
+      <summary>
+            Type of X axis for this chart.
             </summary>
     </member>
     <member name="P:StockSharp.Xaml.Charting.ChartArea.Title">
@@ -535,6 +692,9 @@
             Returns a string that represents the current object.
             </summary>
       <returns>A string that represents the current object.</returns>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.ChartArea.Dispose">
+      <inheritdoc />
     </member>
     <member name="T:StockSharp.Xaml.Charting.ChartAxisAlignment">
       <summary>
@@ -596,9 +756,19 @@
             Chart area.
             </summary>
     </member>
+    <member name="P:StockSharp.Xaml.Charting.ChartAxis.IsDefault">
+      <summary>
+            Whether this axis can be removed from chart area.
+            </summary>
+    </member>
     <member name="P:StockSharp.Xaml.Charting.ChartAxis.Id">
       <summary>
             Unique ID.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.ChartAxis.IsVisible">
+      <summary>
+            Axis visibility.
             </summary>
     </member>
     <member name="P:StockSharp.Xaml.Charting.ChartAxis.Title">
@@ -666,6 +836,16 @@
             The format of X-axis labels within the day.
             </summary>
     </member>
+    <member name="P:StockSharp.Xaml.Charting.ChartAxis.TimeZone">
+      <summary>
+            Time zone for this axis.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.ChartAxis.DataPointWidth">
+      <summary>
+            Current data point with for X axis.
+            </summary>
+    </member>
     <member name="M:StockSharp.Xaml.Charting.ChartAxis.Load(Ecng.Serialization.SettingsStorage)">
       <summary>
             Load settings.
@@ -678,39 +858,77 @@
             </summary>
       <param name="storage">Settings storage.</param>
     </member>
-    <member name="E:StockSharp.Xaml.Charting.ChartAxis.PropertyChanging">
+    <member name="T:StockSharp.Xaml.Charting.ChartBandElement">
       <summary>
-            The chart element properties value changing event.
+            The chart element representing a band.
             </summary>
     </member>
-    <member name="M:StockSharp.Xaml.Charting.ChartAxis.RaisePropertyChanging(System.String)">
+    <member name="P:StockSharp.Xaml.Charting.ChartBandElement.Style">
       <summary>
-            To call the <see cref="E:StockSharp.Xaml.Charting.ChartAxis.PropertyChanging" /> event.
-            </summary>
-      <param name="name">Property name.</param>
-    </member>
-    <member name="E:StockSharp.Xaml.Charting.ChartAxis.PropertyChanged">
-      <summary>
-            The chart element properties value change event.
+            The band drawing style. The default is <see cref="F:StockSharp.Xaml.Charting.ChartIndicatorDrawStyles.Band" />. Can also be <see cref="F:StockSharp.Xaml.Charting.ChartIndicatorDrawStyles.BandOneValue" />.
             </summary>
     </member>
-    <member name="M:StockSharp.Xaml.Charting.ChartAxis.RaisePropertyChanged(System.String)">
+    <member name="P:StockSharp.Xaml.Charting.ChartBandElement.Line1">
       <summary>
-            To call the <see cref="E:StockSharp.Xaml.Charting.ChartAxis.PropertyChanged" /> event.
-            </summary>
-      <param name="name">Property name.</param>
-    </member>
-    <member name="E:StockSharp.Xaml.Charting.ChartAxis.PropertyValueChanging">
-      <summary>
-            The chart element properties value change start event.
+        <see cref="P:StockSharp.Xaml.Charting.ChartBandElement.Line1" />.
             </summary>
     </member>
-    <member name="M:StockSharp.Xaml.Charting.ChartAxis.RaisePropertyValueChanging(System.String,System.Object)">
+    <member name="P:StockSharp.Xaml.Charting.ChartBandElement.Line2">
       <summary>
-            To call the <see cref="E:StockSharp.Xaml.Charting.ChartAxis.PropertyValueChanging" /> event.
+        <see cref="P:StockSharp.Xaml.Charting.ChartBandElement.Line2" />.
             </summary>
-      <param name="name">Property name.</param>
-      <param name="value">New value of the property.</param>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.ChartBandElement.#ctor">
+      <summary>
+            Create instance.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.ChartBandElement.CheckAxesCompatible(System.Nullable{StockSharp.Xaml.Charting.ChartAxisType},System.Nullable{StockSharp.Xaml.Charting.ChartAxisType})">
+      <inheritdoc />
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.ChartBandElement.OnDraw(StockSharp.Xaml.Charting.ChartDrawData)">
+      <inheritdoc />
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.ChartBandElement.Load(Ecng.Serialization.SettingsStorage)">
+      <summary>
+            Load settings.
+            </summary>
+      <param name="storage">Settings storage.</param>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.ChartBandElement.Save(Ecng.Serialization.SettingsStorage)">
+      <summary>
+            Save settings.
+            </summary>
+      <param name="storage">Settings storage.</param>
+    </member>
+    <member name="T:StockSharp.Xaml.Charting.ChartBaseViewModel">
+      <summary>
+            Base class for chart related view models.
+            </summary>
+    </member>
+    <member name="E:StockSharp.Xaml.Charting.ChartBaseViewModel.PropertyValueChanging">
+      <summary>
+            Raised before property value is changed.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.ChartBaseViewModel.SetField``1(``0@,``0,System.String)">
+      <summary>
+            Set property value and raise events.
+            </summary>
+      <param name="field">Property backing field.</param>
+      <param name="value">New value.</param>
+      <param name="propertyName">Name of the property.</param>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.ChartBaseViewModel.MapPropertyChangeNotification(System.ComponentModel.INotifyPropertyChanged,System.String,System.String[])">
+      <summary>
+            Helper method to raise property change notifications on this object if the event was raised on another object <paramref name="source" />.
+            </summary>
+      <param name="source">
+      </param>
+      <param name="nameFrom">
+      </param>
+      <param name="namesTo">
+      </param>
     </member>
     <member name="T:StockSharp.Xaml.Charting.ChartCandleDrawStyles">
       <summary>
@@ -762,6 +980,11 @@
             Area.
             </summary>
     </member>
+    <member name="F:StockSharp.Xaml.Charting.ChartCandleDrawStyles.PnF">
+      <summary>
+            X0 candle.
+            </summary>
+    </member>
     <member name="T:StockSharp.Xaml.Charting.ChartCandleElement">
       <summary>
             The chart element representing a candle.
@@ -809,7 +1032,7 @@
     </member>
     <member name="P:StockSharp.Xaml.Charting.ChartCandleElement.AntiAliasing">
       <summary>
-            Candles rendering smothing (enabled by default).
+            Candles rendering smoothing (enabled by default).
             </summary>
     </member>
     <member name="P:StockSharp.Xaml.Charting.ChartCandleElement.LineColor">
@@ -817,9 +1040,19 @@
             Line color for <see cref="P:StockSharp.Xaml.Charting.ChartCandleElement.DrawStyle" /> Line*.
             </summary>
     </member>
+    <member name="P:StockSharp.Xaml.Charting.ChartCandleElement.AreaColor">
+      <summary>
+            Area color for <see cref="P:StockSharp.Xaml.Charting.ChartCandleElement.DrawStyle" /> set as <see cref="F:StockSharp.Xaml.Charting.ChartCandleDrawStyles.Area" />.
+            </summary>
+    </member>
     <member name="P:StockSharp.Xaml.Charting.ChartCandleElement.ShowAxisMarker">
       <summary>
             Show Y-axis market.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.ChartCandleElement.Colorer">
+      <summary>
+            Custom elements colorer.
             </summary>
     </member>
     <member name="P:StockSharp.Xaml.Charting.ChartCandleElement.Timeframe2Multiplier">
@@ -914,25 +1147,163 @@
             </summary>
       <param name="storage">Settings storage.</param>
     </member>
-    <member name="M:StockSharp.Xaml.Charting.ChartCandleElement.Clone">
+    <member name="M:StockSharp.Xaml.Charting.ChartCandleElement.OnDraw(StockSharp.Xaml.Charting.ChartDrawData)">
+      <inheritdoc />
+    </member>
+    <member name="T:StockSharp.Xaml.Charting.ChartCandleElementPicker">
       <summary>
-            Create a copy of <see cref="T:StockSharp.Xaml.Charting.ChartCandleElement" />.
+            The window for select candle series element.
             </summary>
-      <returns>Copy.</returns>
+      <summary>
+            ChartCandleElementPicker
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.ChartCandleElementPicker.#ctor">
+      <summary>
+            Initializes a new instance of the <see cref="T:StockSharp.Xaml.Charting.ChartCandleElementPicker" />.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.ChartCandleElementPicker.Elements">
+      <summary>
+            Elements.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.ChartCandleElementPicker.SelectedElement">
+      <summary>
+            Selected element.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.ChartCandleElementPicker.InitializeComponent">
+      <summary>
+            InitializeComponent
+            </summary>
     </member>
     <member name="T:StockSharp.Xaml.Charting.ChartDrawData">
       <summary>
             Chart drawing data.
             </summary>
     </member>
+    <member name="T:StockSharp.Xaml.Charting.ChartDrawData.IDrawValue">
+      <summary>
+            Interface which represents all chart draw data types.
+            </summary>
+    </member>
+    <member name="T:StockSharp.Xaml.Charting.ChartDrawData.IndicatorData">
+      <summary>
+            Indicator values to draw on chart.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.ChartDrawData.IndicatorData.Time">
+      <summary>Value timestamp.</summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.ChartDrawData.IndicatorData.Value">
+      <summary>Indicator value.</summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.ChartDrawData.IndicatorData.#ctor(System.DateTimeOffset,StockSharp.Algo.Indicators.IIndicatorValue)">
+      <summary>
+            Create instance.
+            </summary>
+      <param name="dto">Value timestamp.</param>
+      <param name="val">Indicator value.</param>
+    </member>
+    <member name="T:StockSharp.Xaml.Charting.ChartDrawData.AnnotationData">
+      <summary>
+            Used to transfer annotation draw data.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.ChartDrawData.AnnotationData.IsVisible">
+      <summary>Show/hide annotation.</summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.ChartDrawData.AnnotationData.IsEditable">
+      <summary>Whether user can edit annotation.</summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.ChartDrawData.AnnotationData.X1">
+      <summary>
+            X1 coordinate for annotation drawing.
+            <see cref="T:System.DateTimeOffset" /> for coordinate mode <see cref="F:Ecng.Xaml.Charting.Visuals.Annotations.AnnotationCoordinateMode.Absolute" /> or <see cref="F:Ecng.Xaml.Charting.Visuals.Annotations.AnnotationCoordinateMode.RelativeY" />.
+            <see cref="T:System.Double" /> otherwise.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.ChartDrawData.AnnotationData.Y1">
+      <summary>
+            Y1 coordinate for annotation drawing.
+            <see cref="T:System.Decimal" /> for coordinate mode <see cref="F:Ecng.Xaml.Charting.Visuals.Annotations.AnnotationCoordinateMode.Absolute" /> or <see cref="F:Ecng.Xaml.Charting.Visuals.Annotations.AnnotationCoordinateMode.RelativeX" />.
+            <see cref="T:System.Double" /> otherwise.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.ChartDrawData.AnnotationData.X2">
+      <summary>
+            X2 coordinate for annotation drawing.
+            <see cref="T:System.DateTimeOffset" /> for coordinate mode <see cref="F:Ecng.Xaml.Charting.Visuals.Annotations.AnnotationCoordinateMode.Absolute" /> or <see cref="F:Ecng.Xaml.Charting.Visuals.Annotations.AnnotationCoordinateMode.RelativeY" />.
+            <see cref="T:System.Double" /> otherwise.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.ChartDrawData.AnnotationData.Y2">
+      <summary>
+            Y2 coordinate for annotation drawing.
+            <see cref="T:System.Decimal" /> for coordinate mode <see cref="F:Ecng.Xaml.Charting.Visuals.Annotations.AnnotationCoordinateMode.Absolute" /> or <see cref="F:Ecng.Xaml.Charting.Visuals.Annotations.AnnotationCoordinateMode.RelativeX" />.
+            <see cref="T:System.Double" /> otherwise.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.ChartDrawData.AnnotationData.Stroke">
+      <summary>Brush to draw lines and borders.</summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.ChartDrawData.AnnotationData.Fill">
+      <summary>Brush to fill background.</summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.ChartDrawData.AnnotationData.Foreground">
+      <summary>Brush to fill background.</summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.ChartDrawData.AnnotationData.Thickness">
+      <summary>Line thickness.</summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.ChartDrawData.AnnotationData.ShowLabel">
+      <summary>Turn on/off label show for horizontal and vertical lines.</summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.ChartDrawData.AnnotationData.LabelPlacement">
+      <summary>Label placement for horizontal and vertical lines.</summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.ChartDrawData.AnnotationData.HorizontalAlignment">
+      <summary>Alignment for horizontal lines.</summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.ChartDrawData.AnnotationData.VerticalAlignment">
+      <summary>Alignment for vertical lines.</summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.ChartDrawData.AnnotationData.CoordinateMode">
+      <summary>
+            Coordinate mode.
+            <see cref="F:Ecng.Xaml.Charting.Visuals.Annotations.AnnotationCoordinateMode.Absolute" /> means <see cref="T:System.DateTimeOffset" /> for X and <see cref="T:System.Decimal" /> price for Y.
+            <see cref="F:Ecng.Xaml.Charting.Visuals.Annotations.AnnotationCoordinateMode.Relative" /> means relative to the screen edges: double. 0=top/left, 0.5=center, 1=bottom/right
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.ChartDrawData.AnnotationData.Text">
+      <summary>Text for text annotation.</summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.ChartDrawData.AnnotationData.Load(Ecng.Serialization.SettingsStorage)">
+      <summary>
+            Load settings.
+            </summary>
+      <param name="storage">Settings storage.</param>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.ChartDrawData.AnnotationData.Save(Ecng.Serialization.SettingsStorage)">
+      <summary>
+            Save settings.
+            </summary>
+      <param name="storage">Settings storage.</param>
+    </member>
     <member name="T:StockSharp.Xaml.Charting.ChartDrawData.ChartDrawDataItem">
       <summary>
             Chart drawing data item.
             </summary>
     </member>
-    <member name="P:StockSharp.Xaml.Charting.ChartDrawData.ChartDrawDataItem.Time">
+    <member name="P:StockSharp.Xaml.Charting.ChartDrawData.ChartDrawDataItem.TimeStamp">
       <summary>
             The time stamp of the new data generation.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.ChartDrawData.ChartDrawDataItem.XValue">
+      <summary>
+            Value of X coordinate for <see cref="T:StockSharp.Xaml.Charting.ChartLineElement" />.
             </summary>
     </member>
     <member name="M:StockSharp.Xaml.Charting.ChartDrawData.ChartDrawDataItem.Add(StockSharp.Xaml.Charting.ChartCandleElement,StockSharp.Algo.Candles.Candle)">
@@ -944,16 +1315,31 @@
       <returns>
         <see cref="T:StockSharp.Xaml.Charting.ChartDrawData.ChartDrawDataItem" /> instance.</returns>
     </member>
-    <member name="M:StockSharp.Xaml.Charting.ChartDrawData.ChartDrawDataItem.Add(StockSharp.Xaml.Charting.ChartCandleElement,System.Object,System.Decimal,System.Decimal,System.Decimal,System.Decimal)">
+    <member name="M:StockSharp.Xaml.Charting.ChartDrawData.ChartDrawDataItem.Add(StockSharp.Xaml.Charting.ChartCandleElement,StockSharp.Algo.Candles.Candle,System.Decimal,System.Decimal,System.Decimal,System.Decimal)">
       <summary>
             Put the candle data.
             </summary>
       <param name="element">The chart element representing a candle.</param>
-      <param name="candleArg">Candle arg.</param>
+      <param name="candle">Candle.</param>
       <param name="openPrice">Opening price.</param>
       <param name="highPrice">Highest price.</param>
       <param name="lowPrice">Lowest price.</param>
       <param name="closePrice">Closing price.</param>
+      <returns>
+        <see cref="T:StockSharp.Xaml.Charting.ChartDrawData.ChartDrawDataItem" /> instance.</returns>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.ChartDrawData.ChartDrawDataItem.Add(StockSharp.Xaml.Charting.ChartCandleElement,StockSharp.Algo.Candles.Candle,System.Decimal,System.Decimal,System.Decimal,System.Decimal,System.Tuple{System.Decimal,System.Decimal}[],System.Nullable{System.Decimal})">
+      <summary>
+            Put the candle data.
+            </summary>
+      <param name="element">The chart element representing a candle.</param>
+      <param name="candle">Candle.</param>
+      <param name="openPrice">Opening price.</param>
+      <param name="highPrice">Highest price.</param>
+      <param name="lowPrice">Lowest price.</param>
+      <param name="closePrice">Closing price.</param>
+      <param name="priceLevels">Price levels.</param>
+      <param name="priceStep">Minimum price step.</param>
       <returns>
         <see cref="T:StockSharp.Xaml.Charting.ChartDrawData.ChartDrawDataItem" /> instance.</returns>
     </member>
@@ -969,15 +1355,6 @@
       <param name="closePrice">Closing price.</param>
       <param name="priceLevels">Price levels.</param>
       <param name="priceStep">Minimum price step.</param>
-      <returns>
-        <see cref="T:StockSharp.Xaml.Charting.ChartDrawData.ChartDrawDataItem" /> instance.</returns>
-    </member>
-    <member name="M:StockSharp.Xaml.Charting.ChartDrawData.ChartDrawDataItem.Add(StockSharp.Xaml.Charting.ChartCandleElement,System.Tuple{System.Object,System.Decimal,System.Decimal,System.Decimal,System.Decimal,System.Tuple{System.Decimal,System.Decimal}[],System.Nullable{System.Decimal}})">
-      <summary>
-            Put the candle data.
-            </summary>
-      <param name="element">The chart element representing a candle.</param>
-      <param name="candle">The candle data.</param>
       <returns>
         <see cref="T:StockSharp.Xaml.Charting.ChartDrawData.ChartDrawDataItem" /> instance.</returns>
     </member>
@@ -999,24 +1376,16 @@
       <returns>
         <see cref="T:StockSharp.Xaml.Charting.ChartDrawData.ChartDrawDataItem" /> instance.</returns>
     </member>
-    <member name="M:StockSharp.Xaml.Charting.ChartDrawData.ChartDrawDataItem.Add(StockSharp.Xaml.Charting.ChartOrderElement,System.Int64,StockSharp.Messages.Sides,System.Decimal,System.Decimal)">
+    <member name="M:StockSharp.Xaml.Charting.ChartDrawData.ChartDrawDataItem.Add(StockSharp.Xaml.Charting.ChartOrderElement,System.Int64,System.String,StockSharp.Messages.Sides,System.Decimal,System.Decimal)">
       <summary>
             Put the trade data.
             </summary>
       <param name="element">The chart element representing orders.</param>
-      <param name="tradeId">Trade ID.</param>
+      <param name="orderId">Order ID.</param>
+      <param name="orderStringId">Order ID (as string, if electronic board does not use numeric order ID representation).</param>
       <param name="side">Order side (buy or sell).</param>
-      <param name="price">Trade price.</param>
-      <param name="volume">Number of contracts in a trade.</param>
-      <returns>
-        <see cref="T:StockSharp.Xaml.Charting.ChartDrawData.ChartDrawDataItem" /> instance.</returns>
-    </member>
-    <member name="M:StockSharp.Xaml.Charting.ChartDrawData.ChartDrawDataItem.Add(StockSharp.Xaml.Charting.ChartOrderElement,System.Tuple{System.Int64,StockSharp.Messages.Sides,System.Decimal,System.Decimal})">
-      <summary>
-            Put the order data.
-            </summary>
-      <param name="element">The chart element representing orders.</param>
-      <param name="order">The order value.</param>
+      <param name="price">Order price.</param>
+      <param name="volume">Number of contracts in the order.</param>
       <returns>
         <see cref="T:StockSharp.Xaml.Charting.ChartDrawData.ChartDrawDataItem" /> instance.</returns>
     </member>
@@ -1029,24 +1398,16 @@
       <returns>
         <see cref="T:StockSharp.Xaml.Charting.ChartDrawData.ChartDrawDataItem" /> instance.</returns>
     </member>
-    <member name="M:StockSharp.Xaml.Charting.ChartDrawData.ChartDrawDataItem.Add(StockSharp.Xaml.Charting.ChartTradeElement,System.Int64,StockSharp.Messages.Sides,System.Decimal,System.Decimal)">
+    <member name="M:StockSharp.Xaml.Charting.ChartDrawData.ChartDrawDataItem.Add(StockSharp.Xaml.Charting.ChartTradeElement,System.Int64,System.String,StockSharp.Messages.Sides,System.Decimal,System.Decimal)">
       <summary>
             Put the trade data.
             </summary>
       <param name="element">The chart element representing trades.</param>
       <param name="tradeId">Trade ID.</param>
+      <param name="tradeStringId">Trade ID (as string, if electronic board does not use numeric order ID representation).</param>
       <param name="side">Order side (buy or sell).</param>
       <param name="price">Trade price.</param>
-      <param name="volume">Number of contracts in a trade.</param>
-      <returns>
-        <see cref="T:StockSharp.Xaml.Charting.ChartDrawData.ChartDrawDataItem" /> instance.</returns>
-    </member>
-    <member name="M:StockSharp.Xaml.Charting.ChartDrawData.ChartDrawDataItem.Add(StockSharp.Xaml.Charting.ChartTradeElement,System.Tuple{System.Int64,StockSharp.Messages.Sides,System.Decimal,System.Decimal})">
-      <summary>
-            Put the order data.
-            </summary>
-      <param name="element">The chart element representing trades.</param>
-      <param name="trade">The trade value.</param>
+      <param name="volume">Number of contracts in the trade.</param>
       <returns>
         <see cref="T:StockSharp.Xaml.Charting.ChartDrawData.ChartDrawDataItem" /> instance.</returns>
     </member>
@@ -1056,6 +1417,35 @@
             </summary>
       <param name="element">The chart element representing active orders.</param>
       <param name="value">The active order value.</param>
+      <returns>
+        <see cref="T:StockSharp.Xaml.Charting.ChartDrawData.ChartDrawDataItem" /> instance.</returns>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.ChartDrawData.ChartDrawDataItem.Add(StockSharp.Xaml.Charting.ChartLineElement,System.Double,System.Double)">
+      <summary>
+            Put the line data.
+            </summary>
+      <param name="element">The chart element representing a line.</param>
+      <param name="value1">The value1.</param>
+      <param name="value2">The value2.</param>
+      <returns>
+        <see cref="T:StockSharp.Xaml.Charting.ChartDrawData.ChartDrawDataItem" /> instance.</returns>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.ChartDrawData.ChartDrawDataItem.Add(StockSharp.Xaml.Charting.ChartBandElement,System.Decimal)">
+      <summary>
+            Put the line data.
+            </summary>
+      <param name="element">The chart element representing a band.</param>
+      <param name="value">The value.</param>
+      <returns>
+        <see cref="T:StockSharp.Xaml.Charting.ChartDrawData.ChartDrawDataItem" /> instance.</returns>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.ChartDrawData.ChartDrawDataItem.Add(StockSharp.Xaml.Charting.ChartBandElement,System.Double,System.Double)">
+      <summary>
+            Put the line data.
+            </summary>
+      <param name="element">The chart element representing a band.</param>
+      <param name="value1">The value1.</param>
+      <param name="value2">The value2.</param>
       <returns>
         <see cref="T:StockSharp.Xaml.Charting.ChartDrawData.ChartDrawDataItem" /> instance.</returns>
     </member>
@@ -1077,7 +1467,24 @@
       <summary>
             Initializes a new instance of the <see cref="T:StockSharp.Xaml.Charting.ChartDrawData.ChartDrawDataItem" />.
             </summary>
-      <param name="offset">The time stamp of the new data generation.</param>
+      <param name="timeStamp">The time stamp of the new data generation.</param>
+      <returns>
+        <see cref="T:StockSharp.Xaml.Charting.ChartDrawData.ChartDrawDataItem" /> instance.</returns>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.ChartDrawData.Add(StockSharp.Xaml.Charting.ChartAnnotation,StockSharp.Xaml.Charting.ChartDrawData.AnnotationData)">
+      <summary>
+            Put the annotation data.
+            </summary>
+      <param name="element">The chart element representing an annotation.</param>
+      <param name="data">Annotation draw data.</param>
+      <returns>
+        <see cref="T:StockSharp.Xaml.Charting.ChartDrawData.ChartDrawDataItem" /> instance.</returns>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.ChartDrawData.Group(System.Double)">
+      <summary>
+            Initializes a new instance of the <see cref="T:StockSharp.Xaml.Charting.ChartDrawData.ChartDrawDataItem" />.
+            </summary>
+      <param name="xValue">Value of X coordinate for the data.</param>
       <returns>
         <see cref="T:StockSharp.Xaml.Charting.ChartDrawData.ChartDrawDataItem" /> instance.</returns>
     </member>
@@ -1091,9 +1498,24 @@
             Unique ID.
             </summary>
     </member>
+    <member name="P:StockSharp.Xaml.Charting.IChartElement.ParentElement">
+      <summary>
+            Parent chart element.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.IChartElement.ChildElements">
+      <summary>
+            Child chart elements.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.IChartElement.IsVisible">
+      <summary>
+            Whether this element is visible on chart.
+            </summary>
+    </member>
     <member name="P:StockSharp.Xaml.Charting.IChartElement.IsLegend">
       <summary>
-            Should legend be shown on chart.
+            Should this element be shown in the legend.
             </summary>
     </member>
     <member name="P:StockSharp.Xaml.Charting.IChartElement.XAxisId">
@@ -1122,11 +1544,6 @@
             </summary>
       <typeparam name="T">The chart element type.</typeparam>
     </member>
-    <member name="M:StockSharp.Xaml.Charting.ChartElement`1.#ctor">
-      <summary>
-            Initialize <see cref="T:StockSharp.Xaml.Charting.ChartElement`1" />.
-            </summary>
-    </member>
     <member name="P:StockSharp.Xaml.Charting.ChartElement`1.Chart">
       <summary>
             The chart on which the element is drawn.
@@ -1142,9 +1559,14 @@
             The full series title which will be displayed in the chart.
             </summary>
     </member>
+    <member name="P:StockSharp.Xaml.Charting.ChartElement`1.IsVisible">
+      <summary>
+            Show chart element.
+            </summary>
+    </member>
     <member name="P:StockSharp.Xaml.Charting.ChartElement`1.IsLegend">
       <summary>
-            Should legend be shown on chart.
+            Should this element be shown in the legend.
             </summary>
     </member>
     <member name="P:StockSharp.Xaml.Charting.ChartElement`1.XAxisId">
@@ -1156,6 +1578,52 @@
       <summary>
             Y-axis.
             </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.ChartElement`1.Colorer">
+      <summary>
+            Custom elements colorer.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.ChartElement`1.XAxis">
+      <summary>
+            X axis this element currently attached to.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.ChartElement`1.YAxis">
+      <summary>
+            X axis this element currently attached to.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.ChartElement`1.ParentElement">
+      <summary>
+            Parent chart element.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.ChartElement`1.ChildElements">
+      <summary>
+            Child chart elements.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.ChartElement`1.AddChildElement(StockSharp.Xaml.Charting.IChartElement,System.Boolean)">
+      <summary>
+            Add child chart element.
+            </summary>
+      <param name="element">
+      </param>
+      <param name="dontDraw">Do not create corresponding chart element. Used for nested elements.</param>
+      <exception cref="T:System.InvalidOperationException">
+      </exception>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.ChartElement`1.RemoveChildElement(StockSharp.Xaml.Charting.IChartElement)">
+      <summary>
+            Remove child chart element.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.ChartElement`1.OnReset">
+      <summary>Reset element.</summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.ChartElement`1.OnDraw(StockSharp.Xaml.Charting.ChartDrawData)">
+      <summary>Draw on root element.</summary>
     </member>
     <member name="M:StockSharp.Xaml.Charting.ChartElement`1.Load(Ecng.Serialization.SettingsStorage)">
       <summary>
@@ -1169,12 +1637,22 @@
             </summary>
       <param name="storage">Settings storage.</param>
     </member>
-    <member name="M:StockSharp.Xaml.Charting.ChartElement`1.FillClone(`0)">
+    <member name="M:StockSharp.Xaml.Charting.ChartElement`1.CreateClone">
       <summary>
-            To fill out a copy of the element.
+            Create clone but do not fill out fields/properties.
             </summary>
-      <param name="elem">Copy.</param>
-      <returns>Copy.</returns>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.ChartElement`1.Clone">
+      <inheritdoc />
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.ChartElement`1.CheckAxesCompatible(System.Nullable{StockSharp.Xaml.Charting.ChartAxisType},System.Nullable{StockSharp.Xaml.Charting.ChartAxisType})">
+      <summary>
+            Check if the element can be drawn using supplied axis types.
+            </summary>
+      <param name="xType">X axis type.</param>
+      <param name="yType">Y axis type.</param>
+      <returns>
+        <see langword="true" /> if supplied types are supported.</returns>
     </member>
     <member name="T:StockSharp.Xaml.Charting.ChartElementEditor">
       <summary>
@@ -1198,13 +1676,6 @@
       <summary>
             Extension class for <see cref="T:StockSharp.Xaml.Charting.IChart" />.
             </summary>
-    </member>
-    <member name="M:StockSharp.Xaml.Charting.ChartHelper.SeriesName(System.String)">
-      <summary>
-            To get the unique name for the series.
-            </summary>
-      <param name="prefix">Name prefix.</param>
-      <returns>The unique name.</returns>
     </member>
     <member name="M:StockSharp.Xaml.Charting.ChartHelper.Draw(StockSharp.Xaml.Charting.IChart,StockSharp.Xaml.Charting.ChartCandleElement,StockSharp.Algo.Candles.Candle)">
       <summary>
@@ -1238,13 +1709,6 @@
       <param name="chart">Chart.</param>
       <param name="values">New data.</param>
     </member>
-    <member name="M:StockSharp.Xaml.Charting.ChartHelper.SaveToXml(StockSharp.Xaml.Charting.IChart,System.String)">
-      <summary>
-            To save the chart data to xml file.
-            </summary>
-      <param name="chart">Chart.</param>
-      <param name="fileName">The full path to the file.</param>
-    </member>
     <member name="M:StockSharp.Xaml.Charting.ChartHelper.SaveToImage(StockSharp.Xaml.Charting.IChart)">
       <summary>
             To save the chart as image.
@@ -1274,13 +1738,25 @@
       <param name="strategy">Strategy.</param>
       <param name="chart">Chart.</param>
     </member>
-    <member name="M:StockSharp.Xaml.Charting.ChartHelper.SetTitle(StockSharp.Xaml.Charting.ChartCandleElement,StockSharp.Algo.Candles.CandleSeries)">
+    <member name="M:StockSharp.Xaml.Charting.ChartHelper.ToChartTheme(System.String)">
       <summary>
-            To set a title for the element.
+            Convert Devexpress theme to chart theme.
             </summary>
-      <param name="element">Element.</param>
-      <param name="series">Candles series.</param>
-      <returns>Element.</returns>
+      <param name="appTheme">Devexpress theme.</param>
+      <returns>Chart theme.</returns>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.ChartHelper.UpdateTheme(StockSharp.Xaml.Charting.IThemeableChart)">
+      <summary>
+            Update theme for the specified chart.
+            </summary>
+      <param name="chart">Chart.</param>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.ChartHelper.IsVolumeProfileChart(StockSharp.Xaml.Charting.ChartCandleDrawStyles)">
+      <summary>
+            Check the specified style is volume profile based.
+            </summary>
+      <param name="style">Style.</param>
+      <returns>Check result.</returns>
     </member>
     <member name="T:StockSharp.Xaml.Charting.ChartIndicatorDrawStyles">
       <summary>
@@ -1332,14 +1808,27 @@
             Stacked bar chart.
             </summary>
     </member>
+    <member name="F:StockSharp.Xaml.Charting.ChartIndicatorDrawStyles.DashedLine">
+      <summary>
+            Dashed line.
+            </summary>
+    </member>
+    <member name="F:StockSharp.Xaml.Charting.ChartIndicatorDrawStyles.Area">
+      <summary>
+            Area.
+            </summary>
+    </member>
     <member name="T:StockSharp.Xaml.Charting.ChartIndicatorElement">
       <summary>
             The chart element representing the indicator.
             </summary>
     </member>
+    <member name="M:StockSharp.Xaml.Charting.ChartIndicatorElement.ToString">
+      <inheritdoc />
+    </member>
     <member name="M:StockSharp.Xaml.Charting.ChartIndicatorElement.#ctor">
       <summary>
-            Initializes a new instance of the <see cref="T:StockSharp.Xaml.Charting.ChartIndicatorElement" />.
+            Create instance.
             </summary>
     </member>
     <member name="P:StockSharp.Xaml.Charting.ChartIndicatorElement.Title">
@@ -1347,74 +1836,119 @@
             Indicator header that will be shown on chart.
             </summary>
     </member>
-    <member name="P:StockSharp.Xaml.Charting.ChartIndicatorElement.Color">
-      <summary>
-            The color of the line (bar, etc.) by which the indicator will be drawn in the chart. The default is <see cref="P:System.Windows.Media.Colors.Green" />.
-            </summary>
-    </member>
-    <member name="P:StockSharp.Xaml.Charting.ChartIndicatorElement.AdditionalColor">
-      <summary>
-            Additional line color (bars etc), which will be drawn on the chart indicator.
-            </summary>
-    </member>
-    <member name="P:StockSharp.Xaml.Charting.ChartIndicatorElement.StrokeThickness">
-      <summary>
-            The thickness of the line (bar, etc.) by which the indicator will be drawn in the chart. The default is 2.
-            </summary>
-    </member>
     <member name="P:StockSharp.Xaml.Charting.ChartIndicatorElement.IndicatorPainter">
       <summary>
             The indicator renderer.
             </summary>
     </member>
-    <member name="P:StockSharp.Xaml.Charting.ChartIndicatorElement.DrawStyle">
-      <summary>
-            The indicator drawing style. The default is <see cref="F:StockSharp.Xaml.Charting.ChartIndicatorDrawStyles.Line" />.
-            </summary>
+    <member name="P:StockSharp.Xaml.Charting.ChartIndicatorElement.Color">
+      <summary>Compatibility property for <see cref="P:StockSharp.Xaml.Charting.ChartLineElement.Color" /> for <see cref="T:StockSharp.Xaml.Charting.IndicatorPainters.DefaultPainter" />.</summary>
     </member>
-    <member name="P:StockSharp.Xaml.Charting.ChartIndicatorElement.DrawTemplate">
-      <summary>
-            The chart template for the Dot style <see cref="T:StockSharp.Xaml.Charting.ChartIndicatorDrawStyles" />.
-            </summary>
+    <member name="P:StockSharp.Xaml.Charting.ChartIndicatorElement.AdditionalColor">
+      <summary>Compatibility property for <see cref="P:StockSharp.Xaml.Charting.ChartLineElement.AdditionalColor" /> for <see cref="T:StockSharp.Xaml.Charting.IndicatorPainters.DefaultPainter" />.</summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.ChartIndicatorElement.StrokeThickness">
+      <summary>Compatibility property for <see cref="P:StockSharp.Xaml.Charting.ChartLineElement.StrokeThickness" /> for <see cref="T:StockSharp.Xaml.Charting.IndicatorPainters.DefaultPainter" />.</summary>
     </member>
     <member name="P:StockSharp.Xaml.Charting.ChartIndicatorElement.AntiAliasing">
-      <summary>
-            The indicator drawing smoothing.
-            </summary>
+      <summary>Compatibility property for <see cref="P:StockSharp.Xaml.Charting.ChartLineElement.AntiAliasing" /> for <see cref="T:StockSharp.Xaml.Charting.IndicatorPainters.DefaultPainter" />.</summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.ChartIndicatorElement.DrawStyle">
+      <summary>Compatibility property for <see cref="P:StockSharp.Xaml.Charting.ChartLineElement.Style" /> for <see cref="T:StockSharp.Xaml.Charting.IndicatorPainters.DefaultPainter" />.</summary>
     </member>
     <member name="P:StockSharp.Xaml.Charting.ChartIndicatorElement.ShowAxisMarker">
+      <summary>Compatibility property for <see cref="P:StockSharp.Xaml.Charting.ChartLineElement.ShowAxisMarker" /> for <see cref="T:StockSharp.Xaml.Charting.IndicatorPainters.DefaultPainter" />.</summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.ChartIndicatorElement.DrawTemplate">
+      <summary>Compatibility property for <see cref="P:StockSharp.Xaml.Charting.ChartLineElement.DrawTemplate" /> for <see cref="T:StockSharp.Xaml.Charting.IndicatorPainters.DefaultPainter" />.</summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.ChartIndicatorElement.OnDraw(StockSharp.Xaml.Charting.ChartDrawData)">
+      <inheritdoc />
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.ChartIndicatorElement.OnReset">
+      <inheritdoc />
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.ChartIndicatorElement.CreateClone">
+      <inheritdoc />
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.ChartIndicatorElement.Load(Ecng.Serialization.SettingsStorage)">
+      <inheritdoc />
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.ChartIndicatorElement.Save(Ecng.Serialization.SettingsStorage)">
+      <inheritdoc />
+    </member>
+    <member name="T:StockSharp.Xaml.Charting.ChartLineElement">
+      <summary>
+            The chart element representing a line.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.ChartLineElement.#ctor">
+      <summary>
+            Initializes a new instance of the <see cref="T:StockSharp.Xaml.Charting.ChartLineElement" />.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.ChartLineElement.Color">
+      <summary>
+            Line color (bars, etc.), with which it will be drawn on chart.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.ChartLineElement.AdditionalColor">
+      <summary>
+            Additional line color (bars, etc.), with which it will be drawn on the chart.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.ChartLineElement.StrokeThickness">
+      <summary>
+            The thickness of the line (bar, etc.) with which it will be drawn on the chart. The default is 1.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.ChartLineElement.AntiAliasing">
+      <summary>
+            The smoothing of the line drawing. The default is enabled.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.ChartLineElement.Style">
+      <summary>
+            The line drawing style. The default is <see cref="F:StockSharp.Xaml.Charting.ChartIndicatorDrawStyles.Line" />.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.ChartLineElement.ShowAxisMarker">
       <summary>
             Show Y-axis market.
             </summary>
     </member>
-    <member name="P:StockSharp.Xaml.Charting.ChartIndicatorElement.ParentElement">
+    <member name="P:StockSharp.Xaml.Charting.ChartLineElement.DrawTemplate">
       <summary>
-            Parent <see cref="T:StockSharp.Xaml.Charting.ChartIndicatorElement" />. It is used when indicators drawing using <see cref="T:StockSharp.Xaml.Charting.IChartIndicatorPainter" />.
+            The chart template for the Dot style <see cref="T:StockSharp.Xaml.Charting.ChartIndicatorDrawStyles" />.
             </summary>
     </member>
-    <member name="M:StockSharp.Xaml.Charting.ChartIndicatorElement.Load(Ecng.Serialization.SettingsStorage)">
+    <member name="M:StockSharp.Xaml.Charting.ChartLineElement.OnDraw(StockSharp.Xaml.Charting.ChartDrawData)">
+      <inheritdoc />
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.ChartLineElement.Load(Ecng.Serialization.SettingsStorage)">
       <summary>
             Load settings.
             </summary>
       <param name="storage">Settings storage.</param>
     </member>
-    <member name="M:StockSharp.Xaml.Charting.ChartIndicatorElement.Save(Ecng.Serialization.SettingsStorage)">
+    <member name="M:StockSharp.Xaml.Charting.ChartLineElement.Save(Ecng.Serialization.SettingsStorage)">
       <summary>
             Save settings.
             </summary>
       <param name="storage">Settings storage.</param>
     </member>
-    <member name="M:StockSharp.Xaml.Charting.ChartIndicatorElement.Clone">
-      <summary>
-            Create a copy of <see cref="T:StockSharp.Xaml.Charting.ChartIndicatorElement" />.
-            </summary>
-      <returns>Copy.</returns>
+    <member name="M:StockSharp.Xaml.Charting.ChartLineElement.CheckAxesCompatible(System.Nullable{StockSharp.Xaml.Charting.ChartAxisType},System.Nullable{StockSharp.Xaml.Charting.ChartAxisType})">
+      <inheritdoc />
     </member>
-    <member name="M:StockSharp.Xaml.Charting.ChartIndicatorElement.ToString">
+    <member name="T:StockSharp.Xaml.Charting.ChartBubbleElement">
       <summary>
-            Returns a string that represents the current object.
+            The chart element representing bubbles.
             </summary>
-      <returns>A string that represents the current object.</returns>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.ChartBubbleElement.#ctor">
+      <summary>
+            Create instance.
+            </summary>
     </member>
     <member name="T:StockSharp.Xaml.Charting.ChartOrderElement">
       <summary>
@@ -1425,6 +1959,9 @@
       <summary>
             Initialize <see cref="T:StockSharp.Xaml.Charting.ChartOrderElement" />.
             </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.ChartOrderElement.OnDraw(StockSharp.Xaml.Charting.ChartDrawData)">
+      <inheritdoc />
     </member>
     <member name="T:StockSharp.Xaml.Charting.ChartPanel">
       <summary>
@@ -1479,6 +2016,26 @@
             The event of the order cancelation from the chart.
             </summary>
     </member>
+    <member name="E:StockSharp.Xaml.Charting.ChartPanel.AnnotationCreated">
+      <summary>
+            Annotation created event.
+            </summary>
+    </member>
+    <member name="E:StockSharp.Xaml.Charting.ChartPanel.AnnotationModified">
+      <summary>
+            Annotation modified event.
+            </summary>
+    </member>
+    <member name="E:StockSharp.Xaml.Charting.ChartPanel.AnnotationDeleted">
+      <summary>
+            Annotation deleted event.
+            </summary>
+    </member>
+    <member name="E:StockSharp.Xaml.Charting.ChartPanel.AnnotationSelected">
+      <summary>
+            Annotation selection event.
+            </summary>
+    </member>
     <member name="E:StockSharp.Xaml.Charting.ChartPanel.SubscribeCandleElement">
       <summary>
             The event of the subscription to getting data for the element.
@@ -1514,6 +2071,11 @@
             To use automatic range for the X-axis. The default is off.
             </summary>
     </member>
+    <member name="P:StockSharp.Xaml.Charting.ChartPanel.XAxisType">
+      <summary>
+            Default type of X axis.
+            </summary>
+    </member>
     <member name="P:StockSharp.Xaml.Charting.ChartPanel.ChartTheme">
       <summary>
             The name of the graphic theme.
@@ -1527,6 +2089,11 @@
     <member name="P:StockSharp.Xaml.Charting.ChartPanel.ShareSettings">
       <summary>
             Chart share (upload image to web) settings.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.ChartPanel.DisableIndicatorReset">
+      <summary>
+            Disable tracking indicator reset.
             </summary>
     </member>
     <member name="M:StockSharp.Xaml.Charting.ChartPanel.AddArea(StockSharp.Xaml.Charting.ChartArea)">
@@ -1634,6 +2201,11 @@
             To show the preview area.
             </summary>
     </member>
+    <member name="P:StockSharp.Xaml.Charting.ChartPanel.TimeZone">
+      <summary>
+            Local time zone for all <see cref="T:System.DateTimeOffset" /> values conversion.
+            </summary>
+    </member>
     <member name="P:StockSharp.Xaml.Charting.ChartPanel.IndicatorTypes">
       <summary>
             The list of available indicators types.
@@ -1668,7 +2240,7 @@
     </member>
     <member name="P:StockSharp.Xaml.Charting.ChartPanel.IsAutoScroll">
       <summary>
-            To scroll <see cref="P:StockSharp.Xaml.Charting.IChart.Areas" /> areas automatically when new data occured. The default is enabled.
+            To scroll <see cref="P:StockSharp.Xaml.Charting.IChart.Areas" /> areas automatically when new data occurred. The default is enabled.
             </summary>
     </member>
     <member name="M:StockSharp.Xaml.Charting.ChartPanel.Reset(System.Collections.Generic.IEnumerable{StockSharp.Xaml.Charting.IChartElement})">
@@ -1682,6 +2254,11 @@
             To process the new data.
             </summary>
       <param name="data">New data.</param>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.ChartPanel.BackupService">
+      <summary>
+            Backup service for sharing exports.
+            </summary>
     </member>
     <member name="M:StockSharp.Xaml.Charting.ChartPanel.InitializeComponent">
       <summary>
@@ -1705,7 +2282,7 @@
     </member>
     <member name="P:StockSharp.Xaml.Charting.ChartPanelOrderSettings.Volume">
       <summary>
-            Number of contracts in an order.
+            Number of contracts in the order.
             </summary>
     </member>
     <member name="M:StockSharp.Xaml.Charting.ChartPanelOrderSettings.Load(Ecng.Serialization.SettingsStorage)">
@@ -1799,13 +2376,6 @@
             </summary>
       <returns>A hash code.</returns>
     </member>
-    <member name="M:StockSharp.Xaml.Charting.ChartPart`1.FillClone(`0)">
-      <summary>
-            To fill out a copy of the element.
-            </summary>
-      <param name="elem">Copy.</param>
-      <returns>Copy.</returns>
-    </member>
     <member name="E:StockSharp.Xaml.Charting.ChartPart`1.PropertyChanging">
       <summary>
             The chart element properties value changing event.
@@ -1896,6 +2466,9 @@
             The chart element representing trades.
             </summary>
     </member>
+    <member name="M:StockSharp.Xaml.Charting.ChartTradeElement.OnDraw(StockSharp.Xaml.Charting.ChartDrawData)">
+      <inheritdoc />
+    </member>
     <member name="T:StockSharp.Xaml.Charting.ChartTransactionElement`1">
       <summary>
             The base class that describes the Orders Or Trades chart element.
@@ -1932,11 +2505,6 @@
             Border color of graphics element on chart, indicating sell.
             </summary>
     </member>
-    <member name="P:StockSharp.Xaml.Charting.ChartTransactionElement`1.IsHidden">
-      <summary>
-            The visibility of elements in the chart.
-            </summary>
-    </member>
     <member name="M:StockSharp.Xaml.Charting.ChartTransactionElement`1.Load(Ecng.Serialization.SettingsStorage)">
       <summary>
             Load settings.
@@ -1949,18 +2517,91 @@
             </summary>
       <param name="storage">Settings storage.</param>
     </member>
-    <member name="M:StockSharp.Xaml.Charting.ChartTransactionElement`1.FillClone(`0)">
+    <member name="T:StockSharp.Xaml.Charting.CandleSettingsWindow">
       <summary>
-            To fill out a copy of the element.
+            The window for edit <see cref="T:StockSharp.Algo.Candles.CandleSeries" />.
             </summary>
-      <param name="elem">Copy.</param>
-      <returns>Copy.</returns>
+      <summary>
+            CandleSettingsWindow
+            </summary>
     </member>
-    <member name="M:StockSharp.Xaml.Charting.ChartTransactionElement`1.Clone">
+    <member name="M:StockSharp.Xaml.Charting.CandleSettingsWindow.#ctor">
       <summary>
-            Create a copy of <see cref="T:StockSharp.Xaml.Charting.ChartTransactionElement`1" />.
+            Initializes a new instance of the <see cref="T:StockSharp.Xaml.Charting.CandleSettingsWindow" />.
             </summary>
-      <returns>Copy.</returns>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.CandleSettingsWindow.Series">
+      <summary>
+            Candles settings.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.CandleSettingsWindow.SecurityProvider">
+      <summary>
+            The provider of information about instruments.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.CandleSettingsWindow.InitializeComponent">
+      <summary>
+            InitializeComponent
+            </summary>
+    </member>
+    <member name="T:StockSharp.Xaml.Charting.ChartVolatilitySmileElement">
+      <summary>
+            The chart element representing a band.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.ChartVolatilitySmileElement.Values">
+      <summary>
+            Points that displays source volatility values.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.ChartVolatilitySmileElement.Smile">
+      <summary>
+            Line that displays approximated volatility smile.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.ChartVolatilitySmileElement.#ctor">
+      <summary>
+            Create instance.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.ChartVolatilitySmileElement.CheckAxesCompatible(System.Nullable{StockSharp.Xaml.Charting.ChartAxisType},System.Nullable{StockSharp.Xaml.Charting.ChartAxisType})">
+      <inheritdoc />
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.ChartVolatilitySmileElement.OnDraw(StockSharp.Xaml.Charting.ChartDrawData)">
+      <inheritdoc />
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.ChartVolatilitySmileElement.Load(Ecng.Serialization.SettingsStorage)">
+      <summary>
+            Load settings.
+            </summary>
+      <param name="storage">Settings storage.</param>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.ChartVolatilitySmileElement.Save(Ecng.Serialization.SettingsStorage)">
+      <summary>
+            Save settings.
+            </summary>
+      <param name="storage">Settings storage.</param>
+    </member>
+    <member name="T:StockSharp.Xaml.Charting.Editors.BuildCandlesFieldEditor">
+      <summary>
+        <see cref="P:StockSharp.Algo.Candles.CandleSeries.BuildCandlesField" /> editor.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.Editors.BuildCandlesFieldEditor.#ctor">
+      <summary>
+            Initializes a new instance of the <see cref="T:StockSharp.Xaml.Charting.Editors.BuildCandlesFieldEditor" />.
+            </summary>
+    </member>
+    <member name="T:StockSharp.Xaml.Charting.Editors.BuildCandlesFromEditor">
+      <summary>
+        <see cref="P:StockSharp.Algo.Candles.CandleSeries.BuildCandlesFrom" /> editor.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.Editors.BuildCandlesFromEditor.#ctor">
+      <summary>
+            Initializes a new instance of the <see cref="T:StockSharp.Xaml.Charting.Editors.BuildCandlesFromEditor" />.
+            </summary>
     </member>
     <member name="T:StockSharp.Xaml.Charting.EquityCurveChart">
       <summary>
@@ -1975,26 +2616,49 @@
             The name of the graphic theme.
             </summary>
     </member>
-    <member name="M:StockSharp.Xaml.Charting.EquityCurveChart.#ctor">
-      <summary>
-            Initializes a new instance of the <see cref="T:StockSharp.Xaml.Charting.EquityCurveChart" />.
-            </summary>
-    </member>
     <member name="P:StockSharp.Xaml.Charting.EquityCurveChart.NoGapMode">
       <summary>
             To remove gaps (weekends, holidays) on the chart. When the mode is enabled and multiple curves are used then joint scaling will be lost. Enabled by default.
             </summary>
     </member>
-    <member name="M:StockSharp.Xaml.Charting.EquityCurveChart.CreateCurve(System.String,System.Windows.Media.Color,StockSharp.Xaml.Charting.LineChartStyles)">
+    <member name="M:StockSharp.Xaml.Charting.EquityCurveChart.#ctor">
+      <summary>
+            Initializes a new instance of the <see cref="T:StockSharp.Xaml.Charting.EquityCurveChart" />.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.EquityCurveChart.Draw(StockSharp.Xaml.Charting.ChartDrawData)">
+      <summary>
+            To process the new data.
+            </summary>
+      <param name="data">New data.</param>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.EquityCurveChart.Elements">
+      <summary>
+            Elements.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.EquityCurveChart.CreateCurve(System.String,System.Windows.Media.Color,StockSharp.Xaml.Charting.ChartIndicatorDrawStyles,System.Guid)">
       <summary>
             To create new curve to draw the yield.
             </summary>
       <param name="title">The line title.</param>
       <param name="color">The line color.</param>
-      <param name="style">The line drawing style. The default is <see cref="F:StockSharp.Xaml.Charting.LineChartStyles.Line" />.</param>
-      <returns>The collection of data that should be filled for the line drawing.</returns>
+      <param name="style">The line drawing style. The default is <see cref="F:StockSharp.Xaml.Charting.ChartIndicatorDrawStyles.Line" />.</param>
+      <param name="id">Unique ID.</param>
+      <returns>Chart element representing a line.</returns>
     </member>
-    <member name="M:StockSharp.Xaml.Charting.EquityCurveChart.CreateCurve(System.String,System.Windows.Media.Color,System.Windows.Media.Color,StockSharp.Xaml.Charting.LineChartStyles)">
+    <member name="M:StockSharp.Xaml.Charting.EquityCurveChart.CreateCurve(System.String,System.Windows.Media.Color,System.Windows.Media.Color,StockSharp.Xaml.Charting.ChartIndicatorDrawStyles,System.Guid)">
+      <summary>
+            To create new curve to draw the yield.
+            </summary>
+      <param name="title">The line title.</param>
+      <param name="color">The line color.</param>
+      <param name="secondColor">The additional line color. It is used to draw <see cref="F:StockSharp.Xaml.Charting.ChartIndicatorDrawStyles.Area" />.</param>
+      <param name="style">The line drawing style. The default is <see cref="F:StockSharp.Xaml.Charting.ChartIndicatorDrawStyles.Line" />.</param>
+      <param name="id">Unique ID.</param>
+      <returns>Chart element representing a line.</returns>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.EquityCurveChart.CreateCurve(System.String,System.Windows.Media.Color,System.Windows.Media.Color,StockSharp.Xaml.Charting.LineChartStyles,System.Guid)">
       <summary>
             To create new curve to draw the yield.
             </summary>
@@ -2002,22 +2666,694 @@
       <param name="color">The line color.</param>
       <param name="secondColor">The additional line color. It is used to draw <see cref="F:StockSharp.Xaml.Charting.LineChartStyles.Area" />.</param>
       <param name="style">The line drawing style. The default is <see cref="F:StockSharp.Xaml.Charting.LineChartStyles.Line" />.</param>
+      <param name="id">Unique ID.</param>
       <returns>The collection of data that should be filled for the line drawing.</returns>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.EquityCurveChart.CreateCurve(System.String,System.Windows.Media.Color,StockSharp.Xaml.Charting.LineChartStyles,System.Guid)">
+      <summary>
+            To create new curve to draw the yield.
+            </summary>
+      <param name="title">The line title.</param>
+      <param name="color">The line color.</param>
+      <param name="style">The line drawing style. The default is <see cref="F:StockSharp.Xaml.Charting.LineChartStyles.Line" />.</param>
+      <param name="id">Unique ID.</param>
+      <returns>The collection of data that should be filled for the line drawing.</returns>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.EquityCurveChart.RemoveCurve(StockSharp.Xaml.Charting.ChartBandElement)">
+      <summary>
+            To remove the yield curve from the chart.
+            </summary>
+      <param name="elem">The chart element obtained from the method <see cref="M:StockSharp.Xaml.Charting.EquityCurveChart.CreateCurve(System.String,System.Windows.Media.Color,StockSharp.Xaml.Charting.ChartIndicatorDrawStyles,System.Guid)" />.</param>
     </member>
     <member name="M:StockSharp.Xaml.Charting.EquityCurveChart.RemoveCurve(System.Collections.Generic.ICollection{StockSharp.Xaml.Charting.LineData{System.DateTime}})">
       <summary>
             To remove the yield curve from the chart.
             </summary>
-      <param name="items">The collection of data obtained from the method <see cref="M:StockSharp.Xaml.Charting.EquityCurveChart.CreateCurve(System.String,System.Windows.Media.Color,StockSharp.Xaml.Charting.LineChartStyles)" />.</param>
+      <param name="items">The collection of data obtained from the method <see cref="M:StockSharp.Xaml.Charting.EquityCurveChart.CreateCurve(System.String,System.Windows.Media.Color,StockSharp.Xaml.Charting.LineChartStyles,System.Guid)" />.</param>
     </member>
     <member name="M:StockSharp.Xaml.Charting.EquityCurveChart.Clear">
       <summary>
             To remove yield curves from the chart.
             </summary>
     </member>
+    <member name="M:StockSharp.Xaml.Charting.EquityCurveChart.Reset">
+      <summary>
+            To reset all chart elements.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.EquityCurveChart.Reset(System.Collections.Generic.IEnumerable{System.Collections.Generic.ICollection{StockSharp.Xaml.Charting.LineData{System.DateTime}}})">
+      <summary>
+            To reset specified chart elements.
+            </summary>
+      <param name="items">Elements to reset.</param>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.EquityCurveChart.Reset(System.Collections.Generic.IEnumerable{StockSharp.Xaml.Charting.ChartBandElement})">
+      <summary>
+            To reset specified chart elements.
+            </summary>
+      <param name="elements">Elements to reset.</param>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.EquityCurveChart.Load(Ecng.Serialization.SettingsStorage)">
+      <summary>
+            Load settings.
+            </summary>
+      <param name="storage">Settings storage.</param>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.EquityCurveChart.Save(Ecng.Serialization.SettingsStorage)">
+      <summary>
+            Save settings.
+            </summary>
+      <param name="storage">Settings storage.</param>
+    </member>
     <member name="M:StockSharp.Xaml.Charting.EquityCurveChart.InitializeComponent">
       <summary>
             InitializeComponent
+            </summary>
+    </member>
+    <member name="T:StockSharp.Xaml.Charting.HeatmapChart">
+      <summary>
+            The graphical component to display the heatmap.
+            </summary>
+      <summary>
+            HeatmapChart
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.HeatmapChart.#ctor">
+      <summary>
+            Initializes a new instance of the <see cref="T:StockSharp.Xaml.Charting.HeatmapChart" />.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.HeatmapChart.ChartTheme">
+      <summary>
+            The name of the graphic theme.
+            </summary>
+    </member>
+    <member name="F:StockSharp.Xaml.Charting.HeatmapChart.ShowColorMapProperty">
+      <summary>
+        <see cref="T:System.Windows.DependencyProperty" /> for <see cref="P:StockSharp.Xaml.Charting.HeatmapChart.ShowColorMap" />.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.HeatmapChart.ShowColorMap">
+      <summary>
+            Show color map.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.HeatmapChart.Draw(System.String[],System.String[],System.Double[0:,0:])">
+      <summary>
+            Draw chart values.
+            </summary>
+      <param name="xTitles">Titles on X axis.</param>
+      <param name="yTitles">Titles on Y axis.</param>
+      <param name="data">Values.</param>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.HeatmapChart.Clear">
+      <summary>
+            Clear chart.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.HeatmapChart.Load(Ecng.Serialization.SettingsStorage)">
+      <summary>
+            Load settings.
+            </summary>
+      <param name="storage">Settings storage.</param>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.HeatmapChart.Save(Ecng.Serialization.SettingsStorage)">
+      <summary>
+            Save settings.
+            </summary>
+      <param name="storage">Settings storage.</param>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.HeatmapChart.InitializeComponent">
+      <summary>
+            InitializeComponent
+            </summary>
+    </member>
+    <member name="T:StockSharp.Xaml.Charting.HistogramChart">
+      <summary>
+            The graphical component to display histogram.
+            </summary>
+      <summary>
+            HistogramChart
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.HistogramChart.#ctor">
+      <summary>
+            Initializes a new instance of the <see cref="T:StockSharp.Xaml.Charting.HistogramChart" />.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.HistogramChart.ChartTheme">
+      <summary>
+            The name of the graphic theme.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.HistogramChart.Append(System.Decimal,System.Decimal)">
+      <summary>
+            Append new values.
+            </summary>
+      <param name="x">X value.</param>
+      <param name="y">Y value.</param>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.HistogramChart.Update(System.Decimal,System.Decimal)">
+      <summary>
+            Update values.
+            </summary>
+      <param name="x">X value.</param>
+      <param name="y">Y value.</param>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.HistogramChart.Clear">
+      <summary>
+            Clear chart.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.HistogramChart.Load(Ecng.Serialization.SettingsStorage)">
+      <summary>
+            Load settings.
+            </summary>
+      <param name="storage">Settings storage.</param>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.HistogramChart.Save(Ecng.Serialization.SettingsStorage)">
+      <summary>
+            Save settings.
+            </summary>
+      <param name="storage">Settings storage.</param>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.HistogramChart.InitializeComponent">
+      <summary>
+            InitializeComponent
+            </summary>
+    </member>
+    <member name="T:StockSharp.Xaml.Charting.IndicatorAttribute">
+      <summary>
+            Attribute, applied to indicator's painter, to provide information about type of <see cref="T:StockSharp.Algo.Indicators.IIndicator" />.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.IndicatorAttribute.Type">
+      <summary>
+            Indicator type.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorAttribute.#ctor(System.Type)">
+      <summary>
+            Initializes a new instance of the <see cref="T:StockSharp.Xaml.Charting.IndicatorAttribute" />.
+            </summary>
+      <param name="type">Indicator type.</param>
+    </member>
+    <member name="T:StockSharp.Xaml.Charting.IndicatorPainters.DefaultPainter">
+      <summary>
+            Indicator painter which is used by default.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.DefaultPainter.#ctor">
+      <summary>
+            Create instance.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.DefaultPainter.Line">
+      <summary>
+            Default indicator line element.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.DefaultPainter.OnDraw">
+      <summary>Draw new values.</summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.DefaultPainter.Load(Ecng.Serialization.SettingsStorage)">
+      <inheritdoc />
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.DefaultPainter.Save(Ecng.Serialization.SettingsStorage)">
+      <inheritdoc />
+    </member>
+    <member name="T:StockSharp.Xaml.Charting.IndicatorPainters.EnvelopePainter">
+      <summary>
+            The chart element for <see cref="T:StockSharp.Algo.Indicators.Envelope" />.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.EnvelopePainter.Band">
+      <summary>
+        <see cref="P:StockSharp.Xaml.Charting.IndicatorPainters.EnvelopePainter.Band" />.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.EnvelopePainter.MovingAverage">
+      <summary>
+        <see cref="P:StockSharp.Xaml.Charting.IndicatorPainters.EnvelopePainter.MovingAverage" />.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.EnvelopePainter.#ctor">
+      <summary>
+            Create instance.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.EnvelopePainter.OnDraw">
+      <inheritdoc />
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.EnvelopePainter.Load(Ecng.Serialization.SettingsStorage)">
+      <inheritdoc />
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.EnvelopePainter.Save(Ecng.Serialization.SettingsStorage)">
+      <inheritdoc />
+    </member>
+    <member name="T:StockSharp.Xaml.Charting.IndicatorPainters.GatorOscillatorPainter">
+      <summary>
+            The chart element for <see cref="T:StockSharp.Algo.Indicators.GatorOscillator" />.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.GatorOscillatorPainter.Histogram1">
+      <summary>
+        <see cref="P:StockSharp.Algo.Indicators.GatorOscillator.Histogram1" /> line color.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.GatorOscillatorPainter.Histogram2">
+      <summary>
+        <see cref="P:StockSharp.Algo.Indicators.GatorOscillator.Histogram2" /> line color.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.GatorOscillatorPainter.#ctor">
+      <summary>
+            Create instance.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.GatorOscillatorPainter.OnDraw">
+      <inheritdoc />
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.GatorOscillatorPainter.Load(Ecng.Serialization.SettingsStorage)">
+      <inheritdoc />
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.GatorOscillatorPainter.Save(Ecng.Serialization.SettingsStorage)">
+      <inheritdoc />
+    </member>
+    <member name="T:StockSharp.Xaml.Charting.IndicatorPainters.RelativeVigorIndexPainter">
+      <summary>
+            The chart element for <see cref="T:StockSharp.Algo.Indicators.RelativeVigorIndex" />.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.RelativeVigorIndexPainter.Signal">
+      <summary>
+        <see cref="P:StockSharp.Algo.Indicators.RelativeVigorIndex.Signal" />.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.RelativeVigorIndexPainter.Average">
+      <summary>
+        <see cref="P:StockSharp.Algo.Indicators.RelativeVigorIndex.Average" />.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.RelativeVigorIndexPainter.#ctor">
+      <summary>
+            Create instance.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.RelativeVigorIndexPainter.OnDraw">
+      <inheritdoc />
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.RelativeVigorIndexPainter.Load(Ecng.Serialization.SettingsStorage)">
+      <inheritdoc />
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.RelativeVigorIndexPainter.Save(Ecng.Serialization.SettingsStorage)">
+      <inheritdoc />
+    </member>
+    <member name="T:StockSharp.Xaml.Charting.IndicatorPainters.StochasticOscillatorPainter">
+      <summary>
+            The chart element for <see cref="T:StockSharp.Algo.Indicators.StochasticOscillator" />.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.StochasticOscillatorPainter.K">
+      <summary>
+        <see cref="P:StockSharp.Algo.Indicators.StochasticOscillator.K" /> line color.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.StochasticOscillatorPainter.D">
+      <summary>
+        <see cref="P:StockSharp.Algo.Indicators.StochasticOscillator.D" /> line color.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.StochasticOscillatorPainter.#ctor">
+      <summary>
+            Create instance.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.StochasticOscillatorPainter.OnDraw">
+      <inheritdoc />
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.StochasticOscillatorPainter.Load(Ecng.Serialization.SettingsStorage)">
+      <inheritdoc />
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.StochasticOscillatorPainter.Save(Ecng.Serialization.SettingsStorage)">
+      <inheritdoc />
+    </member>
+    <member name="T:StockSharp.Xaml.Charting.IndicatorPainters.AlligatorPainter">
+      <summary>
+            Chart painter for <see cref="T:StockSharp.Algo.Indicators.Alligator" /> indicator.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.AlligatorPainter.Lips">
+      <summary>
+        <see cref="P:StockSharp.Algo.Indicators.Alligator.Lips" />.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.AlligatorPainter.Teeth">
+      <summary>
+        <see cref="P:StockSharp.Algo.Indicators.Alligator.Teeth" />.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.AlligatorPainter.Jaw">
+      <summary>
+        <see cref="P:StockSharp.Algo.Indicators.Alligator.Jaw" />.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.AlligatorPainter.#ctor">
+      <summary>
+            Create instance.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.AlligatorPainter.OnDraw">
+      <inheritdoc />
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.AlligatorPainter.Load(Ecng.Serialization.SettingsStorage)">
+      <inheritdoc />
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.AlligatorPainter.Save(Ecng.Serialization.SettingsStorage)">
+      <inheritdoc />
+    </member>
+    <member name="T:StockSharp.Xaml.Charting.IndicatorPainters.AverageDirectionalIndexPainter">
+      <summary>
+            Chart painter for <see cref="T:StockSharp.Algo.Indicators.AverageDirectionalIndex" /> indicator.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.AverageDirectionalIndexPainter.DiPlus">
+      <summary>
+        <see cref="P:StockSharp.Xaml.Charting.IndicatorPainters.AverageDirectionalIndexPainter.DiPlus" />.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.AverageDirectionalIndexPainter.DiMinus">
+      <summary>
+        <see cref="P:StockSharp.Xaml.Charting.IndicatorPainters.AverageDirectionalIndexPainter.DiMinus" />.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.AverageDirectionalIndexPainter.Adx">
+      <summary>
+        <see cref="T:StockSharp.Algo.Indicators.AverageDirectionalIndex" />.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.AverageDirectionalIndexPainter.#ctor">
+      <summary>
+            Create instance.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.AverageDirectionalIndexPainter.OnDraw">
+      <inheritdoc />
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.AverageDirectionalIndexPainter.Load(Ecng.Serialization.SettingsStorage)">
+      <inheritdoc />
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.AverageDirectionalIndexPainter.Save(Ecng.Serialization.SettingsStorage)">
+      <inheritdoc />
+    </member>
+    <member name="T:StockSharp.Xaml.Charting.IndicatorPainters.BaseChartIndicatorPainter">
+      <summary>
+            The indicator renderer base class on the chart (for example, lines, histograms, etc.).
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.BaseChartIndicatorPainter.Element">
+      <inheritdoc />
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.BaseChartIndicatorPainter.InnerElements">
+      <inheritdoc />
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.BaseChartIndicatorPainter.Indicator">
+      <summary>Indicator which is being drawn.</summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.BaseChartIndicatorPainter.IsAttached">
+      <summary>
+            Whether this painter is currently attached to chart element.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.BaseChartIndicatorPainter.OnDraw">
+      <summary>Draw values on chart.</summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.BaseChartIndicatorPainter.Draw(StockSharp.Xaml.Charting.ChartDrawData)">
+      <inheritdoc />
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.BaseChartIndicatorPainter.Reset">
+      <inheritdoc />
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.BaseChartIndicatorPainter.OnAttached(StockSharp.Xaml.Charting.ChartIndicatorElement)">
+      <inheritdoc />
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.BaseChartIndicatorPainter.OnDetached">
+      <inheritdoc />
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.BaseChartIndicatorPainter.DrawValues(StockSharp.Algo.Indicators.IIndicator,StockSharp.Xaml.Charting.IChartElement,System.Func{StockSharp.Algo.Indicators.IIndicatorValue,System.Double})">
+      <summary>
+            Draw indicator values using value getter.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.BaseChartIndicatorPainter.DrawValues(StockSharp.Algo.Indicators.IIndicator,StockSharp.Xaml.Charting.IChartElement)">
+      <summary>
+            Draw indicator single double values.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.BaseChartIndicatorPainter.DrawValues(StockSharp.Algo.Indicators.IIndicator,StockSharp.Algo.Indicators.IIndicator,StockSharp.Xaml.Charting.IChartElement)">
+      <summary>
+            Draw indicator band values (2 doubles).
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.BaseChartIndicatorPainter.DrawValues(StockSharp.Algo.Indicators.IIndicator,StockSharp.Algo.Indicators.IIndicator,StockSharp.Xaml.Charting.IChartElement,System.Func{System.Double,System.Double,System.Double})">
+      <summary>
+            Draw indicator converting from 2 doubles to one with converter.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.BaseChartIndicatorPainter.AddChildElement(StockSharp.Xaml.Charting.IChartElement)">
+      <summary>
+            Add inner chart element.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.BaseChartIndicatorPainter.Clone">
+      <inheritdoc />
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.BaseChartIndicatorPainter.CopyTo(System.Object)">
+      <summary>
+            To fill out a copy of the element.
+            </summary>
+      <param name="o">Object of the same type to copy to.</param>
+      <returns>Copy.</returns>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.BaseChartIndicatorPainter.Load(Ecng.Serialization.SettingsStorage)">
+      <summary>
+            Load settings.
+            </summary>
+      <param name="storage">Settings storage.</param>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.BaseChartIndicatorPainter.Save(Ecng.Serialization.SettingsStorage)">
+      <summary>
+            Save settings.
+            </summary>
+      <param name="storage">Settings storage.</param>
+    </member>
+    <member name="T:StockSharp.Xaml.Charting.IndicatorPainters.BollingerBandsPainter">
+      <summary>
+            The chart element for <see cref="T:StockSharp.Algo.Indicators.BollingerBands" />.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.BollingerBandsPainter.Band">
+      <summary>
+        <see cref="P:StockSharp.Xaml.Charting.IndicatorPainters.BollingerBandsPainter.Band" />.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.BollingerBandsPainter.MovingAverage">
+      <summary>
+        <see cref="P:StockSharp.Xaml.Charting.IndicatorPainters.BollingerBandsPainter.MovingAverage" />.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.BollingerBandsPainter.#ctor">
+      <summary>
+            Create instance.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.BollingerBandsPainter.OnDraw">
+      <inheritdoc />
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.BollingerBandsPainter.Load(Ecng.Serialization.SettingsStorage)">
+      <inheritdoc />
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.BollingerBandsPainter.Save(Ecng.Serialization.SettingsStorage)">
+      <inheritdoc />
+    </member>
+    <member name="T:StockSharp.Xaml.Charting.IndicatorPainters.FractalsPainter">
+      <summary>
+            The chart element for <see cref="T:StockSharp.Algo.Indicators.Fractals" />.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.FractalsPainter.Up">
+      <summary>
+        <see cref="P:StockSharp.Algo.Indicators.Fractals.Up" /> dots color.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.FractalsPainter.Down">
+      <summary>
+        <see cref="P:StockSharp.Algo.Indicators.Fractals.Down" /> dots color.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.FractalsPainter.#ctor">
+      <summary>
+            Create instance.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.FractalsPainter.OnDraw">
+      <inheritdoc />
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.FractalsPainter.Load(Ecng.Serialization.SettingsStorage)">
+      <inheritdoc />
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.FractalsPainter.Save(Ecng.Serialization.SettingsStorage)">
+      <inheritdoc />
+    </member>
+    <member name="T:StockSharp.Xaml.Charting.IndicatorPainters.IchimokuPainter">
+      <summary>
+            The chart element for <see cref="T:StockSharp.Algo.Indicators.Ichimoku" />.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.IchimokuPainter.Tenkan">
+      <summary>
+        <see cref="P:StockSharp.Algo.Indicators.Ichimoku.Tenkan" /> line.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.IchimokuPainter.Kijun">
+      <summary>
+        <see cref="P:StockSharp.Algo.Indicators.Ichimoku.Kijun" /> line.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.IchimokuPainter.Chinkou">
+      <summary>
+        <see cref="P:StockSharp.Algo.Indicators.Ichimoku.Chinkou" /> line.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.IchimokuPainter.Senkou">
+      <summary>
+            Senkou range.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.IchimokuPainter.#ctor">
+      <summary>
+            Create instance.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.IchimokuPainter.OnDraw">
+      <inheritdoc />
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.IchimokuPainter.Load(Ecng.Serialization.SettingsStorage)">
+      <inheritdoc />
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.IchimokuPainter.Save(Ecng.Serialization.SettingsStorage)">
+      <inheritdoc />
+    </member>
+    <member name="T:StockSharp.Xaml.Charting.IndicatorPainters.MovingAverageConvergenceDivergenceHistogramPainter">
+      <summary>
+            The chart element for <see cref="T:StockSharp.Algo.Indicators.MovingAverageConvergenceDivergenceHistogram" />.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.MovingAverageConvergenceDivergenceHistogramPainter.Macd">
+      <summary>
+        <see cref="P:StockSharp.Xaml.Charting.IndicatorPainters.MovingAverageConvergenceDivergenceHistogramPainter.Macd" /> line.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.MovingAverageConvergenceDivergenceHistogramPainter.Signal">
+      <summary>
+        <see cref="P:StockSharp.Xaml.Charting.IndicatorPainters.MovingAverageConvergenceDivergenceHistogramPainter.Signal" /> line.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.MovingAverageConvergenceDivergenceHistogramPainter.Histogram">
+      <summary>
+        <see cref="P:StockSharp.Xaml.Charting.IndicatorPainters.MovingAverageConvergenceDivergenceHistogramPainter.Histogram" /> line.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.MovingAverageConvergenceDivergenceHistogramPainter.#ctor">
+      <summary>
+            Create instance.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.MovingAverageConvergenceDivergenceHistogramPainter.OnDraw">
+      <inheritdoc />
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.MovingAverageConvergenceDivergenceHistogramPainter.Load(Ecng.Serialization.SettingsStorage)">
+      <inheritdoc />
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.MovingAverageConvergenceDivergenceHistogramPainter.Save(Ecng.Serialization.SettingsStorage)">
+      <inheritdoc />
+    </member>
+    <member name="T:StockSharp.Xaml.Charting.IndicatorPainters.MovingAverageConvergenceDivergenceSignalPainter">
+      <summary>
+            The chart element for <see cref="T:StockSharp.Algo.Indicators.MovingAverageConvergenceDivergenceSignal" />.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.MovingAverageConvergenceDivergenceSignalPainter.Macd">
+      <summary>
+        <see cref="P:StockSharp.Algo.Indicators.MovingAverageConvergenceDivergenceSignal.Macd" /> line color.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.MovingAverageConvergenceDivergenceSignalPainter.SignalMa">
+      <summary>
+        <see cref="P:StockSharp.Algo.Indicators.MovingAverageConvergenceDivergenceSignal.SignalMa" /> line color.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.MovingAverageConvergenceDivergenceSignalPainter.#ctor">
+      <summary>
+            Create instance.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.MovingAverageConvergenceDivergenceSignalPainter.OnDraw">
+      <inheritdoc />
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.MovingAverageConvergenceDivergenceSignalPainter.Load(Ecng.Serialization.SettingsStorage)">
+      <inheritdoc />
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.MovingAverageConvergenceDivergenceSignalPainter.Save(Ecng.Serialization.SettingsStorage)">
+      <inheritdoc />
+    </member>
+    <member name="T:StockSharp.Xaml.Charting.IndicatorPainters.ParabolicSarPainter">
+      <summary>
+            The chart element for <see cref="T:StockSharp.Algo.Indicators.ParabolicSar" />.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.ParabolicSarPainter.#ctor">
+      <summary>
+            Create instance.
+            </summary>
+    </member>
+    <member name="T:StockSharp.Xaml.Charting.IndicatorPainters.VolumePainter">
+      <summary>
+            The chart element for <see cref="T:StockSharp.Algo.Indicators.VolumeIndicator" />.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.VolumePainter.UpVolume">
+      <summary>
+            Up line color.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.VolumePainter.DownVolume">
+      <summary>
+            Down line color.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.VolumePainter.#ctor">
+      <summary>
+            Create instance.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.VolumePainter.OnDraw">
+      <inheritdoc />
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.VolumePainter.Load(Ecng.Serialization.SettingsStorage)">
+      <inheritdoc />
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.VolumePainter.Save(Ecng.Serialization.SettingsStorage)">
+      <inheritdoc />
+    </member>
+    <member name="T:StockSharp.Xaml.Charting.IThemeableChart">
+      <summary>
+            Base interface for all chart components.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.IThemeableChart.ChartTheme">
+      <summary>
+            The name of the graphic theme.
             </summary>
     </member>
     <member name="T:StockSharp.Xaml.Charting.LineChartStyles">
@@ -2065,11 +3401,6 @@
             Initialize <see cref="T:StockSharp.Xaml.Charting.ExtendedBaseApplication" />.
             </summary>
     </member>
-    <member name="T:StockSharp.Xaml.Charting.Extensions">
-      <summary>
-            Extension class.
-            </summary>
-    </member>
     <member name="T:StockSharp.Xaml.Charting.IChart">
       <summary>
             The interface for work with the chart.
@@ -2082,12 +3413,17 @@
     </member>
     <member name="P:StockSharp.Xaml.Charting.IChart.IsAutoScroll">
       <summary>
-            To scroll <see cref="P:StockSharp.Xaml.Charting.IChart.Areas" /> areas automatically when new data occured. The default is enabled.
+            To scroll <see cref="P:StockSharp.Xaml.Charting.IChart.Areas" /> areas automatically when new data occurred. The default is enabled.
             </summary>
     </member>
     <member name="P:StockSharp.Xaml.Charting.IChart.IsAutoRange">
       <summary>
             To use automatic range for the X-axis. The default is off.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.IChart.XAxisType">
+      <summary>
+            Type of X axis for this chart.
             </summary>
     </member>
     <member name="P:StockSharp.Xaml.Charting.IChart.IndicatorTypes">
@@ -2185,522 +3521,41 @@
             </summary>
       <param name="data">New data.</param>
     </member>
-    <member name="T:StockSharp.Xaml.Charting.DrawHandler">
-      <summary>
-            The description of the method of value drawing on the chart.
-            </summary>
-      <param name="element">The chart element.</param>
-      <param name="shift">Offset.</param>
-      <param name="values">Values.</param>
-    </member>
     <member name="T:StockSharp.Xaml.Charting.IChartIndicatorPainter">
       <summary>
             The interface describing the indicator renderer on the chart (for example, lines, histograms, etc.).
             </summary>
     </member>
-    <member name="P:StockSharp.Xaml.Charting.IChartIndicatorPainter.BaseElement">
+    <member name="P:StockSharp.Xaml.Charting.IChartIndicatorPainter.Element">
       <summary>
             The chart element representing the indicator.
             </summary>
     </member>
-    <member name="M:StockSharp.Xaml.Charting.IChartIndicatorPainter.Init">
+    <member name="P:StockSharp.Xaml.Charting.IChartIndicatorPainter.InnerElements">
       <summary>
-            To initialize renderer.
+            Child elements.
             </summary>
-      <returns>Graphical data.</returns>
     </member>
-    <member name="M:StockSharp.Xaml.Charting.IChartIndicatorPainter.ProcessValues(System.DateTimeOffset,StockSharp.Algo.Indicators.IIndicatorValue,StockSharp.Xaml.Charting.DrawHandler)">
+    <member name="M:StockSharp.Xaml.Charting.IChartIndicatorPainter.Draw(StockSharp.Xaml.Charting.ChartDrawData)">
       <summary>
-            To process new values.
+            To process the new data.
             </summary>
-      <param name="time">The time stamp of the new data generation.</param>
-      <param name="value">Indicator values.</param>
-      <param name="draw">The method of value drawing on the chart.</param>
+      <param name="data">New data.</param>
     </member>
-    <member name="T:StockSharp.Xaml.Charting.IndicatorPainters.AlligatorPainter">
+    <member name="M:StockSharp.Xaml.Charting.IChartIndicatorPainter.Reset">
       <summary>
-            The renderer for <see cref="T:StockSharp.Algo.Indicators.Alligator" />.
+            To reset painter child elements.
             </summary>
     </member>
-    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.AlligatorPainter.LipsColor">
+    <member name="M:StockSharp.Xaml.Charting.IChartIndicatorPainter.OnAttached(StockSharp.Xaml.Charting.ChartIndicatorElement)">
       <summary>
-            Lips line color.
+            Called when this painter is attached to chart indicator element.
             </summary>
     </member>
-    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.AlligatorPainter.TeethColor">
+    <member name="M:StockSharp.Xaml.Charting.IChartIndicatorPainter.OnDetached">
       <summary>
-            Teeth line color.
+            Called when this painter is detached from chart indicator element.
             </summary>
-    </member>
-    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.AlligatorPainter.JawColor">
-      <summary>
-            Jaw line color.
-            </summary>
-    </member>
-    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.AlligatorPainter.Init">
-      <summary>
-            To initialize renderer.
-            </summary>
-      <returns>Graphical data.</returns>
-    </member>
-    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.AlligatorPainter.ProcessValues(System.DateTimeOffset,StockSharp.Algo.Indicators.IIndicatorValue,StockSharp.Xaml.Charting.DrawHandler)">
-      <summary>
-            To process new values.
-            </summary>
-      <param name="time">The time stamp of the new data generation.</param>
-      <param name="value">Indicator values.</param>
-      <param name="draw">The method of value drawing on the chart.</param>
-    </member>
-    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.AlligatorPainter.Load(Ecng.Serialization.SettingsStorage)">
-      <summary>
-            Load settings.
-            </summary>
-      <param name="storage">Settings storage.</param>
-    </member>
-    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.AlligatorPainter.Save(Ecng.Serialization.SettingsStorage)">
-      <summary>
-            Save settings.
-            </summary>
-      <param name="storage">Settings storage.</param>
-    </member>
-    <member name="T:StockSharp.Xaml.Charting.IndicatorPainters.AverageDirectionalIndexPainter">
-      <summary>
-            The renderer for <see cref="T:StockSharp.Algo.Indicators.AverageDirectionalIndex" />.
-            </summary>
-    </member>
-    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.AverageDirectionalIndexPainter.DxPlusColor">
-      <summary>
-            DI+ line color.
-            </summary>
-    </member>
-    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.AverageDirectionalIndexPainter.DiMinusColor">
-      <summary>
-            DI- line color.
-            </summary>
-    </member>
-    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.AverageDirectionalIndexPainter.AdxColor">
-      <summary>
-            ADX line color.
-            </summary>
-    </member>
-    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.AverageDirectionalIndexPainter.Init">
-      <summary>
-            To initialize renderer.
-            </summary>
-      <returns>Graphical data.</returns>
-    </member>
-    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.AverageDirectionalIndexPainter.ProcessValues(System.DateTimeOffset,StockSharp.Algo.Indicators.IIndicatorValue,StockSharp.Xaml.Charting.DrawHandler)">
-      <summary>
-            To process new values.
-            </summary>
-      <param name="time">The time stamp of the new data generation.</param>
-      <param name="value">Indicator values.</param>
-      <param name="draw">The method of value drawing on the chart.</param>
-    </member>
-    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.AverageDirectionalIndexPainter.Load(Ecng.Serialization.SettingsStorage)">
-      <summary>
-            Load settings.
-            </summary>
-      <param name="storage">Settings storage.</param>
-    </member>
-    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.AverageDirectionalIndexPainter.Save(Ecng.Serialization.SettingsStorage)">
-      <summary>
-            Save settings.
-            </summary>
-      <param name="storage">Settings storage.</param>
-    </member>
-    <member name="T:StockSharp.Xaml.Charting.IndicatorPainters.BaseChartIndicatorPainter">
-      <summary>
-            The indicator renderer base class on the chart (for example, lines, histograms, etc.).
-            </summary>
-    </member>
-    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.BaseChartIndicatorPainter.BaseElement">
-      <summary>
-            The chart element representing the indicator.
-            </summary>
-    </member>
-    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.BaseChartIndicatorPainter.InnerElements">
-      <summary>
-            Chart elements representing embedded indicators.
-            </summary>
-    </member>
-    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.BaseChartIndicatorPainter.Init">
-      <summary>
-            To initialize renderer.
-            </summary>
-      <returns>Graphical data.</returns>
-    </member>
-    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.BaseChartIndicatorPainter.ProcessValues(System.DateTimeOffset,StockSharp.Algo.Indicators.IIndicatorValue,StockSharp.Xaml.Charting.DrawHandler)">
-      <summary>
-            To process new values.
-            </summary>
-      <param name="time">The time stamp of the new data generation.</param>
-      <param name="value">Indicator values.</param>
-      <param name="draw">The method of value drawing on the chart.</param>
-    </member>
-    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.BaseChartIndicatorPainter.ToString">
-      <summary>
-            Returns a string that represents the current object.
-            </summary>
-      <returns>A string that represents the current object.</returns>
-    </member>
-    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.BaseChartIndicatorPainter.Load(Ecng.Serialization.SettingsStorage)">
-      <summary>
-            Load settings.
-            </summary>
-      <param name="storage">Settings storage.</param>
-    </member>
-    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.BaseChartIndicatorPainter.Save(Ecng.Serialization.SettingsStorage)">
-      <summary>
-            Save settings.
-            </summary>
-      <param name="storage">Settings storage.</param>
-    </member>
-    <member name="T:StockSharp.Xaml.Charting.IndicatorPainters.BollingerBandsPainter">
-      <summary>
-            The renderer for <see cref="T:StockSharp.Algo.Indicators.BollingerBands" />.
-            </summary>
-    </member>
-    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.BollingerBandsPainter.UpBandColor">
-      <summary>
-            Color of the upper indicator line.
-            </summary>
-    </member>
-    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.BollingerBandsPainter.LowBandColor">
-      <summary>
-            Color of the lower indicator line.
-            </summary>
-    </member>
-    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.BollingerBandsPainter.MovingAverageColor">
-      <summary>
-            Color of average line.
-            </summary>
-    </member>
-    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.BollingerBandsPainter.Init">
-      <summary>
-            To initialize renderer.
-            </summary>
-      <returns>Graphical data.</returns>
-    </member>
-    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.BollingerBandsPainter.ProcessValues(System.DateTimeOffset,StockSharp.Algo.Indicators.IIndicatorValue,StockSharp.Xaml.Charting.DrawHandler)">
-      <summary>
-            To process new values.
-            </summary>
-      <param name="time">The time stamp of the new data generation.</param>
-      <param name="value">Indicator values.</param>
-      <param name="draw">The method of value drawing on the chart.</param>
-    </member>
-    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.BollingerBandsPainter.Load(Ecng.Serialization.SettingsStorage)">
-      <summary>
-            Load settings.
-            </summary>
-      <param name="storage">Settings storage.</param>
-    </member>
-    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.BollingerBandsPainter.Save(Ecng.Serialization.SettingsStorage)">
-      <summary>
-            Save settings.
-            </summary>
-      <param name="storage">Settings storage.</param>
-    </member>
-    <member name="T:StockSharp.Xaml.Charting.IndicatorPainters.FractalsPainter">
-      <summary>
-            The renderer for <see cref="T:StockSharp.Algo.Indicators.Fractals" />.
-            </summary>
-    </member>
-    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.FractalsPainter.UpColor">
-      <summary>
-            Up line color.
-            </summary>
-    </member>
-    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.FractalsPainter.DownColor">
-      <summary>
-            Down line color.
-            </summary>
-    </member>
-    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.FractalsPainter.Init">
-      <summary>
-            To initialize renderer.
-            </summary>
-      <returns>Graphical data.</returns>
-    </member>
-    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.FractalsPainter.ProcessValues(System.DateTimeOffset,StockSharp.Algo.Indicators.IIndicatorValue,StockSharp.Xaml.Charting.DrawHandler)">
-      <summary>
-            To process new values.
-            </summary>
-      <param name="time">The time stamp of the new data generation.</param>
-      <param name="value">Indicator values.</param>
-      <param name="draw">The method of value drawing on the chart.</param>
-    </member>
-    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.FractalsPainter.Load(Ecng.Serialization.SettingsStorage)">
-      <summary>
-            Load settings.
-            </summary>
-      <param name="storage">Settings storage.</param>
-    </member>
-    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.FractalsPainter.Save(Ecng.Serialization.SettingsStorage)">
-      <summary>
-            Save settings.
-            </summary>
-      <param name="storage">Settings storage.</param>
-    </member>
-    <member name="T:StockSharp.Xaml.Charting.IndicatorPainters.IchimokuPainter">
-      <summary>
-            The renderer for <see cref="T:StockSharp.Algo.Indicators.Ichimoku" />.
-            </summary>
-    </member>
-    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.IchimokuPainter.TenkanColor">
-      <summary>
-            Tenkan line color.
-            </summary>
-    </member>
-    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.IchimokuPainter.KijunColor">
-      <summary>
-            Kijun line color.
-            </summary>
-    </member>
-    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.IchimokuPainter.SenkouAColor">
-      <summary>
-            SenkouA line color.
-            </summary>
-    </member>
-    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.IchimokuPainter.SenkouBColor">
-      <summary>
-            SenkouA line color.
-            </summary>
-    </member>
-    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.IchimokuPainter.ChinkouColor">
-      <summary>
-            Chinkou line color.
-            </summary>
-    </member>
-    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.IchimokuPainter.Init">
-      <summary>
-            To initialize renderer.
-            </summary>
-      <returns>Graphical data.</returns>
-    </member>
-    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.IchimokuPainter.ProcessValues(System.DateTimeOffset,StockSharp.Algo.Indicators.IIndicatorValue,StockSharp.Xaml.Charting.DrawHandler)">
-      <summary>
-            To process new values.
-            </summary>
-      <param name="time">The time stamp of the new data generation.</param>
-      <param name="value">Indicator values.</param>
-      <param name="draw">The method of value drawing on the chart.</param>
-    </member>
-    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.IchimokuPainter.Load(Ecng.Serialization.SettingsStorage)">
-      <summary>
-            Load settings.
-            </summary>
-      <param name="storage">Settings storage.</param>
-    </member>
-    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.IchimokuPainter.Save(Ecng.Serialization.SettingsStorage)">
-      <summary>
-            Save settings.
-            </summary>
-      <param name="storage">Settings storage.</param>
-    </member>
-    <member name="T:StockSharp.Xaml.Charting.IndicatorPainters.MovingAverageConvergenceDivergenceHistogramPainter">
-      <summary>
-            The renderer for <see cref="T:StockSharp.Algo.Indicators.MovingAverageConvergenceDivergenceHistogram" />.
-            </summary>
-    </member>
-    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.MovingAverageConvergenceDivergenceHistogramPainter.Init">
-      <summary>
-            To initialize renderer.
-            </summary>
-      <returns>Graphical data.</returns>
-    </member>
-    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.MovingAverageConvergenceDivergenceHistogramPainter.ProcessValues(System.DateTimeOffset,StockSharp.Algo.Indicators.IIndicatorValue,StockSharp.Xaml.Charting.DrawHandler)">
-      <summary>
-            To process new values.
-            </summary>
-      <param name="time">The time stamp of the new data generation.</param>
-      <param name="value">Indicator values.</param>
-      <param name="draw">The method of value drawing on the chart.</param>
-    </member>
-    <member name="T:StockSharp.Xaml.Charting.IndicatorPainters.MovingAverageConvergenceDivergenceSignalPainter">
-      <summary>
-            The renderer for <see cref="T:StockSharp.Algo.Indicators.MovingAverageConvergenceDivergenceSignal" />.
-            </summary>
-    </member>
-    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.MovingAverageConvergenceDivergenceSignalPainter.Init">
-      <summary>
-            To initialize renderer.
-            </summary>
-      <returns>Graphical data.</returns>
-    </member>
-    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.MovingAverageConvergenceDivergenceSignalPainter.ProcessValues(System.DateTimeOffset,StockSharp.Algo.Indicators.IIndicatorValue,StockSharp.Xaml.Charting.DrawHandler)">
-      <summary>
-            To process new values.
-            </summary>
-      <param name="time">The time stamp of the new data generation.</param>
-      <param name="value">Indicator values.</param>
-      <param name="draw">The method of value drawing on the chart.</param>
-    </member>
-    <member name="T:StockSharp.Xaml.Charting.IndicatorPainters.ParabolicSarPainter">
-      <summary>
-            The renderer for <see cref="T:StockSharp.Algo.Indicators.ParabolicSar" />.
-            </summary>
-    </member>
-    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.ParabolicSarPainter.Init">
-      <summary>
-            To initialize renderer.
-            </summary>
-      <returns>Graphical data.</returns>
-    </member>
-    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.ParabolicSarPainter.ProcessValues(System.DateTimeOffset,StockSharp.Algo.Indicators.IIndicatorValue,StockSharp.Xaml.Charting.DrawHandler)">
-      <summary>
-            To process new values.
-            </summary>
-      <param name="time">The time stamp of the new data generation.</param>
-      <param name="value">Indicator values.</param>
-      <param name="draw">The method of value drawing on the chart.</param>
-    </member>
-    <member name="T:StockSharp.Xaml.Charting.IndicatorPainters.PeakPainter">
-      <summary>
-            The renderer for <see cref="T:StockSharp.Algo.Indicators.Peak" />.
-            </summary>
-    </member>
-    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.PeakPainter.Init">
-      <summary>
-            To initialize renderer.
-            </summary>
-      <returns>Graphical data.</returns>
-    </member>
-    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.PeakPainter.ProcessValues(System.DateTimeOffset,StockSharp.Algo.Indicators.IIndicatorValue,StockSharp.Xaml.Charting.DrawHandler)">
-      <summary>
-            To process new values.
-            </summary>
-      <param name="time">The time stamp of the new data generation.</param>
-      <param name="value">Indicator values.</param>
-      <param name="draw">The method of value drawing on the chart.</param>
-    </member>
-    <member name="T:StockSharp.Xaml.Charting.IndicatorPainters.TroughPainter">
-      <summary>
-            The renderer for <see cref="T:StockSharp.Algo.Indicators.Trough" />.
-            </summary>
-    </member>
-    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.TroughPainter.Init">
-      <summary>
-            To initialize renderer.
-            </summary>
-      <returns>Graphical data.</returns>
-    </member>
-    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.TroughPainter.ProcessValues(System.DateTimeOffset,StockSharp.Algo.Indicators.IIndicatorValue,StockSharp.Xaml.Charting.DrawHandler)">
-      <summary>
-            To process new values.
-            </summary>
-      <param name="time">The time stamp of the new data generation.</param>
-      <param name="value">Indicator values.</param>
-      <param name="draw">The method of value drawing on the chart.</param>
-    </member>
-    <member name="T:StockSharp.Xaml.Charting.IndicatorPainters.VolumePainter">
-      <summary>
-            The renderer for <see cref="T:StockSharp.Algo.Indicators.VolumeIndicator" />.
-            </summary>
-    </member>
-    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.VolumePainter.UpColor">
-      <summary>
-            Up line color.
-            </summary>
-    </member>
-    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.VolumePainter.DownColor">
-      <summary>
-            Down line color.
-            </summary>
-    </member>
-    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.VolumePainter.BubbleAutoScale">
-      <summary>
-            To use the automatic scaling for the Bubble mode.
-            </summary>
-    </member>
-    <member name="P:StockSharp.Xaml.Charting.IndicatorPainters.VolumePainter.BubbleScale">
-      <summary>
-            Manual scaling for the Bubble mode.
-            </summary>
-    </member>
-    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.VolumePainter.Init">
-      <summary>
-            To initialize renderer.
-            </summary>
-      <returns>Graphical data.</returns>
-    </member>
-    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.VolumePainter.ProcessValues(System.DateTimeOffset,StockSharp.Algo.Indicators.IIndicatorValue,StockSharp.Xaml.Charting.DrawHandler)">
-      <summary>
-            To process new values.
-            </summary>
-      <param name="time">The time stamp of the new data generation.</param>
-      <param name="value">Indicator values.</param>
-      <param name="draw">The method of value drawing on the chart.</param>
-    </member>
-    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.VolumePainter.Load(Ecng.Serialization.SettingsStorage)">
-      <summary>
-            Load settings.
-            </summary>
-      <param name="storage">Settings storage.</param>
-    </member>
-    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.VolumePainter.Save(Ecng.Serialization.SettingsStorage)">
-      <summary>
-            Save settings.
-            </summary>
-      <param name="storage">Settings storage.</param>
-    </member>
-    <member name="T:StockSharp.Xaml.Charting.IndicatorPainters.VolumeProfilePainter">
-      <summary>
-            The renderer for <see cref="T:StockSharp.Algo.Indicators.VolumeProfileIndicator" />.
-            </summary>
-    </member>
-    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.VolumeProfilePainter.Init">
-      <summary>
-            To initialize renderer.
-            </summary>
-      <returns>Graphical data.</returns>
-    </member>
-    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.VolumeProfilePainter.ProcessValues(System.DateTimeOffset,StockSharp.Algo.Indicators.IIndicatorValue,StockSharp.Xaml.Charting.DrawHandler)">
-      <summary>
-            To process new values.
-            </summary>
-      <param name="time">The time stamp of the new data generation.</param>
-      <param name="value">Indicator values.</param>
-      <param name="draw">The method of value drawing on the chart.</param>
-    </member>
-    <member name="T:StockSharp.Xaml.Charting.IndicatorPainters.ZigZagEquisPainter">
-      <summary>
-            The renderer for <see cref="T:StockSharp.Algo.Indicators.ZigZagEquis" />.
-            </summary>
-    </member>
-    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.ZigZagEquisPainter.Init">
-      <summary>
-            To initialize renderer.
-            </summary>
-      <returns>Graphical data.</returns>
-    </member>
-    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.ZigZagEquisPainter.ProcessValues(System.DateTimeOffset,StockSharp.Algo.Indicators.IIndicatorValue,StockSharp.Xaml.Charting.DrawHandler)">
-      <summary>
-            To process new values.
-            </summary>
-      <param name="time">The time stamp of the new data generation.</param>
-      <param name="value">Indicator values.</param>
-      <param name="draw">The method of value drawing on the chart.</param>
-    </member>
-    <member name="T:StockSharp.Xaml.Charting.IndicatorPainters.ZigZagPainter">
-      <summary>
-            The renderer for <see cref="T:StockSharp.Algo.Indicators.ZigZag" />.
-            </summary>
-    </member>
-    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.ZigZagPainter.Init">
-      <summary>
-            To initialize renderer.
-            </summary>
-      <returns>Graphical data.</returns>
-    </member>
-    <member name="M:StockSharp.Xaml.Charting.IndicatorPainters.ZigZagPainter.ProcessValues(System.DateTimeOffset,StockSharp.Algo.Indicators.IIndicatorValue,StockSharp.Xaml.Charting.DrawHandler)">
-      <summary>
-            To process new values.
-            </summary>
-      <param name="time">The time stamp of the new data generation.</param>
-      <param name="value">Indicator values.</param>
-      <param name="draw">The method of value drawing on the chart.</param>
     </member>
     <member name="T:StockSharp.Xaml.Charting.IndicatorPickerWindow">
       <summary>
@@ -2718,6 +3573,16 @@
     <member name="P:StockSharp.Xaml.Charting.IndicatorPickerWindow.SelectedIndicatorType">
       <summary>
             The selected indicator type.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.IndicatorPickerWindow.Indicator">
+      <summary>
+            Indicator.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.IndicatorPickerWindow.AutoSelectCandles">
+      <summary>
+            Auto select candles.
             </summary>
     </member>
     <member name="P:StockSharp.Xaml.Charting.IndicatorPickerWindow.IndicatorTypes">
@@ -2753,6 +3618,16 @@
     <member name="P:StockSharp.Xaml.Charting.IndicatorType.Painter">
       <summary>
             The renderer type for indicator extended drawing.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.IndicatorType.InputValue">
+      <summary>
+            Input values type.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.IndicatorType.OutputValue">
+      <summary>
+            Result values type.
             </summary>
     </member>
     <member name="M:StockSharp.Xaml.Charting.IndicatorType.#ctor">
@@ -2797,6 +3672,7 @@
       <summary>
             Line data.
             </summary>
+      <typeparam name="TKey">Key type.</typeparam>
     </member>
     <member name="P:StockSharp.Xaml.Charting.LineData`1.X">
       <summary>
@@ -2807,42 +3683,6 @@
       <summary>
             The Y value.
             </summary>
-    </member>
-    <member name="T:StockSharp.Xaml.Charting.LineElement">
-      <summary>
-            The chart element representing a line.
-            </summary>
-    </member>
-    <member name="M:StockSharp.Xaml.Charting.LineElement.#ctor">
-      <summary>
-            Initializes a new instance of the <see cref="T:StockSharp.Xaml.Charting.LineElement" />.
-            </summary>
-    </member>
-    <member name="P:StockSharp.Xaml.Charting.LineElement.Color">
-      <summary>
-            Line color (bar and etc.), with which it will be drawn on chart.
-            </summary>
-    </member>
-    <member name="P:StockSharp.Xaml.Charting.LineElement.AdditionalColor">
-      <summary>
-            Additional line color (bars etc), with which it will be drawn on the chart.
-            </summary>
-    </member>
-    <member name="P:StockSharp.Xaml.Charting.LineElement.StrokeThickness">
-      <summary>
-            The thickness of the line (bar, etc.) with which it will be drawn on the chart. The default is 1.
-            </summary>
-    </member>
-    <member name="P:StockSharp.Xaml.Charting.LineElement.AntiAliasing">
-      <summary>
-            The smoothing of the line drawing. The default is enabled.
-            </summary>
-    </member>
-    <member name="M:StockSharp.Xaml.Charting.LineElement.Clone">
-      <summary>
-            Create a copy of <see cref="T:StockSharp.Xaml.Charting.LineElement" />.
-            </summary>
-      <returns>Copy.</returns>
     </member>
     <member name="T:StockSharp.Xaml.Charting.OptionPositionChartParams">
       <summary>
@@ -2892,6 +3732,11 @@
             Initializes a new instance of the <see cref="T:StockSharp.Xaml.Charting.OptionPositionChart" />.
             </summary>
     </member>
+    <member name="P:StockSharp.Xaml.Charting.OptionPositionChart.ChartTheme">
+      <summary>
+            The name of the graphic theme.
+            </summary>
+    </member>
     <member name="P:StockSharp.Xaml.Charting.OptionPositionChart.SecurityProvider">
       <summary>
             The provider of information about instruments.
@@ -2902,19 +3747,24 @@
             The market data provider.
             </summary>
     </member>
-    <member name="P:StockSharp.Xaml.Charting.OptionPositionChart.ChartParam">
+    <member name="P:StockSharp.Xaml.Charting.OptionPositionChart.PositionProvider">
       <summary>
-            The parameter type in the chart. The default is <see cref="F:StockSharp.Xaml.Charting.OptionPositionChartParams.Premium" />.
+            The position provider.
             </summary>
     </member>
-    <member name="P:StockSharp.Xaml.Charting.OptionPositionChart.Positions">
+    <member name="P:StockSharp.Xaml.Charting.OptionPositionChart.UnderlyingAsset">
+      <summary>
+            Underlying asset.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.OptionPositionChart.Options">
       <summary>
             Option positions.
             </summary>
     </member>
-    <member name="P:StockSharp.Xaml.Charting.OptionPositionChart.AssetPosition">
+    <member name="P:StockSharp.Xaml.Charting.OptionPositionChart.ChartParam">
       <summary>
-            The position by the underlying asset.
+            The parameter type in the chart. The default is <see cref="F:StockSharp.Xaml.Charting.OptionPositionChartParams.Premium" />.
             </summary>
     </member>
     <member name="P:StockSharp.Xaml.Charting.OptionPositionChart.ShowSeparated">
@@ -2932,14 +3782,25 @@
             Whether to use the model <see cref="T:StockSharp.Algo.Derivatives.Black" />. By default, the model is not used.
             </summary>
     </member>
-    <member name="M:StockSharp.Xaml.Charting.OptionPositionChart.Refresh(System.Decimal,System.Decimal,System.DateTimeOffset,System.DateTimeOffset)">
+    <member name="M:StockSharp.Xaml.Charting.OptionPositionChart.Refresh(System.Nullable{System.Decimal},System.Nullable{System.DateTimeOffset},System.Nullable{System.DateTimeOffset})">
       <summary>
             To redraw the chart.
             </summary>
       <param name="assetPrice">The current price of the underlying asset.</param>
-      <param name="priceStep">Price step.</param>
       <param name="currentTime">The current time.</param>
       <param name="expiryDate">The expiration date.</param>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.OptionPositionChart.Load(Ecng.Serialization.SettingsStorage)">
+      <summary>
+            Load settings.
+            </summary>
+      <param name="storage">Settings storage.</param>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.OptionPositionChart.Save(Ecng.Serialization.SettingsStorage)">
+      <summary>
+            Save settings.
+            </summary>
+      <param name="storage">Settings storage.</param>
     </member>
     <member name="M:StockSharp.Xaml.Charting.OptionPositionChart.InitializeComponent">
       <summary>
@@ -2954,9 +3815,17 @@
             OptionVolatilitySmileChart
             </summary>
     </member>
+    <member name="F:StockSharp.Xaml.Charting.OptionVolatilitySmileChart.SmileStepProperty">
+      <summary>Step size for volatility smile calculation.</summary>
+    </member>
     <member name="P:StockSharp.Xaml.Charting.OptionVolatilitySmileChart.ChartTheme">
       <summary>
             The name of the graphic theme.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.OptionVolatilitySmileChart.SmileStep">
+      <summary>
+            Volatility smile draw step.
             </summary>
     </member>
     <member name="M:StockSharp.Xaml.Charting.OptionVolatilitySmileChart.#ctor">
@@ -2964,40 +3833,182 @@
             Initializes a new instance of the <see cref="T:StockSharp.Xaml.Charting.OptionVolatilitySmileChart" />.
             </summary>
     </member>
-    <member name="M:StockSharp.Xaml.Charting.OptionVolatilitySmileChart.CreateSmile(System.String,System.Windows.Media.Color,StockSharp.Xaml.Charting.LineChartStyles)">
+    <member name="P:StockSharp.Xaml.Charting.OptionVolatilitySmileChart.Elements">
+      <summary>
+            Elements.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.OptionVolatilitySmileChart.CreateSmile(System.String,System.Windows.Media.Color,StockSharp.Xaml.Charting.ChartIndicatorDrawStyles,System.Guid)">
       <summary>
             To create new smile.
             </summary>
       <param name="title">The line title.</param>
       <param name="color">The line color.</param>
-      <param name="style">The line drawing style. The default is <see cref="F:StockSharp.Xaml.Charting.LineChartStyles.Line" />.</param>
+      <param name="style">The line drawing style. The default is <see cref="F:StockSharp.Xaml.Charting.ChartIndicatorDrawStyles.Line" />.</param>
+      <param name="id">Unique ID.</param>
       <returns>The collection of data that should be filled for the line drawing.</returns>
     </member>
-    <member name="M:StockSharp.Xaml.Charting.OptionVolatilitySmileChart.CreateSmile(System.String,System.Windows.Media.Color,System.Windows.Media.Color,StockSharp.Xaml.Charting.LineChartStyles)">
+    <member name="M:StockSharp.Xaml.Charting.OptionVolatilitySmileChart.CreateSmile(System.String,System.Windows.Media.Color,System.Windows.Media.Color,StockSharp.Xaml.Charting.ChartIndicatorDrawStyles,System.Guid)">
       <summary>
             To create new smile.
             </summary>
       <param name="title">The line title.</param>
       <param name="color">The line color.</param>
-      <param name="secondColor">The additional line color. It is used to draw <see cref="F:StockSharp.Xaml.Charting.LineChartStyles.Area" />.</param>
-      <param name="style">The line drawing style. The default is <see cref="F:StockSharp.Xaml.Charting.LineChartStyles.Line" />.</param>
+      <param name="secondColor">The additional line color. It is used to draw <see cref="F:StockSharp.Xaml.Charting.ChartIndicatorDrawStyles.Area" />.</param>
+      <param name="style">The line drawing style. The default is <see cref="F:StockSharp.Xaml.Charting.ChartIndicatorDrawStyles.Line" />.</param>
+      <param name="id">Unique ID.</param>
       <returns>The collection of data that should be filled for the line drawing.</returns>
     </member>
     <member name="M:StockSharp.Xaml.Charting.OptionVolatilitySmileChart.RemoveSmile(System.Collections.Generic.ICollection{StockSharp.Xaml.Charting.LineData{System.Double}})">
       <summary>
             To remove the yield curve from the chart.
             </summary>
-      <param name="items">The collection of data obtained from the method <see cref="M:StockSharp.Xaml.Charting.OptionVolatilitySmileChart.CreateSmile(System.String,System.Windows.Media.Color,StockSharp.Xaml.Charting.LineChartStyles)" />.</param>
+      <param name="items">The collection of data obtained from the method <see cref="M:StockSharp.Xaml.Charting.OptionVolatilitySmileChart.CreateSmile(System.String,System.Windows.Media.Color,StockSharp.Xaml.Charting.ChartIndicatorDrawStyles,System.Guid)" />.</param>
     </member>
     <member name="M:StockSharp.Xaml.Charting.OptionVolatilitySmileChart.Clear">
       <summary>
             To remove yield curves from the chart.
             </summary>
     </member>
+    <member name="M:StockSharp.Xaml.Charting.OptionVolatilitySmileChart.Reset(System.Collections.Generic.IEnumerable{System.Collections.Generic.ICollection{StockSharp.Xaml.Charting.LineData{System.Double}}})">
+      <summary>
+            To reset specified chart elements.
+            </summary>
+      <param name="items">Elements to reset.</param>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.OptionVolatilitySmileChart.Load(Ecng.Serialization.SettingsStorage)">
+      <summary>
+            Load settings.
+            </summary>
+      <param name="storage">Settings storage.</param>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.OptionVolatilitySmileChart.Save(Ecng.Serialization.SettingsStorage)">
+      <summary>
+            Save settings.
+            </summary>
+      <param name="storage">Settings storage.</param>
+    </member>
     <member name="M:StockSharp.Xaml.Charting.OptionVolatilitySmileChart.InitializeComponent">
       <summary>
             InitializeComponent
             </summary>
+    </member>
+    <member name="T:StockSharp.Xaml.Charting.Ultrachart.ChartIndicatorElementSettingsObject">
+      <summary>
+            Proxy object to edit chart indicator element in property grid.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.Ultrachart.ChartIndicatorElementSettingsObject.#ctor(StockSharp.Xaml.Charting.IChartElement)">
+      <summary>
+            Create instance.
+            </summary>
+      <param name="element">
+      </param>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.Ultrachart.ChartIndicatorElementSettingsObject.OnGetProperties(StockSharp.Xaml.Charting.IChartElement)">
+      <inheritdoc />
+    </member>
+    <member name="T:StockSharp.Xaml.Charting.Ultrachart.ChartSettingsObjectBase`1">
+      <summary>
+            Base proxy object to edit chart element in property grid.
+            </summary>
+    </member>
+    <member name="T:StockSharp.Xaml.Charting.Ultrachart.ChartSettingsObjectBase`1.PdSelector">
+      <summary>
+            Selector delegate to add condition to select wrapped object properties.
+            </summary>
+    </member>
+    <member name="T:StockSharp.Xaml.Charting.Ultrachart.ChartSettingsObjectBase`1.ProxyDescriptor">
+      <summary>
+            Specialization of <see cref="T:System.ComponentModel.PropertyDescriptor" /> class for chart element properties.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.Ultrachart.ChartSettingsObjectBase`1.ProxyDescriptor.#ctor(System.String,System.Object,`0,System.Collections.Generic.IEnumerable{System.Attribute},StockSharp.Xaml.Charting.Ultrachart.ChartSettingsObjectBase{`0}.PdSelector)">
+      <summary>
+            Create instance.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.Ultrachart.ChartSettingsObjectBase`1.ProxyDescriptor.CreateWrapper(`0,StockSharp.Xaml.Charting.Ultrachart.ChartSettingsObjectBase{`0}.PdSelector)">
+      <summary>
+            Create chart settings object wrapper for an object.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.Ultrachart.ChartSettingsObjectBase`1.ProxyDescriptor.Owner">
+      <summary>
+            Parent object.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.Ultrachart.ChartSettingsObjectBase`1.ProxyDescriptor.GetValue(System.Object)">
+      <inheritdoc />
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.Ultrachart.ChartSettingsObjectBase`1.ProxyDescriptor.SetValue(System.Object,System.Object)">
+      <inheritdoc />
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.Ultrachart.ChartSettingsObjectBase`1.ProxyDescriptor.CanResetValue(System.Object)">
+      <inheritdoc />
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.Ultrachart.ChartSettingsObjectBase`1.ProxyDescriptor.ResetValue(System.Object)">
+      <inheritdoc />
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.Ultrachart.ChartSettingsObjectBase`1.ProxyDescriptor.ShouldSerializeValue(System.Object)">
+      <inheritdoc />
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.Ultrachart.ChartSettingsObjectBase`1.ProxyDescriptor.Attributes">
+      <inheritdoc />
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.Ultrachart.ChartSettingsObjectBase`1.ProxyDescriptor.ComponentType">
+      <inheritdoc />
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.Ultrachart.ChartSettingsObjectBase`1.ProxyDescriptor.IsReadOnly">
+      <inheritdoc />
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.Ultrachart.ChartSettingsObjectBase`1.ProxyDescriptor.PropertyType">
+      <inheritdoc />
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.Ultrachart.ChartSettingsObjectBase`1.Orig">
+      <summary>
+            Parent chart element or indicator.
+            </summary>
+    </member>
+    <member name="P:StockSharp.Xaml.Charting.Ultrachart.ChartSettingsObjectBase`1.CategoriesMode">
+      <summary>
+            Categories mode of property grid.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.Ultrachart.ChartSettingsObjectBase`1.#ctor(`0)">
+      <summary>
+            Create instance.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.Ultrachart.ChartSettingsObjectBase`1.OnGetProperties(`0)">
+      <summary>
+            Get property list from wrapped object.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.Ultrachart.ChartSettingsObjectBase`1.ToString">
+      <inheritdoc />
+    </member>
+    <member name="T:StockSharp.Xaml.Charting.Ultrachart.AreaAxesToTooltipConverter">
+      <summary>
+            Show red border around legend element if one or both axes are undefined.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.Ultrachart.AreaAxesToTooltipConverter.Convert(System.Object[],System.Type,System.Object,System.Globalization.CultureInfo)">
+      <inheritdoc />
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.Ultrachart.AreaAxesToTooltipConverter.ConvertBack(System.Object,System.Type[],System.Object,System.Globalization.CultureInfo)">
+      <inheritdoc />
+    </member>
+    <member name="T:StockSharp.Xaml.Charting.Ultrachart.AreaAxesToBorderColorConverter">
+      <summary>
+            Show red border around legend element if one or both axes are undefined.
+            </summary>
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.Ultrachart.AreaAxesToBorderColorConverter.Convert(System.Object[],System.Type,System.Object,System.Globalization.CultureInfo)">
+      <inheritdoc />
+    </member>
+    <member name="M:StockSharp.Xaml.Charting.Ultrachart.AreaAxesToBorderColorConverter.ConvertBack(System.Object,System.Type[],System.Object,System.Globalization.CultureInfo)">
+      <inheritdoc />
     </member>
   </members>
 </doc>

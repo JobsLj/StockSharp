@@ -45,7 +45,7 @@ namespace StockSharp.Algo.Indicators
 		}
 
 		/// <summary>
-		/// �Rapid� EMA period. The default value is 2.
+		/// 'Rapid' EMA period. The default value is 2.
 		/// </summary>
 		[DisplayNameLoc(LocalizedStrings.Str793Key)]
 		[DescriptionLoc(LocalizedStrings.Str794Key)]
@@ -53,7 +53,7 @@ namespace StockSharp.Algo.Indicators
 		public int FastSCPeriod { get; set; }
 
 		/// <summary>
-		/// �Slow� EMA period. The default value is 30.
+		/// 'Slow' EMA period. The default value is 30.
 		/// </summary>
 		[DisplayNameLoc(LocalizedStrings.Str795Key)]
 		[DescriptionLoc(LocalizedStrings.Str796Key)]
@@ -116,7 +116,7 @@ namespace StockSharp.Algo.Indicators
 
 			decimal volatility = 0;
 
-			for (int i = 1; i < buff.Count; i++)
+			for (var i = 1; i < buff.Count; i++)
 			{
 				volatility += Math.Abs(buff[i] - buff[i - 1]);
 			}

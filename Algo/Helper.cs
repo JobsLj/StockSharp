@@ -17,7 +17,6 @@ namespace StockSharp.Algo
 {
 	using System;
 
-	using Ecng.Collections;
 	using Ecng.Common;
 
 	using StockSharp.BusinessEntities;
@@ -66,32 +65,6 @@ namespace StockSharp.Algo
 			return security;
 		}
 
-		public static int ChangeSubscribers<T>(this CachedSynchronizedDictionary<T, int> subscribers, T subscriber, bool isSubscribe)
-		{
-			if (subscribers == null)
-				throw new ArgumentNullException(nameof(subscribers));
-
-			lock (subscribers.SyncRoot)
-			{
-				var value = subscribers.TryGetValue2(subscriber) ?? 0;
-
-				if (isSubscribe)
-					value++;
-				else
-				{
-					if (value > 0)
-						value--;
-				}
-
-				if (value > 0)
-					subscribers[subscriber] = value;
-				else
-					subscribers.Remove(subscriber);
-
-				return value;
-			}
-		}
-
 		public static long GetTradeId(this ExecutionMessage message)
 		{
 			if (message == null)
@@ -129,6 +102,129 @@ namespace StockSharp.Algo
 				return balance.Value;
 
 			throw new ArgumentOutOfRangeException(nameof(message));
+		}
+
+		public static void ReplaceSecurityId(this Message message, SecurityId securityId)
+		{
+			switch (message.Type)
+			{
+				//case MessageTypes.Position:
+				//{
+				//	var positionMsg = (PositionMessage)message;
+				//	positionMsg.SecurityId = securityId;
+				//	break;
+				//}
+
+				case MessageTypes.PositionChange:
+				{
+					var positionMsg = (PositionChangeMessage)message;
+					positionMsg.SecurityId = securityId;
+					break;
+				}
+
+				case MessageTypes.Execution:
+				{
+					var execMsg = (ExecutionMessage)message;
+					execMsg.SecurityId = securityId;
+					break;
+				}
+
+				case MessageTypes.Level1Change:
+				{
+					var level1Msg = (Level1ChangeMessage)message;
+					level1Msg.SecurityId = securityId;
+					break;
+				}
+
+				case MessageTypes.QuoteChange:
+				{
+					var quoteChangeMsg = (QuoteChangeMessage)message;
+					quoteChangeMsg.SecurityId = securityId;
+					break;
+				}
+
+				case MessageTypes.News:
+				{
+					var newsMsg = (NewsMessage)message;
+					newsMsg.SecurityId = securityId;
+					break;
+				}
+
+				case MessageTypes.OrderRegister:
+				{
+					var msg = (OrderRegisterMessage)message;
+					msg.SecurityId = securityId;
+					break;
+				}
+
+				case MessageTypes.OrderReplace:
+				{
+					var msg = (OrderReplaceMessage)message;
+					msg.SecurityId = securityId;
+					break;
+				}
+
+				case MessageTypes.OrderCancel:
+				{
+					var msg = (OrderCancelMessage)message;
+					msg.SecurityId = securityId;
+					break;
+				}
+
+				case MessageTypes.MarketData:
+				{
+					var msg = (MarketDataMessage)message;
+					msg.SecurityId = securityId;
+					break;
+				}
+
+				case MessageTypes.CandleTimeFrame:
+				case MessageTypes.CandleRange:
+				case MessageTypes.CandlePnF:
+				case MessageTypes.CandleRenko:
+				case MessageTypes.CandleTick:
+				case MessageTypes.CandleVolume:
+				{
+					var msg = (CandleMessage)message;
+					msg.SecurityId = securityId;
+					break;
+				}
+
+				default:
+					throw new ArgumentOutOfRangeException(nameof(message), message.Type, LocalizedStrings.Str2770);
+			}
+		}
+
+		public class SubscriptionKey : Tuple<MarketDataTypes, SecurityId, object, int?, Tuple<DateTimeOffset?, DateTimeOffset?, long?>>
+		{
+			public SubscriptionKey(MarketDataTypes item1, SecurityId item2, object item3, int? item4, Tuple<DateTimeOffset?, DateTimeOffset?, long?> item5)
+				: base(item1, item2, item3, item4, item5)
+			{
+			}
+		}
+
+		public static SubscriptionKey CreateKey(this MarketDataMessage message, SecurityId? securityId = null)
+		{
+			if (message == null)
+				throw new ArgumentNullException(nameof(message));
+
+			var isRealTime = message.To == null;
+			var range = isRealTime ? null : Tuple.Create(message.From, message.To, message.Count);
+
+			return new SubscriptionKey(message.DataType, securityId ?? message.SecurityId, message.Arg, message.MaxDepth, range);
+		}
+
+		public static bool NotRequiredSecurityId(this SecurityMessage secMsg)
+		{
+			if (secMsg == null)
+				throw new ArgumentNullException(nameof(secMsg));
+
+			if (secMsg.Type == MessageTypes.MarketData && ((MarketDataMessage)secMsg).DataType == MarketDataTypes.News)
+				return secMsg.SecurityId.IsDefault();
+			else if (secMsg.Type == MessageTypes.OrderGroupCancel)
+				return secMsg.SecurityId.IsDefault();
+
+			return false;
 		}
 	}
 }

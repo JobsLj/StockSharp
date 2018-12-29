@@ -20,7 +20,6 @@ namespace StockSharp.Algo.Storages
 	using System.Collections.Generic;
 	using System.Linq;
 
-	using StockSharp.Algo.Candles;
 	using StockSharp.BusinessEntities;
 	using StockSharp.Messages;
 
@@ -37,7 +36,7 @@ namespace StockSharp.Algo.Storages
 		/// Initializes a new instance of the <see cref="InMemoryMarketDataStorage{T}"/>.
 		/// </summary>
 		/// <param name="security">The instrument.</param>
-		/// <param name="arg">The additional argument, associated with data. For example, <see cref="Candle.Arg"/>.</param>
+		/// <param name="arg">The additional argument, associated with data. For example, <see cref="CandleMessage.Arg"/>.</param>
 		/// <param name="getData">Handler for retrieving in-memory data.</param>
 		/// <param name="dataType">Data type.</param>
 		public InMemoryMarketDataStorage(Security security, object arg, Func<DateTimeOffset, IEnumerable<Message>> getData, Type dataType = null)
@@ -55,22 +54,16 @@ namespace StockSharp.Algo.Storages
 		/// Initializes a new instance of the <see cref="InMemoryMarketDataStorage{T}"/>.
 		/// </summary>
 		/// <param name="security">The instrument.</param>
-		/// <param name="arg">The additional argument, associated with data. For example, <see cref="Candle.Arg"/>.</param>
+		/// <param name="arg">The additional argument, associated with data. For example, <see cref="CandleMessage.Arg"/>.</param>
 		/// <param name="getData">Handler for retrieving in-memory data.</param>
 		public InMemoryMarketDataStorage(Security security, object arg, Func<DateTimeOffset, IEnumerable<T>> getData)
 		{
-			if (getData == null)
-				throw new ArgumentNullException(nameof(getData));
-
 			_security = security;
 			_arg = arg;
-			_getData = getData;
+			_getData = getData ?? throw new ArgumentNullException(nameof(getData));
 		}
 
-		IEnumerable<DateTime> IMarketDataStorage.Dates
-		{
-			get { throw new NotSupportedException(); }
-		}
+		IEnumerable<DateTime> IMarketDataStorage.Dates => throw new NotSupportedException();
 
 		private readonly Security _security;
 
@@ -80,10 +73,7 @@ namespace StockSharp.Algo.Storages
 
 		object IMarketDataStorage.Arg => _arg;
 
-		IMarketDataStorageDrive IMarketDataStorage.Drive
-		{
-			get { throw new NotSupportedException(); }
-		}
+		IMarketDataStorageDrive IMarketDataStorage.Drive => throw new NotSupportedException();
 
 		bool IMarketDataStorage.AppendOnlyNew { get; set; }
 
@@ -93,10 +83,7 @@ namespace StockSharp.Algo.Storages
 
 		IMarketDataSerializer IMarketDataStorage.Serializer => ((IMarketDataStorage<T>)this).Serializer;
 
-		IMarketDataSerializer<T> IMarketDataStorage<T>.Serializer
-		{
-			get { throw new NotSupportedException(); }
-		}
+		IMarketDataSerializer<T> IMarketDataStorage<T>.Serializer => throw new NotSupportedException();
 
 		/// <summary>
 		/// To load data.

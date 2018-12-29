@@ -9,7 +9,7 @@
  	<para><externalLink>
 	<linkText>Инструкция использования GitHub</linkText>
 	<linkAlternateText>Инструкция использования GitHub</linkAlternateText>
-		<linkUri>http://stocksharp.ru/forum/4848/rukovodstvo-po-github/</linkUri>
+		<linkUri>https://stocksharp.ru/forum/4848/rukovodstvo-po-github/</linkUri>
 		<linkTarget>_blank</linkTarget>
 	</externalLink>
 </para>
@@ -37,15 +37,7 @@
   					<para><link xlink:href="1ee210ee-a004-4277-b8f4-91cb08d651db">TWIME</link> - коннектор для управления заявками на срочном рынке Московской Биржи.</para>
   				</listItem>
   				<listItem>
-  					<para>
-  				<externalLink>
-					<linkText>S#.Shell</linkText>
-					<linkAlternateText>Каркас для торговых стратегий</linkAlternateText>
-					<linkUri>http://stocksharp.ru/products/shell/</linkUri>
-					<linkTarget>_blank</linkTarget>
-				</externalLink> - готовый каркас для торговых стратегий.
- 			</para>
-  					
+  					<para><token>stocksharpshell</token> - готовый каркас для торговых стратегий.</para>
   				</listItem>
   				<listItem>
   					<para><token>hydra</token> - программа автоматической загрузки и хранения маркет-данных.</para>
@@ -60,7 +52,7 @@
   			Подробную информацию о стоимости продуктов StockSharp см. <externalLink>
 			<linkText>Стоимость лицензий StockSharp</linkText>
 			<linkAlternateText>Стоимость лицензий</linkAlternateText>
-			<linkUri>http://stocksharp.ru/products/pricing/</linkUri>
+			<linkUri>https://stocksharp.ru/products/pricing/</linkUri>
 			<linkTarget>_blank</linkTarget>
 			</externalLink>.
   			</para>
@@ -70,7 +62,7 @@
      	<externalLink>
 			<linkText>Исходный код S# на GitHub</linkText>
 			<linkAlternateText>Optional alternate text</linkAlternateText>
-			<linkUri>http://stocksharp.ru/news/263/ishodnyi-kod-s-na-github/</linkUri>
+			<linkUri>https://stocksharp.ru/news/263/ishodnyi-kod-s-na-github/</linkUri>
 			<linkTarget>_blank</linkTarget>
 		</externalLink>
     <link xlink:href="b9f672db-e0c9-4208-9759-179e5de17fd8">Установка StockSharp</link>

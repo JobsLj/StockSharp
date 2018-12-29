@@ -57,10 +57,7 @@ namespace StockSharp.Logging
 
 			public LogSourceList(LogManager parent)
 			{
-				if (parent == null)
-					throw new ArgumentNullException(nameof(parent));
-
-				_parent = parent;
+				_parent = parent ?? throw new ArgumentNullException(nameof(parent));
 			}
 
 			protected override bool OnAdding(ILogSource item)
@@ -205,7 +202,7 @@ namespace StockSharp.Logging
 		/// </summary>
 		public ILogReceiver Application
 		{
-			get { return _application; }
+			get => _application;
 			set
 			{
 				if (value == null)
@@ -237,7 +234,7 @@ namespace StockSharp.Logging
 		/// </summary>
 		public TimeSpan FlushInterval
 		{
-			get { return _flushTimer.Interval(); }
+			get => _flushTimer.Interval();
 			set
 			{
 				if (value < TimeSpan.FromMilliseconds(1))
@@ -323,6 +320,9 @@ namespace StockSharp.Logging
 
 			if (storage.Contains(nameof(LocalTimeZone)))
 				LocalTimeZone = storage.GetValue<TimeZoneInfo>(nameof(LocalTimeZone));
+
+			if (storage.Contains(nameof(Application)) && Application is IPersistable appPers)
+				appPers.Load(storage.GetValue<SettingsStorage>(nameof(Application)));
 		}
 
 		/// <summary>
@@ -337,6 +337,9 @@ namespace StockSharp.Logging
 
 			if (LocalTimeZone != null)
 				storage.SetValue(nameof(LocalTimeZone), LocalTimeZone);
+
+			if (Application is IPersistable appPers)
+				storage.SetValue(nameof(Application), appPers.Save());
 		}
 	}
 }

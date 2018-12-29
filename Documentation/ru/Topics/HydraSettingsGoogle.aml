@@ -17,6 +17,9 @@
 		<listItem>
           <legacyBold>Выходные</legacyBold> - игнорировать выходные и праздничные дни (не загружать данные).
 		</listItem>
+		<listItem>
+<legacyBold>Интервал времени</legacyBold> - Интервал в днях, за который скачиваются данные.
+</listItem>
 		 </list>
 		<para><legacyBold>Основные</legacyBold></para>
 		<list class="bullet">
@@ -36,7 +39,7 @@
           <legacyBold>Формат</legacyBold> - формат данных: BIN/CSV.
 		</listItem>
 		<listItem>
-          <legacyBold>Макс. ошибок</legacyBold> - максимальное количество ошибок по достижению которого задача будет остановлена. По умолчанию 0 - количество ошибок игнорируются.
+          <legacyBold>Макс. ошибок</legacyBold> - максимальное количество ошибок, по достижению которого задача будет остановлена. По умолчанию 0 - количество ошибок игнорируется.
 		</listItem>
 		<listItem>
           <legacyBold>Зависимость</legacyBold> - задача, которая должна быть выполнена перед запуском текущей.
@@ -45,6 +48,12 @@
           <legacyBold>Уровень логирования</legacyBold> - уровень логирования.
 		</listItem>
       </list>
+
+<para>Перед запуском получения данных необходимо скачать и выбрать необходимые 
+инструменты, как это сделать описано в пункте 
+<link xlink:href="47ebc084-6b07-4b69-8f96-ea190110111f" />
+.
+</para>
     </introduction>
   </developerConceptualDocument>
 </topic>

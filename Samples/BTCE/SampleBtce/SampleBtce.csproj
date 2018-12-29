@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SampleBtce</RootNamespace>
     <AssemblyName>SampleBtce</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
@@ -97,20 +97,20 @@
     <Reference Include="Ecng.Xaml">
       <HintPath>..\..\..\References\Ecng.Xaml.dll</HintPath>
     </Reference>
-    <Reference Include="Xceed.Wpf.Toolkit">
-      <HintPath>..\..\..\References\Xceed.Wpf.Toolkit.dll</HintPath>
+    <Reference Include="DevExpress.Data.v18.1">
+      <HintPath>..\..\..\References\DevExpress.Data.v18.1.dll</HintPath>
     </Reference>
-    <Reference Include="DevExpress.Data.v15.2">
-      <HintPath>..\..\..\References\DevExpress.Data.v15.2.dll</HintPath>
+    <Reference Include="DevExpress.Xpf.Core.v18.1">
+      <HintPath>..\..\..\References\DevExpress.Xpf.Core.v18.1.dll</HintPath>
     </Reference>
-    <Reference Include="DevExpress.Xpf.Core.v15.2">
-      <HintPath>..\..\..\References\DevExpress.Xpf.Core.v15.2.dll</HintPath>
+    <Reference Include="DevExpress.Xpf.Grid.v18.1">
+      <HintPath>..\..\..\References\DevExpress.Xpf.Grid.v18.1.dll</HintPath>
     </Reference>
-    <Reference Include="DevExpress.Xpf.Grid.v15.2">
-      <HintPath>..\..\..\References\DevExpress.Xpf.Grid.v15.2.dll</HintPath>
+    <Reference Include="DevExpress.Xpf.Grid.v18.1.Core">
+      <HintPath>..\..\..\References\DevExpress.Xpf.Grid.v18.1.Core.dll</HintPath>
     </Reference>
-    <Reference Include="DevExpress.Xpf.Grid.v15.2.Core">
-      <HintPath>..\..\..\References\DevExpress.Xpf.Grid.v15.2.Core.dll</HintPath>
+    <Reference Include="DevExpress.Xpf.Themes.Office2016White.v18.1">
+      <HintPath>..\..\..\References\DevExpress.Xpf.Themes.Office2016White.v18.1.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -240,7 +240,7 @@
       <Project>{DCE69DB8-53CA-4B7F-9368-02F175A31074}</Project>
       <Name>BusinessEntities</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\StockSharpApps\Connectors\Btce\Btce.csproj">
+    <ProjectReference Include="..\..\..\..\StockSharp %28GitLab%29\Connectors\Btce\Btce.csproj">
       <Project>{af225452-1cf1-48a2-b381-c02bebe643d7}</Project>
       <Name>Btce</Name>
     </ProjectReference>

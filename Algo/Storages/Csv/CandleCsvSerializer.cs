@@ -25,11 +25,13 @@ namespace StockSharp.Algo.Storages.Csv
 	using Ecng.Collections;
 	using Ecng.Common;
 
+	using StockSharp.Localization;
 	using StockSharp.Messages;
 
 	/// <summary>
 	/// The candle serializer in the CSV format.
 	/// </summary>
+	/// <typeparam name="TCandleMessage"><see cref="CandleMessage"/> derived type.</typeparam>
 	public class CandleCsvSerializer<TCandleMessage> : CsvMarketDataSerializer<TCandleMessage>
 		where TCandleMessage : CandleMessage, new()
 	{
@@ -48,11 +50,8 @@ namespace StockSharp.Algo.Storages.Csv
 			public CandleCsvMetaInfo(CandleCsvSerializer<TCandleMessage> serializer, DateTime date, Encoding encoding)
 				: base(date)
 			{
-				if (encoding == null)
-					throw new ArgumentNullException(nameof(encoding));
-
 				_serializer = serializer;
-				_encoding = encoding;
+				_encoding = encoding ?? throw new ArgumentNullException(nameof(encoding));
 			}
 
 			public override object LastId { get; set; }
@@ -127,10 +126,7 @@ namespace StockSharp.Algo.Storages.Csv
 		public CandleCsvSerializer(SecurityId securityId, object arg, Encoding encoding = null)
 			: base(securityId, encoding)
 		{
-			if (arg == null)
-				throw new ArgumentNullException(nameof(arg));
-
-			Arg = arg;
+			Arg = arg ?? throw new ArgumentNullException(nameof(arg));
 		}
 
 		/// <summary>
@@ -186,6 +182,9 @@ namespace StockSharp.Algo.Storages.Csv
 		/// <param name="metaInfo">Meta-information on data for one day.</param>
 		protected override void Write(CsvFileWriter writer, TCandleMessage data, IMarketDataMetaInfo metaInfo)
 		{
+			if (data.State == CandleStates.Active)
+				throw new ArgumentException(LocalizedStrings.CandleActiveNotSupport.Put(data), nameof(data));
+
 			writer.WriteRow(new[]
 			{
 				data.OpenTime.WriteTimeMls(),

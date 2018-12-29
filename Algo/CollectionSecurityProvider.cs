@@ -34,22 +34,29 @@ namespace StockSharp.Algo
 
 			AddedRange += s => _added?.Invoke(s);
 			RemovedRange += s => _removed?.Invoke(s);
+
+			if (securities is INotifyList<Security> notifyList)
+			{
+				notifyList.Added += Add;
+				notifyList.Removed += s => Remove(s);
+				notifyList.Cleared += Clear;
+			}
 		}
 
 		private Action<IEnumerable<Security>> _added;
 
 		event Action<IEnumerable<Security>> ISecurityProvider.Added
 		{
-			add { _added += value; }
-			remove { _added -= value; }
+			add => _added += value;
+			remove => _added -= value;
 		}
 
 		private Action<IEnumerable<Security>> _removed;
 
 		event Action<IEnumerable<Security>> ISecurityProvider.Removed
 		{
-			add { _removed += value; }
-			remove { _removed -= value; }
+			add => _removed += value;
+			remove => _removed -= value;
 		}
 
 		void IDisposable.Dispose()

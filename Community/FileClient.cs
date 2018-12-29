@@ -37,7 +37,7 @@ namespace StockSharp.Community
 		/// Initializes a new instance of the <see cref="FileClient"/>.
 		/// </summary>
 		public FileClient()
-			: this("http://stocksharp.com/services/fileservice.svc".To<Uri>())
+			: this("https://stocksharp.com/services/fileservice.svc".To<Uri>())
 		{
 		}
 
@@ -54,11 +54,13 @@ namespace StockSharp.Community
 		/// To get the file data.
 		/// </summary>
 		/// <param name="id">File ID.</param>
+		/// <param name="progress">Progress callback.</param>
+		/// <param name="cancel">Cancel callback.</param>
 		/// <returns>The file data.</returns>
-		public FileData GetFile(long id)
+		public FileData GetFile(long id, Action<int> progress = null, Func<bool> cancel = null)
 		{
 			var data = GetFileInfo(id);
-			Download(data);
+			Download(data, progress, cancel);
 			return data;
 		}
 
@@ -69,20 +71,23 @@ namespace StockSharp.Community
 		/// <returns>The file data.</returns>
 		public FileData GetFileInfo(long id)
 		{
-			return _cache.SafeAdd(id, key => Invoke(f => f.GetFileInfo(TryGetSession ?? Guid.Empty, id)));
+			return _cache.SafeAdd(id, key => Invoke(f => f.GetFileInfo(NullableSessionId ?? Guid.Empty, id)));
 		}
 
 		/// <summary>
 		/// Download file.
 		/// </summary>
 		/// <param name="data">The file data.</param>
-		public void Download(FileData data)
+		/// <param name="progress">Progress callback.</param>
+		/// <param name="cancel">Cancel callback.</param>
+		/// <returns>If the operation was cancelled by <paramref name="cancel"/>, <see langword="false"/> will return.</returns>
+		public bool Download(FileData data, Action<int> progress = null, Func<bool> cancel = null)
 		{
 			if (data == null)
 				throw new ArgumentNullException(nameof(data));
 
 			if (data.Body != null)
-				return;
+				return true;
 
 			var operationId = Invoke(f => f.BeginDownload(AuthenticationClient.Instance.SessionId, data.Id));
 
@@ -90,10 +95,19 @@ namespace StockSharp.Community
 
 			while (body.Count < data.BodyLength)
 			{
+				if (cancel?.Invoke() == true)
+				{
+					Invoke(f => f.FinishDownload(operationId, true));
+					return false;
+				}
+
 				body.AddRange(Invoke(f => f.ProcessDownload(operationId, body.Count, _partSize)));
+				progress?.Invoke(body.Count);
 			}
 
+			Invoke(f => f.FinishDownload(operationId, false));
 			data.Body = body.ToArray();
+			return true;
 		}
 
 		/// <summary>
@@ -101,7 +115,8 @@ namespace StockSharp.Community
 		/// </summary>
 		/// <param name="data">File data.</param>
 		/// <param name="progress">Progress callback.</param>
-		public void Update(FileData data, Action<int> progress = null)
+		/// <param name="cancel">Cancel callback.</param>
+		public void Update(FileData data, Action<int> progress = null, Func<bool> cancel = null)
 		{
 			if (data == null)
 				throw new ArgumentNullException(nameof(data));
@@ -113,15 +128,21 @@ namespace StockSharp.Community
 				throw new ArgumentOutOfRangeException(nameof(data));
 
 			var operationId = Invoke(f => f.BeginUploadExisting(AuthenticationClient.Instance.SessionId, data.Id));
-			Upload(operationId, data.Body, progress);
+			Upload(operationId, data.Body, progress, cancel);
 		}
 
-		private long Upload(Guid operationId, byte[] body, Action<int> progress)
+		private long? Upload(Guid operationId, byte[] body, Action<int> progress, Func<bool> cancel)
 		{
 			var sentCount = 0;
 
 			foreach (var part in body.Batch(_partSize))
 			{
+				if (cancel?.Invoke() == true)
+				{
+					Invoke(f => f.FinishUpload(operationId, true));
+					return null;
+				}
+
 				var arr = part.ToArray();
 
 				ValidateError(Invoke(f => f.ProcessUpload(operationId, arr)));
@@ -145,8 +166,9 @@ namespace StockSharp.Community
 		/// <param name="body">File body.</param>
 		/// <param name="isPublic">Is the file available for public.</param>
 		/// <param name="progress">Progress callback.</param>
-		/// <returns>File data.</returns>
-		public FileData Upload(string fileName, byte[] body, bool isPublic, Action<int> progress = null)
+		/// <param name="cancel">Cancel callback.</param>
+		/// <returns>File data. If the operation was cancelled by <paramref name="cancel"/>, <see langword="null"/> will return.</returns>
+		public FileData Upload(string fileName, byte[] body, bool isPublic, Action<int> progress = null, Func<bool> cancel = null)
 		{
 			if (fileName.IsEmpty())
 				throw new ArgumentNullException(nameof(fileName));
@@ -159,11 +181,14 @@ namespace StockSharp.Community
 
 			var operationId = Invoke(f => f.BeginUpload(AuthenticationClient.Instance.SessionId, fileName, isPublic));
 
-			var id = Upload(operationId, body, progress);
+			var id = Upload(operationId, body, progress, cancel);
+
+			if (id == null)
+				return null;
 
 			var data = new FileData
 			{
-				Id = id,
+				Id = id.Value,
 				FileName = fileName,
 				Body = body,
 				BodyLength = body.Length,
@@ -171,9 +196,18 @@ namespace StockSharp.Community
 				CreationDate = DateTime.UtcNow
 			};
 
-			_cache.Add(id, data);
+			_cache.Add(id.Value, data);
 
 			return data;
+		}
+
+		/// <summary>
+		/// To get a upload size limit.
+		/// </summary>
+		/// <returns>Upload size limit.</returns>
+		public long GetUploadLimit()
+		{
+			return Invoke(f => f.GetUploadLimit(AuthenticationClient.Instance.SessionId));
 		}
 
 		private static void ValidateError(byte errorCode)

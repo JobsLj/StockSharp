@@ -24,7 +24,6 @@ namespace StockSharp.Algo.Strategies.Reporting
 	using Ecng.Collections;
 
 	using StockSharp.Algo.Strategies;
-
 	using StockSharp.Localization;
 
 	/// <summary>
@@ -42,8 +41,6 @@ namespace StockSharp.Algo.Strategies.Reporting
 		public CsvStrategyReport(Strategy strategy, string fileName)
 			: this(new[] { strategy }, fileName)
 		{
-			if (strategy == null)
-				throw new ArgumentNullException(nameof(strategy));
 		}
 
 		/// <summary>
@@ -70,15 +67,15 @@ namespace StockSharp.Algo.Strategies.Reporting
 						strategy.Name, strategy.Security != null ? strategy.Security.Id : string.Empty, strategy.Portfolio != null ? strategy.Portfolio.Name : string.Empty,
 						strategy.TotalWorkingTime, strategy.Position, strategy.PnL, strategy.Commission, strategy.Slippage, strategy.Latency);
 
-					var parameters = strategy.Parameters.SyncGet(c => c.ToArray());
+					var parameters = strategy.Parameters.CachedValues;
 					WriteValues(writer, LocalizedStrings.Str1322);
 					WriteValues(writer, parameters.Select(p => (object)p.Name).ToArray());
-					WriteValues(writer, parameters.Select(p => p.Value is TimeSpan ? Format((TimeSpan)p.Value) : p.Value).ToArray());
+					WriteValues(writer, parameters.Select(p => p.Value is TimeSpan ts ? Format(ts) : p.Value).ToArray());
 
 					var statParameters = strategy.StatisticManager.Parameters.SyncGet(c => c.ToArray());
 					WriteValues(writer, LocalizedStrings.Str436);
 					WriteValues(writer, statParameters.Select(p => (object)p.Name).ToArray());
-					WriteValues(writer, statParameters.Select(p => p.Value is TimeSpan ? Format((TimeSpan)p.Value) : p.Value).ToArray());
+					WriteValues(writer, statParameters.Select(p => p.Value is TimeSpan ts ? Format(ts) : p.Value).ToArray());
 
 					WriteValues(writer, LocalizedStrings.Orders);
 					WriteValues(writer, LocalizedStrings.Str1190, LocalizedStrings.Transaction, LocalizedStrings.Str128, LocalizedStrings.Time, LocalizedStrings.Price,

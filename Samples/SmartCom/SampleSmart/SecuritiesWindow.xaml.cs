@@ -16,17 +16,21 @@ Copyright 2010 by StockSharp, LLC
 namespace SampleSmart
 {
 	using System;
-	using System.Collections.Generic;
 	using System.Linq;
 	using System.Windows;
+	using System.Windows.Controls;
 
 	using Ecng.Collections;
 	using Ecng.Xaml;
 
+	using MoreLinq;
+
+	using StockSharp.Algo.Candles;
 	using StockSharp.BusinessEntities;
 	using StockSharp.Messages;
 	using StockSharp.Xaml;
 	using StockSharp.Localization;
+	using StockSharp.SmartCom;
 
 	public partial class SecuritiesWindow
 	{
@@ -36,15 +40,24 @@ namespace SampleSmart
 		public SecuritiesWindow()
 		{
 			InitializeComponent();
+
+			CandlesPeriods.ItemsSource = SmartComTimeFrames.AllTimeFrames;
+			CandlesPeriods.SelectedIndex = 1;
 		}
 
 		protected override void OnClosed(EventArgs e)
 		{
+			_quotesWindows.SyncDo(d => d.Values.ForEach(w =>
+			{
+				w.DeleteHideable();
+				w.Close();
+			}));
+
 			var trader = MainWindow.Instance.Trader;
 			if (trader != null)
 			{
 				if (_initialized)
-					trader.MarketDepthsChanged -= TraderOnMarketDepthsChanged;
+					trader.MarketDepthChanged -= TraderOnMarketDepthChanged;
 			}
 
 			base.OnClosed(e);
@@ -52,8 +65,8 @@ namespace SampleSmart
 
 		private void SecurityPicker_OnSecuritySelected(Security security)
 		{
-			Depth.IsEnabled = NewStopOrder.IsEnabled = NewOrder.IsEnabled =
-			Quotes.IsEnabled = security != null;
+			Depth.IsEnabled = NewStopOrder.IsEnabled = NewOrder.IsEnabled = Quotes.IsEnabled = security != null;
+			TryEnableCandles();
 		}
 
 		private void NewOrderClick(object sender, RoutedEventArgs e)
@@ -93,56 +106,82 @@ namespace SampleSmart
 		{
 			var trader = MainWindow.Instance.Trader;
 
-			var window = _quotesWindows.SafeAdd(SecurityPicker.SelectedSecurity, security =>
+			foreach (var security in SecurityPicker.SelectedSecurities)
 			{
-				// начинаем получать котировки стакана
-				trader.RegisterMarketDepth(security);
+				var window = _quotesWindows.SafeAdd(security, s =>
+				{
+					// начинаем получать котировки стакана
+					trader.RegisterMarketDepth(security);
 
-				// создаем окно со стаканом
-				var wnd = new QuotesWindow { Title = security.Id + " " + LocalizedStrings.MarketDepth };
-				wnd.MakeHideable();
-				return wnd;
-			});
+					// создаем окно со стаканом
+					var wnd = new QuotesWindow
+					{
+						Title = security.Id + " " + LocalizedStrings.MarketDepth
+					};
+					wnd.MakeHideable();
+					return wnd;
+				});
 
-			if (window.Visibility == Visibility.Visible)
-				window.Hide();
-			else
-				window.Show();
+				if (window.Visibility == Visibility.Visible)
+					window.Hide();
+				else
+				{
+					window.Show();
+					window.DepthCtrl.UpdateDepth(trader.GetMarketDepth(security));
+				}
 
-			if (!_initialized)
-			{
-				TraderOnMarketDepthsChanged(new[] { trader.GetMarketDepth(SecurityPicker.SelectedSecurity) });
-				trader.MarketDepthsChanged += TraderOnMarketDepthsChanged;
-				_initialized = true;
+				if (!_initialized)
+				{
+					trader.MarketDepthChanged += TraderOnMarketDepthChanged;
+					_initialized = true;
+				}
 			}
 		}
 
-		private void TraderOnMarketDepthsChanged(IEnumerable<MarketDepth> depths)
+		private void TraderOnMarketDepthChanged(MarketDepth depth)
 		{
-			foreach (var depth in depths)
-			{
-				var wnd = _quotesWindows.TryGetValue(depth.Security);
+			var wnd = _quotesWindows.TryGetValue(depth.Security);
 
-				if (wnd != null)
-					wnd.DepthCtrl.UpdateDepth(depth);
-			}
+			if (wnd != null)
+				wnd.DepthCtrl.UpdateDepth(depth);
 		}
 
 		private void QuotesClick(object sender, RoutedEventArgs e)
 		{
-			var security = SecurityPicker.SelectedSecurity;
 			var trader = MainWindow.Instance.Trader;
 
-			if (trader.RegisteredSecurities.Contains(security))
+			foreach (var security in SecurityPicker.SelectedSecurities)
 			{
-				trader.UnRegisterSecurity(security);
-				trader.UnRegisterTrades(security);
+				if (trader.RegisteredSecurities.Contains(security))
+				{
+					trader.UnRegisterSecurity(security);
+					trader.UnRegisterTrades(security);
+				}
+				else
+				{
+					trader.RegisterSecurity(security);
+					trader.RegisterTrades(security);
+				}
 			}
-			else
+		}
+
+		private void CandlesClick(object sender, RoutedEventArgs e)
+		{
+			foreach (var security in SecurityPicker.SelectedSecurities)
 			{
-				trader.RegisterSecurity(security);
-				trader.RegisterTrades(security);
+				var series = new CandleSeries(typeof(TimeFrameCandle), security, (TimeSpan)CandlesPeriods.SelectedItem);
+				new ChartWindow(series).Show();
 			}
+		}
+
+		private void CandlesPeriods_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			TryEnableCandles();
+		}
+
+		private void TryEnableCandles()
+		{
+			Candles.IsEnabled = CandlesPeriods.SelectedItem != null && SecurityPicker.SelectedSecurity != null;
 		}
 	}
 }

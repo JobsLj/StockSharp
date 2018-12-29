@@ -16,7 +16,6 @@ Copyright 2010 by StockSharp, LLC
 namespace SampleFix
 {
 	using System;
-	using System.Collections.Generic;
 	using System.ComponentModel;
 	using System.IO;
 	using System.Security;
@@ -31,6 +30,7 @@ namespace SampleFix
 	using StockSharp.Fix;
 	using StockSharp.Logging;
 	using StockSharp.Localization;
+	using StockSharp.Xaml;
 
 	public partial class MainWindow
 	{
@@ -44,6 +44,7 @@ namespace SampleFix
 		private readonly OrdersWindow _ordersWindow = new OrdersWindow();
 		private readonly PortfoliosWindow _portfoliosWindow = new PortfoliosWindow();
 		private readonly StopOrdersWindow _stopOrdersWindow = new StopOrdersWindow();
+		private readonly OrdersLogWindow _ordersLogWindow = new OrdersLogWindow();
 		private readonly NewsWindow _newsWindow = new NewsWindow();
 
 		private readonly LogManager _logManager = new LogManager();
@@ -62,11 +63,16 @@ namespace SampleFix
 			_securitiesWindow.MakeHideable();
 			_stopOrdersWindow.MakeHideable();
 			_portfoliosWindow.MakeHideable();
+			_ordersLogWindow.MakeHideable();
 			_newsWindow.MakeHideable();
 
 			if (File.Exists(_settingsFile))
 			{
-				Trader.Load(new XmlSerializer<SettingsStorage>().Deserialize(_settingsFile));
+				var ctx = new ContinueOnExceptionContext();
+				ctx.Error += ex => ex.LogError();
+
+				using (new Scope<ContinueOnExceptionContext>(ctx))
+					Trader.Load(new XmlSerializer<SettingsStorage>().Deserialize(_settingsFile));
 			}
 
 			MarketDataSessionSettings.SelectedObject = Trader.MarketDataAdapter;
@@ -77,10 +83,9 @@ namespace SampleFix
 
 			Instance = this;
 
-			Trader.LogLevel = LogLevels.Debug;
-
 			_logManager.Sources.Add(Trader);
 			_logManager.Listeners.Add(new FileLogListener { LogDirectory = "StockSharp_Fix" });
+			_logManager.Listeners.Add(new GuiLogListener(LogControl));
 		}
 
 		protected override void OnClosing(CancelEventArgs e)
@@ -91,6 +96,7 @@ namespace SampleFix
 			_securitiesWindow.DeleteHideable();
 			_stopOrdersWindow.DeleteHideable();
 			_portfoliosWindow.DeleteHideable();
+			_ordersLogWindow.DeleteHideable();
 			_newsWindow.DeleteHideable();
 			
 			_securitiesWindow.Close();
@@ -99,6 +105,7 @@ namespace SampleFix
 			_stopOrdersWindow.Close();
 			_ordersWindow.Close();
 			_portfoliosWindow.Close();
+			_ordersLogWindow.Close();
 			_newsWindow.Close();
 
 			if (Trader != null)
@@ -117,7 +124,7 @@ namespace SampleFix
 
 				Trader.Restored += () => this.GuiAsync(() =>
 				{
-					// update gui labes
+					// update gui labels
 					ChangeConnectStatus(true);
 					MessageBox.Show(this, LocalizedStrings.Str2958);
 				});
@@ -132,7 +139,7 @@ namespace SampleFix
 				// subscribe on connection error event
 				Trader.ConnectionError += error => this.GuiAsync(() =>
 				{
-					// update gui labes
+					// update gui labels
 					ChangeConnectStatus(false);
 
 					MessageBox.Show(this, error.ToString(), LocalizedStrings.Str2959);
@@ -146,30 +153,26 @@ namespace SampleFix
 				Trader.MarketDataSubscriptionFailed += (security, msg, error) =>
 					this.GuiAsync(() => MessageBox.Show(this, error.ToString(), LocalizedStrings.Str2956Params.Put(msg.DataType, security)));
 
-				Trader.NewSecurities += securities => _securitiesWindow.SecurityPicker.Securities.AddRange(securities);
-				Trader.NewMyTrades += trades => _myTradesWindow.TradeGrid.Trades.AddRange(trades);
-				Trader.NewTrades += trades => _tradesWindow.TradeGrid.Trades.AddRange(trades);
-				Trader.NewOrders += orders => _ordersWindow.OrderGrid.Orders.AddRange(orders);
-				Trader.NewStopOrders += orders => _stopOrdersWindow.OrderGrid.Orders.AddRange(orders);
+				Trader.NewSecurity += _securitiesWindow.SecurityPicker.Securities.Add;
+				Trader.NewMyTrade += _myTradesWindow.TradeGrid.Trades.Add;
+				Trader.NewTrade += _tradesWindow.TradeGrid.Trades.Add;
+				Trader.NewOrder += _ordersWindow.OrderGrid.Orders.Add;
+				Trader.NewStopOrder += _stopOrdersWindow.OrderGrid.Orders.Add;
 
-				Trader.NewPortfolios += portfolios =>
-				{
-					// subscribe on portfolio updates
-					//portfolios.ForEach(Trader.RegisterPortfolio);
+				Trader.NewOrderLogItem += _ordersLogWindow.OrderLogGrid.LogItems.Add;
 
-					_portfoliosWindow.PortfolioGrid.Portfolios.AddRange(portfolios);
-				};
-				Trader.NewPositions += positions => _portfoliosWindow.PortfolioGrid.Positions.AddRange(positions);
+				Trader.NewPortfolio += _portfoliosWindow.PortfolioGrid.Portfolios.Add;
+				Trader.NewPosition += _portfoliosWindow.PortfolioGrid.Positions.Add;
 
 				// subscribe on error of order registration event
-				Trader.OrdersRegisterFailed += OrdersFailed;
+				Trader.OrderRegisterFailed += _ordersWindow.OrderGrid.AddRegistrationFail;
 				// subscribe on error of order cancelling event
-				Trader.OrdersCancelFailed += OrdersFailed;
+				Trader.OrderCancelFailed += OrderFailed;
 
 				// subscribe on error of stop-order registration event
-				Trader.StopOrdersRegisterFailed += OrdersFailed;
+				Trader.StopOrderRegisterFailed += _stopOrdersWindow.OrderGrid.AddRegistrationFail;
 				// subscribe on error of stop-order cancelling event
-				Trader.StopOrdersCancelFailed += OrdersFailed;
+				Trader.StopOrderCancelFailed += OrderFailed;
 
 				Trader.MassOrderCancelFailed += (transId, error) =>
 					this.GuiAsync(() => MessageBox.Show(this, error.ToString(), LocalizedStrings.Str716));
@@ -183,7 +186,7 @@ namespace SampleFix
 				_newsWindow.NewsPanel.NewsProvider = Trader;
 
 				ShowSecurities.IsEnabled = ShowTrades.IsEnabled = ShowNews.IsEnabled =
-				ShowMyTrades.IsEnabled = ShowOrders.IsEnabled =
+				ShowMyTrades.IsEnabled = ShowOrders.IsEnabled = ShowOrdersLog.IsEnabled =
 				ShowPortfolios.IsEnabled = ShowStopOrders.IsEnabled = true;
 			}
 
@@ -202,12 +205,32 @@ namespace SampleFix
 			}
 		}
 
-		private void OrdersFailed(IEnumerable<OrderFail> fails)
+		private void SwitchMarketData_OnClick(object sender, RoutedEventArgs e)
+		{
+			var mdAdapter = Trader.MarketDataAdapter;
+			var rootAdapter = Trader.Adapter;
+			var innerAdapters = rootAdapter.InnerAdapters;
+
+			innerAdapters.Remove(mdAdapter);
+
+			if (mdAdapter is FastMessageAdapter)
+			{
+				innerAdapters.Add(mdAdapter = new FixMessageAdapter(rootAdapter.TransactionIdGenerator));
+			}
+			else
+			{
+				innerAdapters.Add(mdAdapter = new FastMessageAdapter(rootAdapter.TransactionIdGenerator));
+			}
+
+			MarketDataSessionSettings.SelectedObject = mdAdapter;
+			MarketDataSupportedMessages.Adapter = mdAdapter;
+		}
+
+		private void OrderFailed(OrderFail fail)
 		{
 			this.GuiAsync(() =>
 			{
-				foreach (var fail in fails)
-					MessageBox.Show(this, fail.Error.ToString(), LocalizedStrings.Str153);
+				MessageBox.Show(this, fail.Error.ToString(), LocalizedStrings.Str153);
 			});
 		}
 
@@ -249,6 +272,11 @@ namespace SampleFix
 		private void ShowNewsClick(object sender, RoutedEventArgs e)
 		{
 			ShowOrHide(_newsWindow);
+		}
+
+		private void ShowOrdersLogClick(object sender, RoutedEventArgs e)
+		{
+			ShowOrHide(_ordersLogWindow);
 		}
 
 		private static void ShowOrHide(Window window)

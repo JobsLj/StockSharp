@@ -1,5 +1,6 @@
 namespace StockSharp.Messages
 {
+	using System;
 	using System.Runtime.Serialization;
 
 	/// <summary>
@@ -14,11 +15,40 @@ namespace StockSharp.Messages
 		public long OriginalTransactionId { get; set; }
 
 		/// <summary>
+		/// Contains history market data.
+		/// </summary>
+		[DataMember]
+		[Obsolete]
+		public bool IsHistory { get; set; }
+
+		/// <summary>
 		/// Initialize <see cref="Message"/>.
 		/// </summary>
 		public MarketDataFinishedMessage()
 			: base(MessageTypes.MarketDataFinished)
 		{
+		}
+
+		/// <summary>
+		/// Create a copy of <see cref="MarketDataFinishedMessage"/>.
+		/// </summary>
+		/// <returns>Copy.</returns>
+		public override Message Clone()
+		{
+			var msg = new MarketDataFinishedMessage
+			{
+				LocalTime = LocalTime,
+				OriginalTransactionId = OriginalTransactionId,
+				//IsHistory = IsHistory,
+			};
+
+			return msg;
+		}
+
+		/// <inheritdoc />
+		public override string ToString()
+		{
+			return base.ToString() + $",OrigTransId={OriginalTransactionId}";
 		}
 	}
 }

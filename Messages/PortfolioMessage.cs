@@ -16,6 +16,7 @@ Copyright 2010 by StockSharp, LLC
 namespace StockSharp.Messages
 {
 	using System;
+	using System.ComponentModel.DataAnnotations;
 	using System.Runtime.Serialization;
 
 	using StockSharp.Localization;
@@ -31,14 +32,14 @@ namespace StockSharp.Messages
 		/// Active.
 		/// </summary>
 		[EnumMember]
-		[EnumDisplayNameLoc(LocalizedStrings.Str248Key)]
+		[Display(ResourceType = typeof(LocalizedStrings), Name = LocalizedStrings.Str248Key)]
 		Active,
 		
 		/// <summary>
 		/// Blocked.
 		/// </summary>
 		[EnumMember]
-		[EnumDisplayNameLoc(LocalizedStrings.Str249Key)]
+		[Display(ResourceType = typeof(LocalizedStrings), Name = LocalizedStrings.Str249Key)]
 		Blocked,
 	}
 
@@ -72,21 +73,30 @@ namespace StockSharp.Messages
 		/// </summary>
 		[DataMember]
 		[DisplayNameLoc(LocalizedStrings.BoardKey)]
-		[DescriptionLoc(LocalizedStrings.BoardCodeKey)]
+		[DescriptionLoc(LocalizedStrings.BoardCodeKey, true)]
 		[MainCategory]
 		public string BoardCode { get; set; }
 
 		/// <summary>
-		/// Portfolio state.
+		/// Client code assigned by the broker.
 		/// </summary>
 		[DataMember]
-		[DisplayNameLoc(LocalizedStrings.StateKey)]
-		[DescriptionLoc(LocalizedStrings.Str252Key)]
 		[MainCategory]
-		public PortfolioStates? State { get; set; }
+		[DisplayNameLoc(LocalizedStrings.ClientCodeKey)]
+		[DescriptionLoc(LocalizedStrings.ClientCodeDescKey)]
+		public string ClientCode { get; set; }
+
+		///// <summary>
+		///// Portfolio state.
+		///// </summary>
+		//[DataMember]
+		//[DisplayNameLoc(LocalizedStrings.StateKey)]
+		//[DescriptionLoc(LocalizedStrings.Str252Key)]
+		//[MainCategory]
+		//public PortfolioStates? State { get; set; }
 
 		/// <summary>
-		/// ID of the original message <see cref="PortfolioMessage.TransactionId"/> for which this message is a response.
+		/// ID of the original message <see cref="TransactionId"/> for which this message is a response.
 		/// </summary>
 		[DataMember]
 		public long OriginalTransactionId { get; set; }
@@ -123,10 +133,7 @@ namespace StockSharp.Messages
 		{
 		}
 
-		/// <summary>
-		/// Returns a string that represents the current object.
-		/// </summary>
-		/// <returns>A string that represents the current object.</returns>
+		/// <inheritdoc />
 		public override string ToString()
 		{
 			return base.ToString() + $",Name={PortfolioName}";
@@ -144,7 +151,8 @@ namespace StockSharp.Messages
 		/// <summary>
 		/// Copy the message into the <paramref name="destination" />.
 		/// </summary>
-		/// <param name="destination">The object, which copied information.</param>
+		/// <param name="destination">The object, to which copied information.</param>
+		/// <returns>The object, to which copied information.</returns>
 		protected PortfolioMessage CopyTo(PortfolioMessage destination)
 		{
 			destination.PortfolioName = PortfolioName;
@@ -152,8 +160,9 @@ namespace StockSharp.Messages
 			destination.BoardCode = BoardCode;
 			destination.OriginalTransactionId = OriginalTransactionId;
 			destination.IsSubscribe = IsSubscribe;
-			destination.State = State;
+			//destination.State = State;
 			destination.TransactionId = TransactionId;
+			destination.ClientCode = ClientCode;
 
 			this.CopyExtensionInfo(destination);
 

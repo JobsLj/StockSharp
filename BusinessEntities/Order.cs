@@ -57,7 +57,7 @@ namespace StockSharp.BusinessEntities
 		[Nullable]
 		public TimeSpan? LatencyRegistration
 		{
-			get { return _latencyRegistration; }
+			get => _latencyRegistration;
 			set
 			{
 				if (_latencyRegistration == value)
@@ -80,7 +80,7 @@ namespace StockSharp.BusinessEntities
 		[Nullable]
 		public TimeSpan? LatencyCancellation
 		{
-			get { return _latencyCancellation; }
+			get => _latencyCancellation;
 			set
 			{
 				if (_latencyCancellation == value)
@@ -102,7 +102,7 @@ namespace StockSharp.BusinessEntities
 		[MainCategory]
 		public long? Id
 		{
-			get { return _id; }
+			get => _id;
 			set
 			{
 				if (_id == value)
@@ -124,7 +124,7 @@ namespace StockSharp.BusinessEntities
 		[MainCategory]
 		public string StringId
 		{
-			get { return _stringId; }
+			get => _stringId;
 			set
 			{
 				_stringId = value;
@@ -143,7 +143,7 @@ namespace StockSharp.BusinessEntities
 		[MainCategory]
 		public string BoardId
 		{
-			get { return _boardId; }
+			get => _boardId;
 			set
 			{
 				_boardId = value;
@@ -162,7 +162,7 @@ namespace StockSharp.BusinessEntities
 		[MainCategory]
 		public DateTimeOffset Time
 		{
-			get { return _time; }
+			get => _time;
 			set
 			{
 				if (_time == value)
@@ -170,9 +170,6 @@ namespace StockSharp.BusinessEntities
 
 				_time = value;
 				NotifyChanged(nameof(Time));
-
-				if (LastChangeTime.IsDefault())
-					LastChangeTime = value;
 			}
 		}
 
@@ -207,7 +204,7 @@ namespace StockSharp.BusinessEntities
 		[MainCategory]
 		public OrderStates State
 		{
-			get { return _state; }
+			get => _state;
 			set
 			{
 				if (_state == value)
@@ -253,7 +250,7 @@ namespace StockSharp.BusinessEntities
 		[MainCategory]
 		public DateTimeOffset LastChangeTime
 		{
-			get { return _lastChangeTime; }
+			get => _lastChangeTime;
 			set
 			{
 				if (_lastChangeTime == value)
@@ -275,7 +272,7 @@ namespace StockSharp.BusinessEntities
 		[MainCategory]
 		public DateTimeOffset LocalTime
 		{
-			get { return _localTime; }
+			get => _localTime;
 			set
 			{
 				if (_localTime == value)
@@ -295,24 +292,14 @@ namespace StockSharp.BusinessEntities
 		[MainCategory]
 		public decimal Price { get; set; }
 
-		private decimal _volume;
-
 		/// <summary>
-		/// Number of contracts in an order.
+		/// Number of contracts in the order.
 		/// </summary>
 		[DataMember]
 		[DisplayNameLoc(LocalizedStrings.VolumeKey)]
 		[DescriptionLoc(LocalizedStrings.OrderVolumeKey)]
 		[MainCategory]
-		public decimal Volume
-		{
-			get { return _volume; }
-			set
-			{
-				_volume = value;
-				VisibleVolume = value;
-			}
-		}
+		public decimal Volume { get; set; }
 
 		/// <summary>
 		/// Visible quantity of contracts in order.
@@ -336,7 +323,7 @@ namespace StockSharp.BusinessEntities
 		private decimal _balance;
 
 		/// <summary>
-		/// Order contracts remainder.
+		/// Order contracts balance.
 		/// </summary>
 		[DataMember]
 		[DisplayNameLoc(LocalizedStrings.Str130Key)]
@@ -344,7 +331,7 @@ namespace StockSharp.BusinessEntities
 		[MainCategory]
 		public decimal Balance
 		{
-			get { return _balance; }
+			get => _balance;
 			set
 			{
 				if (_balance == value)
@@ -365,7 +352,7 @@ namespace StockSharp.BusinessEntities
 		[Browsable(false)]
 		public long? Status
 		{
-			get { return _status; }
+			get => _status;
 			set
 			{
 				if (_status == value)
@@ -388,7 +375,7 @@ namespace StockSharp.BusinessEntities
 		[Nullable]
 		public bool? IsSystem
 		{
-			get { return _isSystem; }
+			get => _isSystem;
 			set
 			{
 				if (_isSystem == value)
@@ -424,7 +411,7 @@ namespace StockSharp.BusinessEntities
 		/// Order expiry time. The default is <see langword="null" />, which mean (GTC).
 		/// </summary>
 		/// <remarks>
-		/// If the value is <see cref="DateTimeOffset.MaxValue"/>, then the order is registered until cancel. Otherwise, the period is specified.
+		/// If the value is <see langword="null"/>, then the order is registered until cancel. Otherwise, the period is specified.
 		/// </remarks>
 		[DataMember]
 		[DisplayNameLoc(LocalizedStrings.Str141Key)]
@@ -432,7 +419,7 @@ namespace StockSharp.BusinessEntities
 		[MainCategory]
 		public DateTimeOffset? ExpiryDate
 		{
-			get { return _expiryDate; }
+			get => _expiryDate;
 			set
 			{
 				if (_expiryDate == value)
@@ -469,15 +456,17 @@ namespace StockSharp.BusinessEntities
 		/// <summary>
 		/// Exchange order that was created by the stop-order when the condition is activated (<see langword="null" /> if a stop condition has not been activated).
 		/// </summary>
-		[DataMember]
-		[InnerSchema]
+		//[DataMember]
+		//[InnerSchema]
 		[Ignore]
+		[XmlIgnore]
 		[DisplayNameLoc(LocalizedStrings.Str532Key)]
 		[DescriptionLoc(LocalizedStrings.Str533Key)]
 		[CategoryLoc(LocalizedStrings.Str156Key)]
+		[Obsolete("No longer used.")]
 		public Order DerivedOrder
 		{
-			get { return _derivedOrder; }
+			get => _derivedOrder;
 			set
 			{
 				if (_derivedOrder == value)
@@ -507,7 +496,7 @@ namespace StockSharp.BusinessEntities
 		public RpsOrderInfo RpsInfo { get; set; }
 
 		[field: NonSerialized]
-		private SynchronizedDictionary<object, object> _extensionInfo;
+		private SynchronizedDictionary<string, object> _extensionInfo;
 
 		/// <summary>
 		/// Extended information on order.
@@ -520,9 +509,9 @@ namespace StockSharp.BusinessEntities
 		[DisplayNameLoc(LocalizedStrings.ExtendedInfoKey)]
 		[DescriptionLoc(LocalizedStrings.Str427Key)]
 		[MainCategory]
-		public IDictionary<object, object> ExtensionInfo
+		public IDictionary<string, object> ExtensionInfo
 		{
-			get { return _extensionInfo; }
+			get => _extensionInfo;
 			set
 			{
 				_extensionInfo = value.Sync();
@@ -531,7 +520,7 @@ namespace StockSharp.BusinessEntities
 		}
 
 		/// <summary>
-		/// Comission (broker, exchange etc.).
+		/// Commission (broker, exchange etc.).
 		/// </summary>
 		[DataMember]
 		[Nullable]
@@ -539,6 +528,11 @@ namespace StockSharp.BusinessEntities
 		[DescriptionLoc(LocalizedStrings.Str160Key)]
 		[MainCategory]
 		public decimal? Commission { get; set; }
+
+		/// <summary>
+		/// Commission currency. Can be <see lnagword="null"/>.
+		/// </summary>
+		public string CommissionCurrency { get; set; }
 
 		//[field: NonSerialized]
 		//private IConnector _connector;
@@ -602,13 +596,37 @@ namespace StockSharp.BusinessEntities
 		public CurrencyTypes? Currency { get; set; }
 
 		/// <summary>
+		/// Is the order of market-maker.
+		/// </summary>
+		[DataMember]
+		[DisplayNameLoc(LocalizedStrings.MarketMakerKey)]
+		[DescriptionLoc(LocalizedStrings.MarketMakerOrderKey, true)]
+		public bool? IsMarketMaker { get; set; }
+
+		/// <summary>
+		/// Is margin enabled.
+		/// </summary>
+		[DataMember]
+		[DisplayNameLoc(LocalizedStrings.MarginKey)]
+		[DescriptionLoc(LocalizedStrings.IsMarginKey)]
+		public bool? IsMargin { get; set; }
+
+		/// <summary>
+		/// Slippage in trade price.
+		/// </summary>
+		[DataMember]
+		[DisplayNameLoc(LocalizedStrings.Str163Key)]
+		[DescriptionLoc(LocalizedStrings.Str164Key)]
+		public decimal? Slippage { get; set; }
+
+		/// <summary>
 		/// Returns a string that represents the current object.
 		/// </summary>
 		/// <returns>A string that represents the current object.</returns>
 		public override string ToString()
 		{
 			return LocalizedStrings.Str534Params
-				.Put(TransactionId, Id == null ? StringId : Id.To<string>(), Direction == Sides.Buy ? LocalizedStrings.Str403 : LocalizedStrings.Str404, Price, Volume, State, Balance);
+				.Put(TransactionId, Id == null ? StringId : Id.To<string>(), Security?.Id, Portfolio?.Name, Direction == Sides.Buy ? LocalizedStrings.Str403 : LocalizedStrings.Str404, Price, Volume, State, Balance, Type);
 		}
 	}
 }

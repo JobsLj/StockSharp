@@ -49,7 +49,7 @@ namespace StockSharp.Messages
 		[DataMember]
 		public IDictionary<string, object> Parameters
 		{
-			get { return _parameters; }
+			get => _parameters;
 			set
 			{
 				if (value == null)
@@ -67,8 +67,8 @@ namespace StockSharp.Messages
 		public override OrderCondition Clone()
 		{
 			var clone = GetType().CreateInstance<OrderCondition>();
-			clone.Parameters.Clear(); // удаляем параметры по умолчанию
-			clone.Parameters.AddRange(_parameters.SyncGet(d => d.ToArray()));
+			clone.Parameters.Clear(); // removing pre-defined values
+			clone.Parameters.AddRange(_parameters.SyncGet(d => d.Select(p => new KeyValuePair<string, object>(p.Key, p.Value is ICloneable cl ? cl.Clone() : (p.Value is IPersistable pers ? pers.Clone() : p.Value))).ToArray()));
 			return clone;
 		}
 	}

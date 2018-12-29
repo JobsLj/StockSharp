@@ -24,6 +24,8 @@ namespace StockSharp.Community
 	using Ecng.Collections;
 	using Ecng.Common;
 
+	using StockSharp.Logging;
+
 	/// <summary>
 	/// The client for access to <see cref="IStrategyService"/>.
 	/// </summary>
@@ -43,7 +45,7 @@ namespace StockSharp.Community
 		/// Initializes a new instance of the <see cref="StrategyClient"/>.
 		/// </summary>
 		public StrategyClient()
-			: this(new Uri("http://stocksharp.com/services/strategyservice.svc"))
+			: this(new Uri("https://stocksharp.com/services/strategyservice.svc"))
 		{
 		}
 
@@ -127,35 +129,67 @@ namespace StockSharp.Community
 		/// </summary>
 		public event Action<StrategyBacktest> BacktestStopped;
 
+		private readonly SyncObject _syncObject = new SyncObject();
+		private bool _isProcessing;
+
 		private void EnsureInit()
 		{
-			if (_refreshTimer != null)
-				return;
-
-			Refresh();
-
-			var subscriptions = Invoke(f => f.GetSubscriptions(SessionId, DateTime.MinValue));
-
-			foreach (var subscription in subscriptions)
+			lock (_syncObject)
 			{
-				_subscriptions.Add(subscription.Id, subscription);
+				if (_refreshTimer != null)
+					return;
+
+				var processSubscriptions = true;
+
+				_refreshTimer = ThreadingHelper.Timer(() =>
+				{
+					lock (_syncObject)
+					{
+						if (_isProcessing)
+							return;
+
+						_isProcessing = true;
+					}
+
+					try
+					{
+						Refresh();
+
+						if (processSubscriptions)
+						{
+							var subscriptions = Invoke(f => f.GetSubscriptions(SessionId, DateTime.MinValue));
+
+							foreach (var subscription in subscriptions)
+							{
+								_subscriptions.Add(subscription.Id, subscription);
+							}
+
+							var backtests = Invoke(f => f.GetBacktests(SessionId, DateTime.Today - TimeSpan.FromDays(5), DateTime.UtcNow));
+
+							foreach (var backtest in backtests)
+							{
+								_backtests.Add(backtest.Id, backtest);
+							}
+
+							processSubscriptions = false;
+						}
+					}
+					catch (Exception ex)
+					{
+						ex.LogError();
+					}
+					finally
+					{
+						lock (_syncObject)
+							_isProcessing = false;
+					}
+				}).Interval(TimeSpan.Zero, TimeSpan.FromMinutes(1));
 			}
-
-			var backtests = Invoke(f => f.GetBacktests(SessionId, DateTime.Today - TimeSpan.FromDays(5), DateTime.UtcNow));
-
-			foreach (var backtest in backtests)
-			{
-				_backtests.Add(backtest.Id, backtest);
-			}
-
-			_refreshTimer = ThreadingHelper
-				.Timer(Refresh)
-				.Interval(TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
 		}
 
 		private void Refresh()
 		{
-			var ids = Invoke(f => f.GetStrategies(_lastCheckTime)).ToArray();
+			var ids = Invoke(f => f.GetStrategies(_lastCheckTime, IsEnglish)).ToArray();
 
 			foreach (var tuple in ids.Where(t => t.Item2 < 0))
 			{
@@ -249,7 +283,7 @@ namespace StockSharp.Community
 		/// <param name="strategy">The strategy data.</param>
 		public void CreateStrategy(StrategyData strategy)
 		{
-			var id = Invoke(f => f.CreateStrategy(SessionId, strategy));
+			var id = Invoke(f => f.CreateStrategy(SessionId, IsEnglish, strategy));
 
 			if (id < 0)
 				ValidateError((byte)-id, strategy.Id, strategy.Price);
@@ -379,6 +413,16 @@ namespace StockSharp.Community
 			ValidateError(Invoke(f => f.StopBacktest(SessionId, backtest.Id)));
 		}
 
+		/// <summary>
+		/// Get strategy info.
+		/// </summary>
+		/// <param name="id">Identifier.</param>
+		/// <returns>The strategy data.</returns>
+		public StrategyData GetDescription(long id)
+		{
+			return Invoke(f => f.GetDescription(new[] { id }))?.FirstOrDefault();
+		}
+
 		private static void ValidateError(byte errorCode, params object[] args)
 		{
 			((ErrorCodes)errorCode).ThrowIfError(args);
@@ -389,7 +433,15 @@ namespace StockSharp.Community
 		/// </summary>
 		protected override void DisposeManaged()
 		{
-			_refreshTimer?.Dispose();
+			lock (_syncObject)
+			{
+				if (_refreshTimer != null)
+				{
+					_refreshTimer.Dispose();
+					_refreshTimer = null;
+				}
+			}
+
 			base.DisposeManaged();
 		}
 	}

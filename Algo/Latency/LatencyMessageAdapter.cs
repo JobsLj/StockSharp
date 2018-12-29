@@ -17,8 +17,6 @@ namespace StockSharp.Algo.Latency
 {
 	using System;
 
-	using Ecng.Common;
-
 	using StockSharp.Messages;
 
 	/// <summary>
@@ -42,14 +40,8 @@ namespace StockSharp.Algo.Latency
 		/// </summary>
 		public ILatencyManager LatencyManager
 		{
-			get { return _latencyManager; }
-			set
-			{
-				if (value == null)
-					throw new ArgumentNullException(nameof(value));
-
-				_latencyManager = value;
-			}
+			get => _latencyManager;
+			set => _latencyManager = value ?? throw new ArgumentNullException(nameof(value));
 		}
 
 		/// <summary>
@@ -58,8 +50,13 @@ namespace StockSharp.Algo.Latency
 		/// <param name="message">Message.</param>
 		public override void SendInMessage(Message message)
 		{
-			if (message.LocalTime.IsDefault())
-				message.LocalTime = InnerAdapter.CurrentTime;
+			if (message.IsBack)
+			{
+				base.SendInMessage(message);
+				return;
+			}
+
+			message.TryInitLocalTime(this);
 
 			LatencyManager.ProcessMessage(message);
 
@@ -72,7 +69,8 @@ namespace StockSharp.Algo.Latency
 		/// <param name="message">The message.</param>
 		protected override void OnInnerAdapterNewOutMessage(Message message)
 		{
-			ProcessExecution(message);
+			if (!message.IsBack)
+				ProcessExecution(message);
 
 			base.OnInnerAdapterNewOutMessage(message);
 		}

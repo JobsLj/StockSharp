@@ -42,8 +42,8 @@ namespace StockSharp.Messages
 		[MainCategory]
 		public string SecurityCode
 		{
-			get { return _securityCode; }
-			set { _securityCode = value; }
+			get => _securityCode;
+			set => _securityCode = value;
 		}
 
 		private string _boardCode;
@@ -53,12 +53,12 @@ namespace StockSharp.Messages
 		/// </summary>
 		[DataMember]
 		[DisplayNameLoc(LocalizedStrings.BoardKey)]
-		[DescriptionLoc(LocalizedStrings.BoardCodeKey)]
+		[DescriptionLoc(LocalizedStrings.BoardCodeKey, true)]
 		[MainCategory]
 		public string BoardCode
 		{
-			get { return _boardCode; }
-			set { _boardCode = value; }
+			get => _boardCode;
+			set => _boardCode = value;
 		}
 
 		private object _native;
@@ -68,15 +68,15 @@ namespace StockSharp.Messages
 		/// </summary>
 		public object Native
 		{
-			get { return _nativeAsInt != 0 ? _nativeAsInt : _native; }
+			get => _nativeAsInt != 0 ? _nativeAsInt : _native;
 			set
 			{
 				_native = value;
 
-				if (value is long)
-					_nativeAsInt = (long)value;
-				else if (value == null)
-					_nativeAsInt = 0;
+				_nativeAsInt = 0;
+
+				if (value is long l)
+					_nativeAsInt = l;
 			}
 		}
 
@@ -87,8 +87,8 @@ namespace StockSharp.Messages
 		/// </summary>
 		public long NativeAsInt
 		{
-			get { return _nativeAsInt; }
-			set { _nativeAsInt = value; }
+			get => _nativeAsInt;
+			set => _nativeAsInt = value;
 		}
 
 		private SecurityTypes? _securityType;
@@ -98,8 +98,8 @@ namespace StockSharp.Messages
 		/// </summary>
 		public SecurityTypes? SecurityType
 		{
-			get { return _securityType; }
-			set { _securityType = value; }
+			get => _securityType;
+			set => _securityType = value;
 		}
 
 		/// <summary>
@@ -178,25 +178,32 @@ namespace StockSharp.Messages
 			return EnsureGetHashCode();
 		}
 
-		private int EnsureGetHashCode()
+		/// <summary>
+		/// Evaluate and cache hash code.
+		/// </summary>
+		public void EnsureHashCode()
 		{
 			if (_hashCode == 0)
 			{
 				_hashCode = (_nativeAsInt != 0 ? _nativeAsInt.GetHashCode() : _native?.GetHashCode())
-					?? (_securityCode + _boardCode).ToLowerInvariant().GetHashCode();
+						?? (_securityCode + _boardCode).ToLowerInvariant().GetHashCode();
 			}
+		}
 
+		private int EnsureGetHashCode()
+		{
+			EnsureHashCode();
 			return _hashCode;
 		}
 
 		/// <summary>
-		/// Compare <see cref="Currency"/> on the equivalence.
+		/// Compare <see cref="SecurityId"/> on the equivalence.
 		/// </summary>
 		/// <param name="other">Another value with which to compare.</param>
 		/// <returns><see langword="true" />, if the specified object is equal to the current object, otherwise, <see langword="false" />.</returns>
 		public override bool Equals(object other)
 		{
-			return Equals((SecurityId)other);
+			return other is SecurityId secId && Equals(secId);
 		}
 
 		/// <summary>
@@ -246,7 +253,18 @@ namespace StockSharp.Messages
 		/// <returns>A string that represents the current object.</returns>
 		public override string ToString()
 		{
-			return $"S#:{SecurityCode}@{BoardCode}, Native:{Native},Type:{SecurityType}";
+			var id = $"S#:{SecurityCode}@{BoardCode}, Native:{Native},Type:{SecurityType}";
+
+			if (!Isin.IsEmpty())
+				id += $",ISIN:{Isin}";
+
+			if (!IQFeed.IsEmpty())
+				id += $",IQFeed:{IQFeed}";
+
+			if (InteractiveBrokers != null)
+				id += $",IB:{InteractiveBrokers}";
+
+			return id;
 		}
 	}
 }

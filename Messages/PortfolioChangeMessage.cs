@@ -29,6 +29,8 @@ namespace StockSharp.Messages
 	/// </summary>
 	[DataContract]
 	[Serializable]
+	[DisplayNameLoc(LocalizedStrings.PortfolioKey)]
+	[DescriptionLoc(LocalizedStrings.Str541Key)]
 	public sealed class PortfolioChangeMessage : BaseChangeMessage<PositionChangeTypes>
 	{
 		/// <summary>
@@ -45,9 +47,18 @@ namespace StockSharp.Messages
 		/// </summary>
 		[DataMember]
 		[DisplayNameLoc(LocalizedStrings.BoardKey)]
-		[DescriptionLoc(LocalizedStrings.BoardCodeKey)]
+		[DescriptionLoc(LocalizedStrings.BoardCodeKey, true)]
 		[MainCategory]
 		public string BoardCode { get; set; }
+
+		/// <summary>
+		/// Client code assigned by the broker.
+		/// </summary>
+		[DataMember]
+		[MainCategory]
+		[DisplayNameLoc(LocalizedStrings.ClientCodeKey)]
+		[DescriptionLoc(LocalizedStrings.ClientCodeDescKey)]
+		public string ClientCode { get; set; }
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="PortfolioChangeMessage"/>.
@@ -68,7 +79,8 @@ namespace StockSharp.Messages
 				LocalTime = LocalTime,
 				PortfolioName = PortfolioName,
 				BoardCode = BoardCode,
-				ServerTime = ServerTime
+				ServerTime = ServerTime,
+				ClientCode = ClientCode,
 			};
 
 			msg.Changes.AddRange(Changes);
@@ -77,10 +89,7 @@ namespace StockSharp.Messages
 			return msg;
 		}
 
-		/// <summary>
-		/// Returns a string that represents the current object.
-		/// </summary>
-		/// <returns>A string that represents the current object.</returns>
+		/// <inheritdoc />
 		public override string ToString()
 		{
 			return base.ToString() + $",P={PortfolioName},Changes={Changes.Select(c => c.ToString()).Join(",")}";

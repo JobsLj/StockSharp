@@ -20,6 +20,7 @@ namespace StockSharp.Algo
 
 	using Ecng.Common;
 
+	using StockSharp.Algo.Candles;
 	using StockSharp.BusinessEntities;
 	using StockSharp.Logging;
 	using StockSharp.Messages;
@@ -27,299 +28,192 @@ namespace StockSharp.Algo
 
 	partial class Connector
 	{
-		/// <summary>
-		/// Own trade received.
-		/// </summary>
+		/// <inheritdoc />
 		public event Action<MyTrade> NewMyTrade;
 
-		/// <summary>
-		/// Own trades received.
-		/// </summary>
+		/// <inheritdoc />
 		public event Action<IEnumerable<MyTrade>> NewMyTrades;
 
-		/// <summary>
-		/// Tick trade received.
-		/// </summary>
+		/// <inheritdoc />
 		public event Action<Trade> NewTrade;
 
-		/// <summary>
-		/// Tick trades received.
-		/// </summary>
+		/// <inheritdoc />
 		public event Action<IEnumerable<Trade>> NewTrades;
 
-		/// <summary>
-		/// Order received.
-		/// </summary>
+		/// <inheritdoc />
 		public event Action<Order> NewOrder;
 
-		/// <summary>
-		/// Orders received.
-		/// </summary>
+		/// <inheritdoc />
 		public event Action<IEnumerable<Order>> NewOrders;
 
-		/// <summary>
-		/// Order changed (cancelled, matched).
-		/// </summary>
+		/// <inheritdoc />
 		public event Action<Order> OrderChanged;
 
-		/// <summary>
-		/// Stop-orders received.
-		/// </summary>
+		/// <inheritdoc />
 		public event Action<IEnumerable<Order>> NewStopOrders;
 
-		/// <summary>
-		/// Orders changed (cancelled, matched).
-		/// </summary>
+		/// <inheritdoc />
 		public event Action<IEnumerable<Order>> OrdersChanged;
 
-		/// <summary>
-		/// Order registration error event.
-		/// </summary>
+		/// <inheritdoc />
 		public event Action<OrderFail> OrderRegisterFailed;
 
-		/// <summary>
-		/// Order cancellation error event.
-		/// </summary>
+		/// <inheritdoc />
 		public event Action<OrderFail> OrderCancelFailed;
 
-		/// <summary>
-		/// Stop-orders changed.
-		/// </summary>
+		/// <inheritdoc />
 		public event Action<IEnumerable<Order>> StopOrdersChanged;
 
-		/// <summary>
-		/// Stop-order registration error event.
-		/// </summary>
+		/// <inheritdoc />
 		public event Action<OrderFail> StopOrderRegisterFailed;
 
-		/// <summary>
-		/// Stop-order cancellation error event.
-		/// </summary>
+		/// <inheritdoc />
 		public event Action<OrderFail> StopOrderCancelFailed;
 
-		/// <summary>
-		/// Stop-order received.
-		/// </summary>
+		/// <inheritdoc />
 		public event Action<Order> NewStopOrder;
 
-		/// <summary>
-		/// Stop order state change event.
-		/// </summary>
+		/// <inheritdoc />
 		public event Action<Order> StopOrderChanged;
 
-		/// <summary>
-		/// Security received.
-		/// </summary>
+		/// <inheritdoc />
 		public event Action<Security> NewSecurity;
 
-		/// <summary>
-		/// Order registration errors event.
-		/// </summary>
+		/// <inheritdoc />
 		public event Action<IEnumerable<OrderFail>> OrdersRegisterFailed;
 
-		/// <summary>
-		/// Order cancellation errors event.
-		/// </summary>
+		/// <inheritdoc />
 		public event Action<IEnumerable<OrderFail>> OrdersCancelFailed;
 
-		/// <summary>
-		/// Mass order cancellation event.
-		/// </summary>
+		/// <inheritdoc />
 		public event Action<long> MassOrderCanceled;
 
-		/// <summary>
-		/// Mass order cancellation errors event.
-		/// </summary>
+		/// <inheritdoc />
 		public event Action<long, Exception> MassOrderCancelFailed;
 
-		/// <summary>
-		/// Stop-order registration errors event.
-		/// </summary>
+		/// <inheritdoc />
+		public event Action<long, Exception> OrderStatusFailed;
+
+		/// <inheritdoc />
 		public event Action<IEnumerable<OrderFail>> StopOrdersRegisterFailed;
 
-		/// <summary>
-		/// Stop-order cancellation errors event.
-		/// </summary>
+		/// <inheritdoc />
 		public event Action<IEnumerable<OrderFail>> StopOrdersCancelFailed;
 
-		/// <summary>
-		/// Securities received.
-		/// </summary>
+		/// <inheritdoc />
 		public event Action<IEnumerable<Security>> NewSecurities;
 
-		/// <summary>
-		/// Security changed.
-		/// </summary>
+		/// <inheritdoc />
 		public event Action<Security> SecurityChanged;
 
-		/// <summary>
-		/// Securities changed.
-		/// </summary>
+		/// <inheritdoc />
 		public event Action<IEnumerable<Security>> SecuritiesChanged;
 
-		/// <summary>
-		/// New portfolio received.
-		/// </summary>
+		/// <inheritdoc />
 		public event Action<Portfolio> NewPortfolio;
 
-		/// <summary>
-		/// Portfolios received.
-		/// </summary>
+		/// <inheritdoc />
 		public event Action<IEnumerable<Portfolio>> NewPortfolios;
 
-		/// <summary>
-		/// Portfolio changed.
-		/// </summary>
+		/// <inheritdoc />
 		public event Action<Portfolio> PortfolioChanged;
 
-		/// <summary>
-		/// Portfolios changed.
-		/// </summary>
+		/// <inheritdoc />
 		public event Action<IEnumerable<Portfolio>> PortfoliosChanged;
 
-		/// <summary>
-		/// Position received.
-		/// </summary>
+		/// <inheritdoc />
 		public event Action<Position> NewPosition;
 
-		/// <summary>
-		/// Positions received.
-		/// </summary>
+		/// <inheritdoc />
 		public event Action<IEnumerable<Position>> NewPositions;
 
-		/// <summary>
-		/// Position changed.
-		/// </summary>
+		/// <inheritdoc />
 		public event Action<Position> PositionChanged;
 
-		/// <summary>
-		/// Positions changed.
-		/// </summary>
+		/// <inheritdoc />
 		public event Action<IEnumerable<Position>> PositionsChanged;
 
-		/// <summary>
-		/// Order book received.
-		/// </summary>
+		/// <inheritdoc />
 		public event Action<MarketDepth> NewMarketDepth;
 
-		/// <summary>
-		/// Order book changed.
-		/// </summary>
+		/// <inheritdoc />
 		public event Action<MarketDepth> MarketDepthChanged;
 
-		/// <summary>
-		/// Order books received.
-		/// </summary>
+		/// <inheritdoc />
 		public event Action<IEnumerable<MarketDepth>> NewMarketDepths;
 
-		/// <summary>
-		/// Order books changed.
-		/// </summary>
+		/// <inheritdoc />
 		public event Action<IEnumerable<MarketDepth>> MarketDepthsChanged;
 
-		/// <summary>
-		/// Order log received.
-		/// </summary>
+		/// <inheritdoc />
 		public event Action<OrderLogItem> NewOrderLogItem;
 
-		/// <summary>
-		/// Order log received.
-		/// </summary>
+		/// <inheritdoc />
 		public event Action<IEnumerable<OrderLogItem>> NewOrderLogItems;
 
-		/// <summary>
-		/// Server time changed <see cref="IConnector.ExchangeBoards"/>. It passed the time difference since the last call of the event. The first time the event passes the value <see cref="TimeSpan.Zero"/>.
-		/// </summary>
+		/// <inheritdoc />
 		public event Action<TimeSpan> MarketTimeChanged;
 
-		/// <summary>
-		/// News received.
-		/// </summary>
+		/// <inheritdoc />
 		public event Action<News> NewNews;
 
-		/// <summary>
-		/// News updated (news body received <see cref="StockSharp.BusinessEntities.News.Story"/>).
-		/// </summary>
+		/// <inheritdoc />
 		public event Action<News> NewsChanged;
 
-		/// <summary>
-		/// Message processed <see cref="Message"/>.
-		/// </summary>
+		/// <inheritdoc />
 		public event Action<Message> NewMessage;
 
-		/// <summary>
-		/// Connected.
-		/// </summary>
+		/// <inheritdoc />
 		public event Action Connected;
 
-		/// <summary>
-		/// Disconnected.
-		/// </summary>
+		/// <inheritdoc />
 		public event Action Disconnected;
 
-		/// <summary>
-		/// Connection error (for example, the connection was aborted by server).
-		/// </summary>
+		/// <inheritdoc />
 		public event Action<Exception> ConnectionError;
 
-		/// <summary>
-		/// Connected.
-		/// </summary>
+		/// <inheritdoc />
 		public event Action<IMessageAdapter> ConnectedEx;
 
-		/// <summary>
-		/// Disconnected.
-		/// </summary>
+		/// <inheritdoc />
 		public event Action<IMessageAdapter> DisconnectedEx;
 
-		/// <summary>
-		/// Connection error (for example, the connection was aborted by server).
-		/// </summary>
+		/// <inheritdoc />
 		public event Action<IMessageAdapter, Exception> ConnectionErrorEx;
 
 		/// <summary>
-		/// Dats process error.
+		/// Data process error.
 		/// </summary>
 		public event Action<Exception> Error;
 
-		/// <summary>
-		/// Lookup result <see cref="IConnector.LookupSecurities(Security)"/> received.
-		/// </summary>
-		public event Action<Exception, IEnumerable<Security>> LookupSecuritiesResult;
+		/// <inheritdoc />
+		public event Action<SecurityLookupMessage, IEnumerable<Security>, Exception> LookupSecuritiesResult;
 
-		/// <summary>
-		/// Lookup result <see cref="IConnector.LookupPortfolios"/> received.
-		/// </summary>
-		public event Action<Exception, IEnumerable<Portfolio>> LookupPortfoliosResult;
+		/// <inheritdoc />
+		public event Action<PortfolioLookupMessage, IEnumerable<Portfolio>, Exception> LookupPortfoliosResult;
 
-		/// <summary>
-		/// Successful subscription market-data.
-		/// </summary>
+		/// <inheritdoc />
+		public event Action<BoardLookupMessage, IEnumerable<ExchangeBoard>, Exception> LookupBoardsResult;
+
+		/// <inheritdoc />
 		public event Action<Security, MarketDataMessage> MarketDataSubscriptionSucceeded;
 
-		/// <summary>
-		/// Error subscription market-data.
-		/// </summary>
+		/// <inheritdoc />
 		public event Action<Security, MarketDataMessage, Exception> MarketDataSubscriptionFailed;
 
-		/// <summary>
-		/// Successful unsubscription market-data.
-		/// </summary>
+		/// <inheritdoc />
 		public event Action<Security, MarketDataMessage> MarketDataUnSubscriptionSucceeded;
 
-		/// <summary>
-		/// Error unsubscription market-data.
-		/// </summary>
+		/// <inheritdoc />
 		public event Action<Security, MarketDataMessage, Exception> MarketDataUnSubscriptionFailed;
 
-		/// <summary>
-		/// Session changed.
-		/// </summary>
+		/// <inheritdoc />
+		public event Action<Security, MarketDataFinishedMessage> MarketDataSubscriptionFinished;
+
+		/// <inheritdoc />
 		public event Action<ExchangeBoard, SessionStates> SessionStateChanged;
 
-		/// <summary>
-		/// Security changed.
-		/// </summary>
+		/// <inheritdoc />
 		public event Action<Security, IEnumerable<KeyValuePair<Level1Fields, object>>, DateTimeOffset, DateTimeOffset> ValuesChanged;
 
 		/// <summary>
@@ -332,8 +226,20 @@ namespace StockSharp.Algo
 		/// </summary>
 		public event Action TimeOut;
 
+		/// <summary>
+		/// A new value for processing occurrence event.
+		/// </summary>
+		public event Action<CandleSeries, Candle> CandleSeriesProcessing;
+
+		/// <summary>
+		/// The series processing end event.
+		/// </summary>
+		public event Action<CandleSeries> CandleSeriesStopped;
+
 		private void RaiseNewMyTrade(MyTrade trade)
 		{
+			this.AddInfoLog("New own trade: {0}", trade);
+
 			NewMyTrade?.Invoke(trade);
 			NewMyTrades?.Invoke(new[] { trade });
 		}
@@ -376,16 +282,6 @@ namespace StockSharp.Algo
 			StopOrdersChanged?.Invoke(new[] { stopOrder });
 		}
 
-		private void RaiseStopOrdersChanged(IEnumerable<Order> stopOrders)
-		{
-			foreach (var stopOrder in stopOrders)
-			{
-				StopOrderChanged?.Invoke(stopOrder);
-			}
-
-			StopOrdersChanged?.Invoke(stopOrders);
-		}
-
 		private void RaiseOrderRegisterFailed(OrderFail fail)
 		{
 			OrderRegisterFailed?.Invoke(fail);
@@ -426,6 +322,11 @@ namespace StockSharp.Algo
 		private void RaiseMassOrderCancelFailed(long transactionId, Exception error)
 		{
 			MassOrderCancelFailed?.Invoke(transactionId, error);
+		}
+
+		private void RaiseOrderStatusFailed(long transactionId, Exception error)
+		{
+			OrderStatusFailed?.Invoke(transactionId, error);
 		}
 
 		private void RaiseNewSecurity(Security security)
@@ -608,49 +509,78 @@ namespace StockSharp.Algo
 		/// <summary>
 		/// To call the event <see cref="LookupSecuritiesResult"/>.
 		/// </summary>
-		/// <param name="error">An error of security lookup operation. The value will be <see langword="null"/> if operation complete successfully.</param>
+		/// <param name="message">Message.</param>
+		/// <param name="error">An error of lookup operation. The value will be <see langword="null"/> if operation complete successfully.</param>
 		/// <param name="securities">Found instruments.</param>
-		private void RaiseLookupSecuritiesResult(Exception error, IEnumerable<Security> securities)
+		private void RaiseLookupSecuritiesResult(SecurityLookupMessage message, Exception error, IEnumerable<Security> securities)
 		{
-			LookupSecuritiesResult?.Invoke(error, securities);
+			LookupSecuritiesResult?.Invoke(message, securities, error);
+		}
+
+		/// <summary>
+		/// To call the event <see cref="LookupBoardsResult"/>.
+		/// </summary>
+		/// <param name="message">Message.</param>
+		/// <param name="error">An error of lookup operation. The value will be <see langword="null"/> if operation complete successfully.</param>
+		/// <param name="boards">Found boards.</param>
+		private void RaiseLookupBoardsResult(BoardLookupMessage message, Exception error, IEnumerable<ExchangeBoard> boards)
+		{
+			LookupBoardsResult?.Invoke(message, boards, error);
 		}
 
 		/// <summary>
 		/// To call the event <see cref="LookupPortfoliosResult"/>.
 		/// </summary>
-		/// <param name="error">An error of portfolio lookup operation. The value will be <see langword="null"/> if operation complete successfully.</param>
+		/// <param name="message">Message.</param>
+		/// <param name="error">An error of lookup operation. The value will be <see langword="null"/> if operation complete successfully.</param>
 		/// <param name="portfolios">Found portfolios.</param>
-		private void RaiseLookupPortfoliosResult(Exception error, IEnumerable<Portfolio> portfolios)
+		private void RaiseLookupPortfoliosResult(PortfolioLookupMessage message, Exception error, IEnumerable<Portfolio> portfolios)
 		{
-			LookupPortfoliosResult?.Invoke(error, portfolios);
+			LookupPortfoliosResult?.Invoke(message, portfolios, error);
 		}
 
 		private void RaiseMarketDataSubscriptionSucceeded(Security security, MarketDataMessage message)
 		{
-			var msg = LocalizedStrings.Str690Params.Put(security.Id, message.DataType);
+			var msg = LocalizedStrings.SubscribedOk.Put(security?.Id,
+				message.DataType + (message.DataType.IsCandleDataType() ? " " + message.Arg : string.Empty));
 
 			if (message.From != null && message.To != null)
 				msg += LocalizedStrings.Str691Params.Put(message.From.Value, message.To.Value);
 
-			this.AddInfoLog(msg + ".");
+			this.AddDebugLog(msg + ".");
 
 			MarketDataSubscriptionSucceeded?.Invoke(security, message);
 		}
 
 		private void RaiseMarketDataSubscriptionFailed(Security security, MarketDataMessage message, Exception error)
 		{
-			this.AddErrorLog(LocalizedStrings.Str634Params, security.Id, message.DataType, message.Error);
+			this.AddErrorLog(LocalizedStrings.SubscribedError, security?.Id, message.DataType, error.Message);
 			MarketDataSubscriptionFailed?.Invoke(security, message, error);
 		}
 
 		private void RaiseMarketDataUnSubscriptionSucceeded(Security security, MarketDataMessage message)
 		{
+			var msg = LocalizedStrings.UnSubscribedOk.Put(security?.Id,
+				message.DataType + (message.DataType.IsCandleDataType() ? " " + message.Arg : string.Empty));
+
+			if (message.From != null && message.To != null)
+				msg += LocalizedStrings.Str691Params.Put(message.From.Value, message.To.Value);
+
+			this.AddDebugLog(msg + ".");
+
 			MarketDataUnSubscriptionSucceeded?.Invoke(security, message);
 		}
 
 		private void RaiseMarketDataUnSubscriptionFailed(Security security, MarketDataMessage message, Exception error)
 		{
+			this.AddErrorLog(LocalizedStrings.UnSubscribedError, security?.Id, message.DataType, error.Message);
 			MarketDataUnSubscriptionFailed?.Invoke(security, message, error);
+		}
+
+		private void RaiseMarketDataSubscriptionFinished(Security security, MarketDataFinishedMessage message)
+		{
+			this.AddDebugLog("Market data finished: {0} {1}", security?.Id, message);
+			MarketDataSubscriptionFinished?.Invoke(security, message);
 		}
 
 		/// <summary>
@@ -675,6 +605,16 @@ namespace StockSharp.Algo
 		private void RaiseTimeOut()
 		{
 			TimeOut?.Invoke();
+		}
+
+		private void RaiseCandleSeriesProcessing(CandleSeries series, Candle candle)
+		{
+			CandleSeriesProcessing?.Invoke(series, candle);
+		}
+
+		private void RaiseCandleSeriesStopped(CandleSeries series)
+		{
+			CandleSeriesStopped?.Invoke(series);
 		}
 	}
 }

@@ -53,6 +53,14 @@ namespace StockSharp.Community
 		byte[] ProcessDownload(Guid operationId, int startIndex, int count);
 
 		/// <summary>
+		/// To finish downloading the file.
+		/// </summary>
+		/// <param name="operationId">Operation ID, received from <see cref="BeginDownload"/>.</param>
+		/// <param name="isCancel">Cancel the operation.</param>
+		[OperationContract]
+		void FinishDownload(Guid operationId, bool isCancel);
+
+		/// <summary>
 		/// To start uploading the file to the site.
 		/// </summary>
 		/// <param name="sessionId">Session ID.</param>
@@ -97,5 +105,13 @@ namespace StockSharp.Community
 		/// <returns>The execution result code.</returns>
 		[OperationContract]
 		byte Delete(Guid sessionId, long id);
+
+		/// <summary>
+		/// To get a upload size limit.
+		/// </summary>
+		/// <param name="sessionId">Session ID.</param>
+		/// <returns>Upload size limit.</returns>
+		[OperationContract]
+		long GetUploadLimit(Guid sessionId);
 	}
 }

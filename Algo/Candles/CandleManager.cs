@@ -25,8 +25,6 @@ namespace StockSharp.Algo.Candles
 
 	using MoreLinq;
 
-	using StockSharp.Algo.Storages;
-	using StockSharp.Algo.Candles.Compression;
 	using StockSharp.Logging;
 	using StockSharp.BusinessEntities;
 	using StockSharp.Messages;
@@ -37,24 +35,20 @@ namespace StockSharp.Algo.Candles
 	/// </summary>
 	public class CandleManager : BaseLogReceiver, ICandleManager
 	{
-		private sealed class CandleManagerSourceList : SynchronizedList<ICandleManagerSource>, ICandleManagerSourceList
+		private sealed class CandleManagerSourceList : SynchronizedList<ICandleSource<Candle>>
 		{
 			private sealed class SourceInfo : Disposable
 			{
-				private readonly ICandleManagerSource _source;
+				private readonly ICandleSource<Candle> _source;
 				private readonly CandleManager _manager;
 
-				public SourceInfo(ICandleManagerSource source, CandleManager manager)
+				public SourceInfo(ICandleSource<Candle> source, CandleManager manager)
 				{
-					if (source == null)
-						throw new ArgumentNullException(nameof(source));
-
-					_source = source;
+					_source = source ?? throw new ArgumentNullException(nameof(source));
 					_manager = manager;
 
 					_source.Processing += OnProcessing;
 					_source.Error += _manager.RaiseError;
-					_source.CandleManager = _manager;
 				}
 
 				private void OnProcessing(CandleSeries series, Candle candle)
@@ -78,30 +72,27 @@ namespace StockSharp.Algo.Candles
 				}
 			}
 
-			private readonly SynchronizedDictionary<ICandleManagerSource, SourceInfo> _info = new SynchronizedDictionary<ICandleManagerSource,SourceInfo>();
+			private readonly SynchronizedDictionary<ICandleSource<Candle>, SourceInfo> _info = new SynchronizedDictionary<ICandleSource<Candle>, SourceInfo>();
 			private readonly CandleManager _manager;
 
 			public CandleManagerSourceList(CandleManager manager)
 			{
-				if (manager == null)
-					throw new ArgumentNullException(nameof(manager));
-
-				_manager = manager;
+				_manager = manager ?? throw new ArgumentNullException(nameof(manager));
 			}
 
-			protected override void OnAdded(ICandleManagerSource item)
+			protected override void OnAdded(ICandleSource<Candle> item)
 			{
 				Subscribe(item);
 				base.OnAdded(item);
 			}
 
-			protected override bool OnRemoving(ICandleManagerSource item)
+			protected override bool OnRemoving(ICandleSource<Candle> item)
 			{
 				UnSubscribe(item);
 				return base.OnRemoving(item);
 			}
 
-			protected override void OnInserted(int index, ICandleManagerSource item)
+			protected override void OnInserted(int index, ICandleSource<Candle> item)
 			{
 				Subscribe(item);
 				base.OnInserted(index, item);
@@ -115,12 +106,12 @@ namespace StockSharp.Algo.Candles
 				return base.OnClearing();
 			}
 
-			private void Subscribe(ICandleManagerSource source)
+			private void Subscribe(ICandleSource<Candle> source)
 			{
 				_info.Add(source, new SourceInfo(source, _manager));
 			}
 
-			private void UnSubscribe(ICandleManagerSource source)
+			private void UnSubscribe(ICandleSource<Candle> source)
 			{
 				lock (_info.SyncRoot)
 				{
@@ -131,17 +122,14 @@ namespace StockSharp.Algo.Candles
 			}
 		}
 
-		private sealed class ExternalCandleSource : Disposable, ICandleManagerSource
+		private sealed class ExternalCandleSource : Disposable, ICandleSource<Candle>
 		{
 			private readonly HashSet<CandleSeries> _series = new HashSet<CandleSeries>();
 			private readonly IExternalCandleSource _source;
 
 			public ExternalCandleSource(IExternalCandleSource source)
 			{
-				if (source == null)
-					throw new ArgumentNullException(nameof(source));
-
-				_source = source;
+				_source = source ?? throw new ArgumentNullException(nameof(source));
 				_source.NewCandles += OnNewCandles;
 				_source.Stopped += OnStopped;
 			}
@@ -162,7 +150,7 @@ namespace StockSharp.Algo.Candles
 				return _source.GetSupportedRanges(series);
 			}
 
-			void ICandleSource<Candle>.Start(CandleSeries series, DateTimeOffset from, DateTimeOffset to)
+			void ICandleSource<Candle>.Start(CandleSeries series, DateTimeOffset? from, DateTimeOffset? to)
 			{
 				_series.Add(series);
                 _source.SubscribeCandles(series, from, to);
@@ -206,56 +194,121 @@ namespace StockSharp.Algo.Candles
 
 				base.DisposeManaged();
 			}
-
-			ICandleManager ICandleManagerSource.CandleManager { get; set; }
 		}
 
-		private readonly SynchronizedDictionary<CandleSeries, CandleSourceEnumerator<ICandleManagerSource, Candle>> _series = new SynchronizedDictionary<CandleSeries, CandleSourceEnumerator<ICandleManagerSource, Candle>>();
+		private sealed class ConnectorCandleSource : Disposable, ICandleSource<Candle>
+		{
+			private readonly SynchronizedSet<CandleSeries> _candleSeries = new CachedSynchronizedSet<CandleSeries>();
+
+			private readonly Connector _connector;
+
+			public int SpeedPriority => 1;
+
+			public event Action<CandleSeries, Candle> Processing;
+
+			public event Action<CandleSeries> Stopped;
+
+			public event Action<Exception> Error;
+
+			public ConnectorCandleSource(Connector connector)
+			{
+				_connector = connector ?? throw new ArgumentNullException(nameof(connector));
+				_connector.CandleSeriesProcessing += OnConnectorProcessingCandle;
+				_connector.CandleSeriesStopped += OnConnectorCandleSeriesStopped;
+			}
+
+			private void OnConnectorProcessingCandle(CandleSeries series, Candle candle)
+			{
+				if (_candleSeries.Contains(series))
+					Processing?.Invoke(series, candle);
+			}
+
+			private void OnConnectorCandleSeriesStopped(CandleSeries series)
+			{
+				_candleSeries.Remove(series);
+				Stopped?.Invoke(series);
+			}
+
+			IEnumerable<Range<DateTimeOffset>> ICandleSource<Candle>.GetSupportedRanges(CandleSeries series)
+			{
+				yield return new Range<DateTimeOffset>(DateTimeOffset.MinValue, DateTimeOffset.MaxValue);
+			}
+
+			void ICandleSource<Candle>.Start(CandleSeries series, DateTimeOffset? from, DateTimeOffset? to)
+			{
+				_candleSeries.Add(series);
+				_connector.SubscribeCandles(series, from, to);
+			}
+
+			void ICandleSource<Candle>.Stop(CandleSeries series)
+			{
+				_connector.UnSubscribeCandles(series);
+				_candleSeries.Remove(series);
+			}
+
+			/// <summary>
+			/// Release resources.
+			/// </summary>
+			protected override void DisposeManaged()
+			{
+				_connector.CandleSeriesProcessing -= OnConnectorProcessingCandle;
+				_connector.CandleSeriesStopped -= OnConnectorCandleSeriesStopped;
+
+				base.DisposeManaged();
+			}
+		}
+
+		private readonly SynchronizedDictionary<CandleSeries, CandleSourceEnumerator<ICandleSource<Candle>, Candle>> _series = new SynchronizedDictionary<CandleSeries, CandleSourceEnumerator<ICandleSource<Candle>, Candle>>();
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="CandleManager"/>.
 		/// </summary>
 		public CandleManager()
 		{
-			var builderContainer = new CandleBuilderContainer();
+			Sources = new CandleManagerSourceList(this);
+			//{
+			//	new StorageCandleSource(),
 
-			Sources = new CandleManagerSourceList(this)
-			{
-				new StorageCandleSource(),
-
-				new TimeFrameCandleBuilder(builderContainer),
-				new TickCandleBuilder(builderContainer),
-				new VolumeCandleBuilder(builderContainer),
-				new RangeCandleBuilder(builderContainer),
-				new RenkoCandleBuilder(builderContainer),
-				new PnFCandleBuilder(builderContainer),
-			};
+			//	//new BuilderCandleSource<TimeFrameCandleBuilder>(),
+			//	//new BuilderCandleSource<TickCandleBuilder>(),
+			//	//new BuilderCandleSource<VolumeCandleBuilder>(),
+			//	//new BuilderCandleSource<RangeCandleBuilder>(),
+			//	//new BuilderCandleSource<RenkoCandleBuilder>(),
+			//	//new BuilderCandleSource<PnFCandleBuilder>(),
+			//};
 		}
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="CandleManager"/>.
-		/// </summary>
-		/// <param name="builderSource">The data source for <see cref="ICandleBuilder"/>.</param>
-		public CandleManager(ICandleBuilderSource builderSource)
-			: this()
-		{
-			if (builderSource == null)
-				throw new ArgumentNullException(nameof(builderSource));
+		///// <summary>
+		///// Initializes a new instance of the <see cref="CandleManager"/>.
+		///// </summary>
+		///// <param name="source">The data source for <see cref="IBuilderCandleSource"/>.</param>
+		//public CandleManager(ICandleBuilderSource source)
+		//	: this()
+		//{
+		//	if (source == null)
+		//		throw new ArgumentNullException(nameof(source));
 
-			Sources.OfType<ICandleBuilder>().ForEach(b => b.Sources.Add(builderSource));
-		}
+		//	Sources.OfType<IBuilderCandleSource>().ForEach(b => b.Sources.Add(source));
+		//}
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="CandleManager"/>.
 		/// </summary>
 		/// <param name="connector">The connection to trading system to create the source for tick trades by default.</param>
-		public CandleManager(IConnector connector)
-			: this(new TradeCandleBuilderSource(connector))
+		public CandleManager(Connector connector)
+			: this()
 		{
-			var externalSource = connector as IExternalCandleSource;
-			
-			if (externalSource != null)
-				Sources.Add(new ExternalCandleSource(externalSource));
+			Sources.Add(new ConnectorCandleSource(connector));
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="CandleManager"/>.
+		/// </summary>
+		/// <param name="candleSource">The external candles source (for example, connection <see cref="IConnector"/> which provides the possibility of ready candles getting).</param>
+		public CandleManager(IExternalCandleSource candleSource)
+			: this()
+		{
+			Sources.Add(new ExternalCandleSource(candleSource));
 		}
 
 		private ICandleManagerContainer _container = new CandleManagerContainer();
@@ -265,7 +318,7 @@ namespace StockSharp.Algo.Candles
 		/// </summary>
 		public ICandleManagerContainer Container
 		{
-			get { return _container; }
+			get => _container;
 			set
 			{
 				if (value == null)
@@ -279,20 +332,20 @@ namespace StockSharp.Algo.Candles
 			}
 		}
 
-		private IStorageRegistry _storageRegistry;
+		//private IStorageRegistry _storageRegistry;
 
-		/// <summary>
-		/// The data storage. To be sent to all sources that implement the interface <see cref="IStorageCandleSource"/>.
-		/// </summary>
-		public IStorageRegistry StorageRegistry
-		{
-			get { return _storageRegistry; }
-			set
-			{
-				_storageRegistry = value;
-				Sources.OfType<IStorageCandleSource>().ForEach(s => s.StorageRegistry = value);
-			}
-		}
+		///// <summary>
+		///// The data storage. To be sent to all sources that implement the interface <see cref="IStorageCandleSource"/>.
+		///// </summary>
+		//public IStorageRegistry StorageRegistry
+		//{
+		//	get => _storageRegistry;
+		//	set
+		//	{
+		//		_storageRegistry = value;
+		//		Sources.OfType<IStorageCandleSource>().ForEach(s => s.StorageRegistry = value);
+		//	}
+		//}
 
 		/// <summary>
 		/// All currently active candles series started via <see cref="Start"/>.
@@ -305,15 +358,12 @@ namespace StockSharp.Algo.Candles
 		/// <summary>
 		/// Candles sources.
 		/// </summary>
-		public ICandleManagerSourceList Sources { get; }
+		public IList<ICandleSource<Candle>> Sources { get; }
 
 		/// <summary>
 		/// The source priority by speed (0 - the best).
 		/// </summary>
-		public int SpeedPriority
-		{
-			get { throw new NotSupportedException(); }
-		}
+		public int SpeedPriority => throw new NotSupportedException();
 
 		/// <summary>
 		/// A new value for processing occurrence event.
@@ -349,20 +399,21 @@ namespace StockSharp.Algo.Candles
 		/// <param name="series">The candles series for which data receiving should be started.</param>
 		/// <param name="from">The initial date from which you need to get data.</param>
 		/// <param name="to">The final date by which you need to get data.</param>
-		public virtual void Start(CandleSeries series, DateTimeOffset from, DateTimeOffset to)
+		public virtual void Start(CandleSeries series, DateTimeOffset? from, DateTimeOffset? to)
 		{
 			if (series == null)
 				throw new ArgumentNullException(nameof(series));
 
-			CandleSourceEnumerator<ICandleManagerSource, Candle> enumerator;
+			CandleSourceEnumerator<ICandleSource<Candle>, Candle> enumerator;
 
 			lock (_series.SyncRoot)
 			{
 				if (_series.ContainsKey(series))
 					throw new ArgumentException(LocalizedStrings.Str650Params.Put(series), nameof(series));
 
-				enumerator = new CandleSourceEnumerator<ICandleManagerSource, Candle>(series, from, to,
-					series.Security is IndexSecurity ? (IEnumerable<ICandleManagerSource>)new[] { new IndexSecurityCandleManagerSource(this, from, to) } : Sources,
+				enumerator = new CandleSourceEnumerator<ICandleSource<Candle>, Candle>(series, from, to,
+					//series.Security is IndexSecurity ? new[] { new IndexSecurityCandleManagerSource(this, ConfigManager.GetService<ISecurityProvider>(), from, to) } : 
+					Sources,
 					c =>
 					{
 						Processing?.Invoke(series, c);
@@ -378,8 +429,11 @@ namespace StockSharp.Algo.Candles
 				_series.Add(series, enumerator);
 
 				//series.CandleManager = this;
-				series.From = from;
-				series.To = to;
+				if (from != null)
+					series.From = from;
+
+				if (to != null)
+					series.To = to;
 
 				Container.Start(series, from, to);
 			}
@@ -419,7 +473,7 @@ namespace StockSharp.Algo.Candles
 		/// </summary>
 		protected override void DisposeManaged()
 		{
-			lock (Sources.SyncRoot)
+			lock (((CandleManagerSourceList)Sources).SyncRoot)
 			{
 				Sources.ForEach(s => s.Dispose());
 				Sources.Clear();

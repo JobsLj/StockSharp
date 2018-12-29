@@ -105,11 +105,8 @@ namespace StockSharp.Logging
 		/// </summary>
 		public string FileName
 		{
-			get { return _fileName; }
-			set
-			{
-				_fileName = value.IsEmpty() ? null : value;
-			}
+			get => _fileName;
+			set => _fileName = value.IsEmpty() ? null : value;
 		}
 
 		private Encoding _encoding = Encoding.UTF8;
@@ -119,14 +116,8 @@ namespace StockSharp.Logging
 		/// </summary>
 		public Encoding Encoding
 		{
-			get { return _encoding; }
-			set
-			{
-				if (value == null)
-					throw new ArgumentNullException(nameof(value));
-
-				_encoding = value;
-			}
+			get => _encoding;
+			set => _encoding = value ?? throw new ArgumentNullException(nameof(value));
 		}
 
 		private long _maxLength;
@@ -136,7 +127,7 @@ namespace StockSharp.Logging
 		/// </summary>
 		public long MaxLength
 		{
-			get { return _maxLength; }
+			get => _maxLength;
 			set
 			{
 				if (value < 0)
@@ -153,7 +144,7 @@ namespace StockSharp.Logging
 		/// </summary>
 		public int MaxCount
 		{
-			get { return _maxCount; }
+			get => _maxCount;
 			set
 			{
 				if (value < 0)
@@ -178,7 +169,7 @@ namespace StockSharp.Logging
 		/// </remarks>
 		public string LogDirectory
 		{
-			get { return _logDirectory; }
+			get => _logDirectory;
 			set
 			{
 				if (value.IsEmpty())
@@ -202,7 +193,7 @@ namespace StockSharp.Logging
 		/// </summary>
 		public string Extension
 		{
-			get { return _extension; }
+			get => _extension;
 			set
 			{
 				if (value.IsEmpty())
@@ -224,7 +215,7 @@ namespace StockSharp.Logging
 		/// </summary>
 		public string DirectoryDateFormat
 		{
-			get { return _directoryDateFormat; }
+			get => _directoryDateFormat;
 			set
 			{
 				if (value.IsEmpty())

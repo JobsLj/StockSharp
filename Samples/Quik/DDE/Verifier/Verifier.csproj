@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>StockSharp.Quik.Verifier</RootNamespace>
     <AssemblyName>Verifier</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
@@ -91,6 +91,21 @@
     </Reference>
     <Reference Include="Ecng.Xaml">
       <HintPath>..\..\..\..\References\Ecng.Xaml.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Data.v18.1">
+      <HintPath>..\..\..\..\References\DevExpress.Data.v18.1.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Xpf.Core.v18.1">
+      <HintPath>..\..\..\..\References\DevExpress.Xpf.Core.v18.1.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Xpf.Grid.v18.1">
+      <HintPath>..\..\..\..\References\DevExpress.Xpf.Grid.v18.1.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Xpf.Grid.v18.1.Core">
+      <HintPath>..\..\..\..\References\DevExpress.Xpf.Grid.v18.1.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Xpf.Themes.Office2016White.v18.1">
+      <HintPath>..\..\..\..\References\DevExpress.Xpf.Themes.Office2016White.v18.1.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -176,7 +191,7 @@
       <Project>{de2dc640-fa5b-46f2-92e7-e5a53232185f}</Project>
       <Name>Fix</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Connectors\Quik\Quik.csproj">
+    <ProjectReference Include="..\..\..\..\..\StockSharp %28GitLab%29\Connectors\Quik\Quik.csproj">
       <Project>{1B798A4E-2271-46F9-9C2D-4E563114E268}</Project>
       <Name>Quik</Name>
     </ProjectReference>

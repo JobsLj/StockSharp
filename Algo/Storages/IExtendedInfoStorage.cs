@@ -9,7 +9,9 @@ namespace StockSharp.Algo.Storages
 
 	using Ecng.Collections;
 	using Ecng.Common;
+	using Ecng.Serialization;
 
+	using StockSharp.Logging;
 	using StockSharp.Messages;
 
 	/// <summary>
@@ -18,22 +20,50 @@ namespace StockSharp.Algo.Storages
 	public interface IExtendedInfoStorageItem
 	{
 		/// <summary>
-		/// Names of extended security fields.
+		/// Extended fields (names and types).
 		/// </summary>
-		string[] Fields { get; }
+		IEnumerable<Tuple<string, Type>> Fields { get; }
+
+		/// <summary>
+		/// Get all security identifiers.
+		/// </summary>
+		IEnumerable<SecurityId> Securities { get; }
+
+		/// <summary>
+		/// Storage name.
+		/// </summary>
+		string StorageName { get; }
+
+		/// <summary>
+		/// Initialize the storage.
+		/// </summary>
+		void Init();
 
 		/// <summary>
 		/// Add extended info.
 		/// </summary>
 		/// <param name="securityId">Security identifier.</param>
 		/// <param name="extensionInfo">Extended information.</param>
-		void Add(SecurityId securityId, IDictionary<object, object> extensionInfo);
+		void Add(SecurityId securityId, IDictionary<string, object> extensionInfo);
 
 		/// <summary>
 		/// Load extended info. 
 		/// </summary>
 		/// <returns>Extended information.</returns>
-		IEnumerable<Tuple<SecurityId, IDictionary<object, object>>> Load();
+		IEnumerable<Tuple<SecurityId, IDictionary<string, object>>> Load();
+
+		/// <summary>
+		/// Load extended info. 
+		/// </summary>
+		/// <param name="securityId">Security identifier.</param>
+		/// <returns>Extended information.</returns>
+		IDictionary<string, object> Load(SecurityId securityId);
+
+		/// <summary>
+		/// Delete extended info.
+		/// </summary>
+		/// <param name="securityId">Security identifier.</param>
+		void Delete(SecurityId securityId);
 	}
 
 	/// <summary>
@@ -42,12 +72,46 @@ namespace StockSharp.Algo.Storages
 	public interface IExtendedInfoStorage
 	{
 		/// <summary>
-		/// To get and initialize storage for the specified name.
+		/// Get all extended storages.
+		/// </summary>
+		IEnumerable<IExtendedInfoStorageItem> Storages { get; }
+
+		/// <summary>
+		/// Initialize the storage.
+		/// </summary>
+		/// <returns>Possible errors with storage names. Empty dictionary means initialization without any issues.</returns>
+		IDictionary<IExtendedInfoStorageItem, Exception> Init();
+
+		/// <summary>
+		/// To get storage for the specified name.
 		/// </summary>
 		/// <param name="storageName">Storage name.</param>
-		/// <param name="fields">Names of extended security fields.</param>
 		/// <returns>Storage.</returns>
-		IExtendedInfoStorageItem Get(string storageName, string[] fields);
+		IExtendedInfoStorageItem Get(string storageName);
+
+		/// <summary>
+		/// To create storage.
+		/// </summary>
+		/// <param name="storageName">Storage name.</param>
+		/// <param name="fields">Extended fields (names and types).</param>
+		/// <returns>Storage.</returns>
+		IExtendedInfoStorageItem Create(string storageName, Tuple<string, Type>[] fields);
+
+		/// <summary>
+		/// Delete storage.
+		/// </summary>
+		/// <param name="storage">Storage.</param>
+		void Delete(IExtendedInfoStorageItem storage);
+
+		/// <summary>
+		/// The storage was created.
+		/// </summary>
+		event Action<IExtendedInfoStorageItem> Created;
+
+		/// <summary>
+		/// The storage was deleted.
+		/// </summary>
+		event Action<IExtendedInfoStorageItem> Deleted;
 	}
 
 	/// <summary>
@@ -57,61 +121,133 @@ namespace StockSharp.Algo.Storages
 	{
 		private class CsvExtendedInfoStorageItem : IExtendedInfoStorageItem
 		{
+			private readonly CsvExtendedInfoStorage _storage;
 			private readonly string _fileName;
-			private readonly string[] _fields;
+			private Tuple<string, Type>[] _fields;
 			private readonly SyncObject _lock = new SyncObject();
-			private readonly Dictionary<string, Type> _fieldTypes = new Dictionary<string, Type>(StringComparer.InvariantCultureIgnoreCase);
-			private readonly Dictionary<SecurityId, Dictionary<object, object>> _cache = new Dictionary<SecurityId, Dictionary<object, object>>();
-			private bool _isDirty;
+			//private readonly Dictionary<string, Type> _fieldTypes = new Dictionary<string, Type>(StringComparer.InvariantCultureIgnoreCase);
+			private readonly Dictionary<SecurityId, Dictionary<string, object>> _cache = new Dictionary<SecurityId, Dictionary<string, object>>();
 
-			public CsvExtendedInfoStorageItem(string fileName, string[] fields)
+			public CsvExtendedInfoStorageItem(CsvExtendedInfoStorage storage, string fileName)
 			{
 				if (fileName.IsEmpty())
 					throw new ArgumentNullException(nameof(fileName));
 
+				_storage = storage ?? throw new ArgumentNullException(nameof(storage));
+				_fileName = fileName;
+			}
+
+			public CsvExtendedInfoStorageItem(CsvExtendedInfoStorage storage, string fileName, Tuple<string, Type>[] fields)
+				: this(storage, fileName)
+			{
 				if (fields == null)
 					throw new ArgumentNullException(nameof(fields));
 
 				if (fields.IsEmpty())
 					throw new ArgumentOutOfRangeException(nameof(fields));
 
-				_fileName = fileName;
 				_fields = fields;
-
-				ThreadingHelper
-					.Timer(OnFlush)
-					.Interval(TimeSpan.FromSeconds(5));
 			}
 
-			private void OnFlush()
+			public string StorageName => Path.GetFileNameWithoutExtension(_fileName);
+
+			public void Init()
 			{
-				lock (_lock)
+				if (File.Exists(_fileName))
 				{
-					if (!_isDirty)
-						return;
-
-					_isDirty = false;
-
 					CultureInfo.InvariantCulture.DoInCulture(() =>
 					{
-						using (var stream = new FileStream(_fileName, FileMode.Create, FileAccess.Write))
-						using (var writer = new CsvFileWriter(stream))
+						using (var stream = new FileStream(_fileName, FileMode.Open, FileAccess.Read))
 						{
-							writer.WriteRow(new[] { nameof(SecurityId) }.Concat(_fields));
-							writer.WriteRow(new[] { typeof(string) }.Concat(_fields.Select(f => _fieldTypes.TryGetValue(f) ?? typeof(string))).Select(t => Converter.GetAlias(t) ?? t.GetTypeName(false)));
+							var reader = new FastCsvReader(stream, Encoding.UTF8);
 
-							foreach (var pair in _cache)
+							reader.NextLine();
+							reader.Skip();
+
+							var fields = new string[reader.ColumnCount - 1];
+
+							for (var i = 0; i < fields.Length; i++)
+								fields[i] = reader.ReadString();
+
+							reader.NextLine();
+							reader.Skip();
+
+							var types = new Type[reader.ColumnCount - 1];
+
+							for (var i = 0; i < types.Length; i++)
 							{
-								writer.WriteRow(new[] { pair.Key.ToStringId() }.Concat(_fields.Select(f => pair.Value.TryGetValue(f)?.To<string>())));
+								types[i] = reader.ReadString().To<Type>();
+								//_fieldTypes.Add(fields[i], types[i]);
+							}
+
+							if (_fields == null)
+							{
+								if (fields.Length != types.Length)
+									throw new InvalidOperationException($"{fields.Length} != {types.Length}");
+
+								_fields = fields.Select((f, i) => Tuple.Create(f, types[i])).ToArray();
+							}
+
+							while (reader.NextLine())
+							{
+								var secId = reader.ReadString().ToSecurityId();
+
+								var values = new Dictionary<string, object>();
+
+								for (var i = 0; i < fields.Length; i++)
+								{
+									values[fields[i]] = reader.ReadString().To(types[i]);
+								}
+
+								_cache.Add(secId, values);
 							}
 						}
 					});
 				}
+				else
+				{
+					if (_fields == null)
+						throw new InvalidOperationException();
+
+					Write(Enumerable.Empty<Tuple<SecurityId, IDictionary<string, object>>>());
+				}
 			}
 
-			string[] IExtendedInfoStorageItem.Fields => _fields;
+			private void Flush()
+			{
+				_storage.DelayAction.DefaultGroup.Add(() => Write(((IExtendedInfoStorageItem)this).Load()));
+			}
 
-			void IExtendedInfoStorageItem.Add(SecurityId securityId, IDictionary<object, object> extensionInfo)
+			private void Write(IEnumerable<Tuple<SecurityId, IDictionary<string, object>>> values)
+			{
+				if (values == null)
+					throw new ArgumentNullException(nameof(values));
+
+				using (var writer = new CsvFileWriter(new TransactionFileStream(_fileName, FileMode.Create)))
+				{
+					writer.WriteRow(new[] { nameof(SecurityId) }.Concat(_fields.Select(f => f.Item1)));
+					writer.WriteRow(new[] { typeof(string) }.Concat(_fields.Select(f => f.Item2)).Select(t => Converter.GetAlias(t) ?? t.GetTypeName(false)));
+
+					foreach (var pair in values)
+					{
+						writer.WriteRow(new[] { pair.Item1.ToStringId() }.Concat(_fields.Select(f => pair.Item2.TryGetValue(f.Item1)?.To<string>())));
+					}
+				}
+			}
+
+			public void Delete()
+			{
+				_storage.DelayAction.DefaultGroup.Add(() =>
+				{
+					File.Delete(_fileName);
+				});
+
+				_storage._deleted?.Invoke(this);
+			}
+
+			IEnumerable<Tuple<string, Type>> IExtendedInfoStorageItem.Fields => _fields;
+
+			void IExtendedInfoStorageItem.Add(SecurityId securityId, IDictionary<string, object> extensionInfo)
 			{
 				lock (_lock)
 				{
@@ -119,25 +255,25 @@ namespace StockSharp.Algo.Storages
 
 					foreach (var field in _fields)
 					{
-						var value = extensionInfo[field];
+						var value = extensionInfo.TryGetValue(field.Item1);
 
 						if (value == null)
 							continue;
 
-						dict[field] = value;
+						dict[field.Item1] = value;
 
-						_fieldTypes.TryAdd(field, value.GetType());
-
-						_isDirty = true;
+						//_fieldTypes.TryAdd(field, value.GetType());
 					}
 				}
+
+				Flush();
 			}
 
-			IEnumerable<Tuple<SecurityId, IDictionary<object, object>>> IExtendedInfoStorageItem.Load()
+			IEnumerable<Tuple<SecurityId, IDictionary<string, object>>> IExtendedInfoStorageItem.Load()
 			{
 				lock (_lock)
 				{
-					var retVal = new Tuple<SecurityId, IDictionary<object, object>>[_cache.Count];
+					var retVal = new Tuple<SecurityId, IDictionary<string, object>>[_cache.Count];
 
 					var i = 0;
 					foreach (var pair in _cache)
@@ -150,57 +286,31 @@ namespace StockSharp.Algo.Storages
 				}
 			}
 
-			public void Init()
+			IDictionary<string, object> IExtendedInfoStorageItem.Load(SecurityId securityId)
 			{
-				if (!File.Exists(_fileName))
-					return;
+				lock (_lock)
+					return _cache.TryGetValue(securityId)?.ToDictionary();
+			}
 
-				CultureInfo.InvariantCulture.DoInCulture(() =>
+			void IExtendedInfoStorageItem.Delete(SecurityId securityId)
+			{
+				lock (_lock)
+					_cache.Remove(securityId);
+
+				Flush();
+			}
+
+			IEnumerable<SecurityId> IExtendedInfoStorageItem.Securities
+			{
+				get
 				{
-					using (var stream = new FileStream(_fileName, FileMode.Open, FileAccess.Read))
-					{
-						var reader = new FastCsvReader(stream, Encoding.UTF8);
-
-						reader.NextLine();
-						reader.Skip();
-
-						var fields = new string[reader.ColumnCount - 1];
-
-						for (var i = 0; i < reader.ColumnCount - 1; i++)
-							fields[i] = reader.ReadString();
-
-						reader.NextLine();
-						reader.Skip();
-
-						var types = new Type[reader.ColumnCount - 1];
-
-						for (var i = 0; i < reader.ColumnCount - 1; i++)
-						{
-							types[i] = reader.ReadString().To<Type>();
-							_fieldTypes.Add(fields[i], types[i]);
-						}
-
-						var idGenerator = new SecurityIdGenerator();
-
-						while (reader.NextLine())
-						{
-							var secId = idGenerator.Split(reader.ReadString());
-
-							var values = new Dictionary<object, object>();
-
-							for (var i = 0; i < fields.Length; i++)
-							{
-								values[fields[i]] = reader.ReadString().To(types[i]);
-							}
-
-							_cache.Add(secId, values);
-						}
-					}
-				});
+					lock (_lock)
+						return _cache.Keys.ToArray();
+				}
 			}
 		}
 
-		private readonly SynchronizedDictionary<string, CsvExtendedInfoStorageItem> _items = new SynchronizedDictionary<string, CsvExtendedInfoStorageItem>(StringComparer.InvariantCultureIgnoreCase);
+		private readonly CachedSynchronizedDictionary<string, CsvExtendedInfoStorageItem> _items = new CachedSynchronizedDictionary<string, CsvExtendedInfoStorageItem>(StringComparer.InvariantCultureIgnoreCase);
 		private readonly string _path;
 
 		/// <summary>
@@ -214,27 +324,98 @@ namespace StockSharp.Algo.Storages
 
 			_path = path.ToFullPath();
 			Directory.CreateDirectory(path);
+
+			_delayAction = new DelayAction(ex => ex.LogError());
 		}
 
+		private DelayAction _delayAction;
+
 		/// <summary>
-		/// To get and initialize storage for the specified name.
+		/// The time delayed action.
 		/// </summary>
-		/// <param name="storageName">Storage name.</param>
-		/// <param name="fields">Names of extended security fields.</param>
-		/// <returns>Storage.</returns>
-		public IExtendedInfoStorageItem Get(string storageName, string[] fields)
+		public DelayAction DelayAction
+		{
+			get => _delayAction;
+			set => _delayAction = value ?? throw new ArgumentNullException(nameof(value));
+		}
+
+		IExtendedInfoStorageItem IExtendedInfoStorage.Create(string storageName, Tuple<string, Type>[] fields)
 		{
 			if (storageName.IsEmpty())
 				throw new ArgumentNullException(nameof(storageName));
 
-			var fileName = Path.Combine(_path, storageName + ".csv");
-
-			return _items.SafeAdd(storageName, key =>
+			var retVal = _items.SafeAdd(storageName, key =>
 			{
-				var item = new CsvExtendedInfoStorageItem(fileName, fields);
+				var item = new CsvExtendedInfoStorageItem(this, Path.Combine(_path, key + ".csv"), fields);
 				item.Init();
 				return item;
-			});
+			}, out var isNew);
+
+			if (isNew)
+				_created?.Invoke(retVal);
+
+			return retVal;
+		}
+
+		void IExtendedInfoStorage.Delete(IExtendedInfoStorageItem storage)
+		{
+			if (storage == null)
+				throw new ArgumentNullException(nameof(storage));
+
+			if (_items.Remove(storage.StorageName))
+			{
+				((CsvExtendedInfoStorageItem)storage).Delete();
+			}
+		}
+
+		private Action<IExtendedInfoStorageItem> _created;
+
+		event Action<IExtendedInfoStorageItem> IExtendedInfoStorage.Created
+		{
+			add => _created += value;
+			remove => _created -= value;
+		}
+
+		private Action<IExtendedInfoStorageItem> _deleted;
+
+		event Action<IExtendedInfoStorageItem> IExtendedInfoStorage.Deleted
+		{
+			add => _deleted += value;
+			remove => _deleted -= value;
+		}
+
+		IExtendedInfoStorageItem IExtendedInfoStorage.Get(string storageName)
+		{
+			if (storageName.IsEmpty())
+				throw new ArgumentNullException(nameof(storageName));
+
+			return _items.TryGetValue(storageName);
+		}
+
+		IEnumerable<IExtendedInfoStorageItem> IExtendedInfoStorage.Storages => _items.CachedValues;
+
+		/// <inheritdoc />
+		public IDictionary<IExtendedInfoStorageItem, Exception> Init()
+		{
+			var errors = new Dictionary<IExtendedInfoStorageItem, Exception>();
+
+			foreach (var fileName in Directory.GetFiles(_path, "*.csv"))
+			{
+				var item = new CsvExtendedInfoStorageItem(this, fileName);
+
+				_items.Add(Path.GetFileNameWithoutExtension(fileName), item);
+
+				try
+				{
+					item.Init();
+				}
+				catch (Exception ex)
+				{
+					errors.Add(item, ex);
+				}
+			}
+
+			return errors;
 		}
 	}
 }
